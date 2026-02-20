@@ -14,22 +14,24 @@ export const columns: ColumnDef<Cliente>[] = [
   {
     accessorKey: 'documento',
     header: () => h('div', 'Tipo y Nro Documento'),
-    cell: ({row})=> `${TipoDocumento[row.original.tipoDocumento]} - ${row.original.nroDocumento} `,
-  },  
-  {
-    accessorKey: 'email',
-    header: () => h('div', 'Email'),
-    cell: info=> info.getValue()
-  },
+    cell: ({row})=>
+      (row.original.tipoDocumento || row.original.nroDocumento)
+        ? `${TipoDocumento[row.original.tipoDocumento] ?? ''}  ${row.original.nroDocumento ?? ''}`
+        : '-'
+  }, 
   {
     accessorKey: 'telefono',
     header: () => h('div', 'Teléfono'),
-    cell: info=> info.getValue()
+    cell: ({ row }) =>
+      row.original.telefono ?? '-'
   },
   {
     accessorKey: 'localidad',
     header: () => h('div', 'Localidad'),
-    cell: ({row})=> `${row.original.localidad.localidad}, ${row.original.localidad.provincia.provincia}`,
+    cell: ({ row }) =>
+      row.original.localidad
+        ? `${row.original.localidad.localidad}, ${row.original.localidad.provincia.provincia}`
+        : '-'
   },  
   {
     accessorKey: 'actions',

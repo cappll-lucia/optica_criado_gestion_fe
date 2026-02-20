@@ -242,62 +242,62 @@ export const routerRoutes = [
 			    auth: true,
 		    },
         },
-        {
-            path: '/ventas',
-            name:'ventas',
-            component: ()=> import('../views/Ventas/Ventas.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/ventas/new',
-            name:'new-venta',
-            component: ()=> import('../views/Ventas/Ventas.New.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/ventas/view/:id',
-            name:'view-venta',
-            component: ()=> import('../views/Ventas/Ventas.View.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/nota-credito/new',
-            name:'nc-new',
-            component: ()=> import('../views/Comprobantes/NotaCredito.Create.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/nota-debito/new',
-            name:'nd-new',
-            component: ()=> import('../views/Comprobantes/NotaDebito.Create.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/nota-credito-debito/view/:id',
-            name:'nc-view',
-            component: ()=> import('../views/Comprobantes/NotaCreditoDebito.View.vue'),
-            meta: {
-                auth: true
-            }
-        },
-        {
-            path: '/comprobantes',
-            name:'comprobantes',
-            component: ()=> import('../views/Comprobantes/Comprobantes.vue'),
-            meta: {
-                auth: true
-            }
-        },
+        // {
+        //     path: '/ventas',
+        //     name:'ventas',
+        //     component: ()=> import('../views/Ventas/Ventas.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/ventas/new',
+        //     name:'new-venta',
+        //     component: ()=> import('../views/Ventas/Ventas.New.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/ventas/view/:id',
+        //     name:'view-venta',
+        //     component: ()=> import('../views/Ventas/Ventas.View.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/nota-credito/new',
+        //     name:'nc-new',
+        //     component: ()=> import('../views/Comprobantes/NotaCredito.Create.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/nota-debito/new',
+        //     name:'nd-new',
+        //     component: ()=> import('../views/Comprobantes/NotaDebito.Create.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/nota-credito-debito/view/:id',
+        //     name:'nc-view',
+        //     component: ()=> import('../views/Comprobantes/NotaCreditoDebito.View.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
+        // {
+        //     path: '/comprobantes',
+        //     name:'comprobantes',
+        //     component: ()=> import('../views/Comprobantes/Comprobantes.vue'),
+        //     meta: {
+        //         auth: true
+        //     }
+        // },
         {
             path: '/cuentas-corrientes',
             name:'cuentas-corrientes',
@@ -331,24 +331,24 @@ export const routerRoutes = [
                 requireAdmin: true,
             }
         },
-        {
-            path: '/reportes/obras-sociales',
-            name:'reportes-obras-sociales',
-            component: ()=> import('../views/Reportes/Reportes.ObrasSociales.vue'),
-            meta: {
-                auth: true,
-                requireAdmin: true,
-            }
-        },
-        {
-            path: '/reportes/ventas',
-            name:'reportes-ventas',
-            component: ()=> import('../views/Reportes/Reportes.Ventas.vue'),
-            meta: {
-                auth: true,
-                requireAdmin: true,
-            }
-        },
+        // {
+        //     path: '/reportes/obras-sociales',
+        //     name:'reportes-obras-sociales',
+        //     component: ()=> import('../views/Reportes/Reportes.ObrasSociales.vue'),
+        //     meta: {
+        //         auth: true,
+        //         requireAdmin: true,
+        //     }
+        // },
+        // {
+        //     path: '/reportes/ventas',
+        //     name:'reportes-ventas',
+        //     component: ()=> import('../views/Reportes/Reportes.Ventas.vue'),
+        //     meta: {
+        //         auth: true,
+        //         requireAdmin: true,
+        //     }
+        // },
         {
             path: '/:pathMatch(.*)*',
             name:'not-found',
