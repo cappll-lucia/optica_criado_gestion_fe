@@ -280,9 +280,8 @@ const handleEmitFactura = async (venta: Venta) => {
           <div class="flex items-center gap-3">
             <!-- Avatar iniciales -->
             <div class="w-11 h-11 rounded-full bg-[#f0f0f0] flex items-center justify-center text-sm font-bold text-[#999] flex-shrink-0">
-              <User class="rounded-[50%]" />
+              {{ currentCliente.apellido?.slice(0,1) }}{{ currentCliente.nombre?.slice(0,1) }}
             </div>
-          
             <h1 class="text-[20px] font-bold tracking-tight text-[#1a1a1a]">
               {{ currentCliente.apellido }}, {{ currentCliente.nombre }}
             </h1>
@@ -455,6 +454,82 @@ const handleEmitFactura = async (venta: Venta) => {
         </div>
       </div>
 
+      <!-- ── Ventas ── -->
+      <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
+          <span class="text-sm font-bold text-[#1a1a1a]">Ventas</span>
+          <button
+            @click="hanldeRedirectVenta"
+            class="h-7 px-3 flex items-center gap-1.5 rounded-lg bg-[#1a1a1a] text-white text-xs font-semibold hover:bg-[#333] transition-colors"
+          >
+            <PlusIcon class="w-3 h-3" />
+            Nueva venta
+          </button>
+        </div>
+        <div v-if="ventasCliente.length">
+          <div
+            v-for="venta in ventasCliente"
+            class="flex items-center gap-4 px-5 py-3.5 border-b border-[#f5f5f5] last:border-0 hover:bg-[#fafafa] transition-colors"
+          >
+            <span class="text-xs text-[#aaa] w-24 flex-shrink-0">{{ formatDate(venta.fecha?.toString()) }}</span>
+            <span class="text-sm text-[#1a1a1a] flex-1">{{ venta.observaciones ?? '—' }}</span>
+            <span class="text-sm font-medium text-[#1a1a1a]">${{ venta.importe?.toFixed(2) }}</span>
+            <div class="flex items-center gap-1.5">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <button
+                      v-if="!venta.comprobante"
+                      @click="handleEmitFactura(venta)"
+                      class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+                    >
+                      <AsteriskIcon class="w-3.5 h-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Emitir factura</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <template v-if="venta.comprobante">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <button
+                        @click="printComprobante(venta.comprobante.id, venta.comprobante.tipoComprobante, venta.comprobante.fecha, 0)"
+                        class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+                      >
+                        <PrinterIcon class="w-3.5 h-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Imprimir comprobante</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <button
+                        @click="emailComprobante(venta.comprobante.id)"
+                        class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+                      >
+                        <Mail class="w-3.5 h-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Enviar por email</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </template>
+            </div>
+          </div>
+        </div>
+        <div v-else class="flex flex-col items-center justify-center py-12 gap-3">
+          <p class="text-sm text-[#aaa]">Sin ventas registradas</p>
+          <button
+            @click="hanldeRedirectVenta"
+            class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+          >
+            Nueva venta
+          </button>
+        </div>
+      </div>
 
     </div>
   </div>

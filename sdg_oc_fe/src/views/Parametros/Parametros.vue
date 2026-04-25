@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { router } from "@/router";
 import { SlashIcon } from "@radix-icons/vue";
-import { BuildingIcon, ShieldPlusIcon, TruckIcon } from "lucide-vue-next";
+import {  ShieldPlusIcon } from "lucide-vue-next";
 import { onMounted } from "vue";
 
 const loadData = async () => {};

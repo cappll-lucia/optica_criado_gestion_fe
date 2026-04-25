@@ -244,7 +244,7 @@ const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ sele
 
                          <div class="h-[5rem] w-[43rem] ">
                                 <div class="flex flex-row items-center justify-start w-full ">
-                                    <Label class="w-[7rem] mr-[2rem] text-right">Fecha Receta</Label>
+                                    <Label class="w-[7rem] mr-[2rem] text-right">Fecha Informe</Label>
                                     <div class="flex gap-2">
                                         <Input type="text" v-model="fechaInforme.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
                                         <Input type="text" v-model="fechaInforme.month" placeholder="MM" class="w-16 text-center" maxlength="2" />

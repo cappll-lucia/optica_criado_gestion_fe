@@ -1,91 +1,122 @@
 <script lang="ts" setup>
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AsteriskIcon } from 'lucide-vue-next';
 import AlertError from '@/components/AlertError.vue';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
-import { ref } from 'vue'
+import { ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import LoaderForm from './LoaderForm.vue';
-
 
 const newObraSocial = ref<string>();
 const isValidNewObraSocial = ref<boolean>(true);
 const loadingForm = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
-const errorMessage =ref<string>('');
+const errorMessage = ref<string>('');
 
 const emit = defineEmits(['handleCreateObraSocial', 'handleCancel']);
 
-
 const onSubmit = async () => {
-    loadingForm.value=true;
+    loadingForm.value = true;
     try {
-        if(!newObraSocial.value){
-            isValidNewObraSocial.value=false;
+        if (!newObraSocial.value) {
+            isValidNewObraSocial.value = false;
             return;
-        } 
-        const createdObraSocial = await obrasSocialesApi.create({nombre: newObraSocial.value})
-        emit('handleCreateObraSocial', createdObraSocial )
-        loadingForm.value=false;
-        newObraSocial.value=undefined;
+        }
+        const createdObraSocial = await obrasSocialesApi.create({ nombre: newObraSocial.value });
+        emit('handleCreateObraSocial', createdObraSocial);
+        loadingForm.value = false;
+        newObraSocial.value = undefined;
     } catch (err: any) {
-        errorMessage.value=err.message as string
+        errorMessage.value = err.message as string;
         showError.value = true;
-        loadingForm.value=false;
-        newObraSocial.value=undefined;
-    };
-}
+        loadingForm.value = false;
+        newObraSocial.value = undefined;
+    }
+};
 
 const validateAndSubmit = async () => {
-    if(newObraSocial.value && newObraSocial.value.length>2){
+    if (newObraSocial.value && newObraSocial.value.length > 2) {
         await onSubmit();
-    }else{
+    } else {
         isValidNewObraSocial.value = false;
     }
-}
+};
 
-
-const handleCancel = ()=>{
+const handleCancel = () => {
     emit('handleCancel');
-}
-
-
+};
 </script>
 
 <template>
-    <div class="flex w-full justify-center items-center">
-        <form @submit.prevent="validateAndSubmit" class="forms" v-if="!loadingForm">
-            <h3 class="page-subtitle text-center">Registrar Nueva Obra Social</h3>
-            <Separator class="my-6" />
-                <div class="h-[5rem] w-full flex justify-center">
-                    <div class="flex w-[33rem] flex-row items-center justify-start ">
-                        <Label class="w-[6rem]">Nombre</Label>
-                        <Input class="w-[25rem]" type="text" v-model="newObraSocial"  />
-                        <TooltipProvider  v-if="!isValidNewObraSocial" >
-                            <Tooltip>
-                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                    <p>Ingresar nombre de la Obra Social</p>
-                                    <p>Al menos dos caracteres</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+    <div class="w-100%">
+
+        <form @submit.prevent="validateAndSubmit" v-if="!loadingForm" class="flex flex-col gap-5">
+
+            <div class="flex flex-col gap-1">
+                <h2 class="text-[17px] font-bold text-[#1a1a1a]">Nueva Obra Social</h2>
+                <p class="text-sm text-[#aaa]">Completá el nombre para registrarla</p>
+            </div>
+
+            <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                <div class="px-6 py-5">
+                    <div class="flex flex-col gap-1.5">
+                        <Label class="text-xs text-[#888]">Nombre</Label>
+                        <div class="flex items-center gap-2">
+                            <Input
+                                type="text"
+                                class="h-9 text-sm flex-1"
+                                :class="!isValidNewObraSocial ? 'border-destructive' : ''"
+                                v-model="newObraSocial"
+                                @input="isValidNewObraSocial = true"
+                            />
+                            <TooltipProvider v-if="!isValidNewObraSocial">
+                                <Tooltip>
+                                    <TooltipTrigger class="text-destructive">
+                                        <AsteriskIcon :size="14" />
+                                    </TooltipTrigger>
+                                    <TooltipContent class="text-destructive border-destructive text-xs font-thin">
+                                        <p>Ingresar nombre de la obra social</p>
+                                        <p>Al menos dos caracteres</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                     </div>
                 </div>
-            <div class="w-full flex flex-row justify-end mt-8 mb-6 pr-14 ">
-                <Button type="button" variant="outline" class="w-[25%] mr-5" @click="handleCancel" >Cancelar</Button>
-                <Button type="submit" class="w-[25%]">Guardar</Button>
             </div>
+
+            <div class="flex justify-end gap-3 pt-1">
+                <button
+                    type="button"
+                    @click="handleCancel"
+                    class="h-9 px-5 rounded-lg border border-[#e5e5e5] text-sm text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    class="h-9 px-5 rounded-lg bg-[#1a1a1a] text-white text-sm font-semibold hover:bg-[#333] transition-colors"
+                >
+                    Guardar
+                </button>
+            </div>
+
         </form>
-        <div v-else  class="flex w-full justify-center items-center h-[10rem]">
+
+        <div v-else class="flex w-full justify-center items-center h-32">
             <LoaderForm />
         </div>
+
     </div>
 
-    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
-            :action="()=>{showError=false}" />
+    <AlertError
+        v-model="showError"
+        title="Error"
+        :message="errorMessage"
+        button="Aceptar"
+        :action="() => { showError = false; }"
+    />
 </template>
