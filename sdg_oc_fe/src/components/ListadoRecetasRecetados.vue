@@ -164,10 +164,10 @@ const handleChangeReceta = (receta: RecetasAereos)=>{
             <div v-else-if="currentRec?.tipoReceta=='Cerca' && detalleCerca">
                 <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
             </div>
-            <div v-else-if="currentRec?.tipoReceta == 'Multifocal' && detalleLejos && detalleCerca">
-                <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
-                <Separator class="my-8" />
+            <div v-else-if="(currentRec?.tipoReceta == 'Multifocal' || currentRec?.tipoReceta == 'Bifocal')  && detalleLejos && detalleCerca">
                 <ItemDetalleReceta :detalleReceta="detalleLejos" title="Lejos" />
+                <Separator class="my-8" />
+                <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
             </div>
 
             <Separator class="my-8" />
