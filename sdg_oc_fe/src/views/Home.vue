@@ -1,161 +1,210 @@
 <script setup lang="ts">
-import { ArrowDownUpIcon, AsteriskIcon, BanknoteIcon, EarIcon, EyeIcon, Glasses, Receipt, SettingsIcon, ShoppingBag, Users2Icon } from 'lucide-vue-next';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { EarIcon, EyeIcon, SettingsIcon, Users2Icon, GlassesIcon } from 'lucide-vue-next';
 import { router } from '@/router';
-import { useCajaStore } from '@/stores/CajaStore';
-import { onMounted, ref } from 'vue';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import Label from '@/components/ui/label/Label.vue';
-import Input from '@/components/ui/input/Input.vue';
-import Button from '@/components/ui/button/Button.vue';
-import LoaderForm from '@/components/LoaderForm.vue';
-import { cajaApi } from '@/api/libs/caja';
-
-
-const loadingForm = ref<boolean>(false);
-const cajaStore = useCajaStore();
-
-const importeOpenCaja = ref<number>(0);
-const isValidImporteOpenCaja = ref<boolean>(true);
-const showError = ref<boolean>(false);
-const errorMessage =ref<string>('');
-const openDialogOpenCaja = ref<boolean>(false);
-
-
-onMounted(async ()=>{
-    const opened = await cajaStore.isCajaOpenedToday();
-    openDialogOpenCaja.value = !opened;
-})
-
-const abrirCajaDiaria = async()=>{
-    try{
-        if(importeOpenCaja.value >= 0){
-            loadingForm.value=true;
-            await cajaApi.apertura(importeOpenCaja.value);
-            openDialogOpenCaja.value=false;
-            loadingForm.value=false;
-        }
-    }catch(e: any){
-        errorMessage.value = e.message as string;
-        loadingForm.value=false
-        showError.value = true;
-    }
-}
 </script>
 
 <template>
-    <div class="page lg:px-60 ">
-         <div class="grid grid-cols-3 grid-rows-[auto_auto_auto_auto] gap-4 p-6 0 h-[90vh] ">
-            <div @click="router.push(`/caja`)" class="box caja">
-                <div class="flex flex-row items-center justify-center">
-                    <BanknoteIcon class="mb-2" :size="25" />
-                    <ArrowDownUpIcon  class="mb-2" :size="25" />
+    <div class="page lg:px-60">
+        <div class="oc-container">
+
+            <!-- Header / Logo -->
+            <div class="oc-header">
+                <img src="/oc_logo_no_bg.png" class="oc-logo-img" alt="Óptica Criado" />
+                <p class="oc-tagline">Sistema de gestión</p>
+            </div>
+
+            <!-- Grid -->
+            <div class="oc-grid">
+
+                <!-- Clientes — wide -->
+                <div @click="router.push('/clientes')" class="oc-card c-green wide">
+                    <div class="oc-icon">
+                        <Users2Icon :size="20" />
+                    </div>
+                    <div class="oc-card-body">
+                        <p class="oc-card-label">Clientes</p>
+                        <p class="oc-card-sub">Listado de Clientes</p>
+                    </div>
+                    <span class="oc-arrow">→</span>
                 </div>
-                <span>Caja</span>
-            </div>
-            <div class=" flex justify-center items-center nueva-receta col-span-2 px-[10%]"> <img src="/image.png" class="w-[300px]" /> </div>
 
-            <div @click="router.push(`/ventas/new`)" class="box menu-venta">
-                <ShoppingBag class="mb-2" :size="25" />
-                <span>Nueva Venta</span>
-            </div>
-            <div @click="router.push(`/comprobantes`)" class="box obras-sociales">
-                <Receipt class="mb-2" :size="25" />
-                <span>Contabilidad</span>
-            </div>
-            <div @click="router.push(`/clientes`)" class="box clientes row-span-2">
-                <Users2Icon class="mb-2" :size="25" />
-                <span>Clientes</span>
-            </div>
+                <!-- Anteojos Recetados -->
+                <div @click="router.push('/recetas/recetados/new')" class="oc-card c-blue">
+                    <div class="oc-icon">
+                        <GlassesIcon :size="20" />
+                    </div>
+                    <div>
+                        <p class="oc-card-label">Anteojos Recetados</p>
+                        <p class="oc-card-sub">Nueva Receta</p>
+                    </div>
+                </div>
 
-            <DropdownMenu>
-                <DropdownMenuTrigger class="box nueva-receta col-span-2">
-                        <EyeIcon class="mb-2" :size="25" />
-                        <span>Nueva Receta</span>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-[40rem]" >
-                    <DropdownMenuLabel class="cursor-pointer font-normal text-[1.5rem]" @click="router.push('/recetas/recetados/new')"  >Receta Anteojos Recetados</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel class="cursor-pointer font-normal text-[1.5rem]" @click="router.push('/recetas/contacto/new')" >Receta Lentes de Contacto</DropdownMenuLabel>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <div @click="router.push(`/productos`)" class="box productos">
-                <Glasses class="mb-2" :size="25" />
-                <span>Productos</span>
-            </div>
-            <div @click="router.push(`/audiometrias/create`)" class="box nuevo-audiom">
-                <EarIcon class="mb-2" :size="25" />
-                <span>Nueva Audiometría</span>
-            </div>
-            <div @click="router.push(`/parametros`)" class="box productos">
-                <SettingsIcon class="mb-2" :size="25" />
-                <span>Parámetros</span>
-            </div>
+                <!-- Lentes de Contacto -->
+                <div @click="router.push('/recetas/contacto/new')" class="oc-card c-blue">
+                    <div class="oc-icon">
+                        <EyeIcon :size="20" />
+                    </div>
+                    <div>
+                        <p class="oc-card-label">Lentes de Contacto</p>
+                        <p class="oc-card-sub">Nueva Receta</p>
+                    </div>
+                </div>
 
+                <!-- Audiometría -->
+                <div @click="router.push('/audiometrias/create')" class="oc-card c-amber">
+                    <div class="oc-icon">
+                        <EarIcon :size="20" />
+                    </div>
+                    <div>
+                        <p class="oc-card-label">Audiometrías</p>
+                        <p class="oc-card-sub">Nueva Audiometría</p>
+                    </div>
+                </div>
+
+                <!-- Parámetros -->
+                <div @click="router.push('/parametros')" class="oc-card c-slate">
+                    <div class="oc-icon">
+                        <SettingsIcon :size="20" />
+                    </div>
+                    <p class="oc-card-label">Parámetros</p>
+                </div>
+
+            </div>
         </div>
     </div>
-    <Dialog v-model:open="openDialogOpenCaja" >
-        <DialogContent class="max-w-[530px] min-h-[15rem] pl-[50px] py-[50px] ">
-            <DialogHeader>
-                <DialogTitle>Abrir Caja del Día</DialogTitle>
-                <DialogDescription>
-                    Ingrese el importe en EFECTIVO con el que abre la caja de hoy
-                </DialogDescription>
-            </DialogHeader>
-            <form @submit.prevent="abrirCajaDiaria()" v-if="!loadingForm" >
-            <div class="flex flex-row">
-                <div class="flex flex-row items-center justify-start mb-4">
-                    <Label class="text-left w-[150px]">Importe Efectivo</Label>
-                    <div class=" w-[270px] flex flex-row items-center justify-start">
-                        <Label class="w-[30px]  text-center">$</Label>
-                        <Input v-decimal type="number" v-model="importeOpenCaja"   />
-                    </div>
-                    <div class="w-[20px]">
-                        <TooltipProvider  v-if="!isValidImporteOpenCaja" >
-                            <Tooltip>
-                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                    <p>Ingresar Importe</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-            </div>
-            <DialogFooter>
-                <Button type="submit" class="mr-[30px]">
-                Abrir Caja
-                </Button>
-            </DialogFooter>
-            </form>
-            <div v-else>
-                <LoaderForm />
-            </div>
-        </DialogContent>
-    </Dialog>
 </template>
 
-
 <style scoped>
-.box {
-  @apply rounded-lg text-[1.2rem] p-6 text-center flex flex-col justify-center items-center cursor-pointer;
-  box-shadow: #F5F5F5 0px 3px 8px;
-  /* box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px; */
-  box-shadow: rgba(71, 70, 70, 0.15) 0px 2px 8px;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap');
+
+.oc-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 2rem;
+}
+
+/* ── Header ── */
+.oc-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 2.5rem;
+}
+
+.oc-logo-img {
+    height: 80px;
+    width: auto;
+}
+
+.oc-tagline {
+    font-size: 20px;
+    color: #999;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0 2px;
+}
+
+/* ── Grid ── */
+.oc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* ── Card base ── */
+.oc-card {
+    background: #ffffff;
+    border: 0.5px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.oc-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 18px 18px 0 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.oc-card:hover {
+    transform: translateY(-2px);
+    border-color: #ccc;
+}
+
+.oc-card:hover::after { opacity: 1; }
+.oc-card:active { transform: scale(0.985); }
+
+/* ── Wide card ── */
+.oc-card.wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    min-height: 120px;
+    gap: 16px;
+}
+
+.oc-card-body { flex: 1; }
+
+/* ── Color variants ── */
+.c-green::after { background: #000; }
+.c-blue::after  { background: #000; }
+.c-amber::after { background: #000; }
+.c-slate::after { background: #000; }
+
+/* ── Icon ── */
+.oc-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.c-green .oc-icon { background: #F1EFE8; color: #000; }
+.c-blue  .oc-icon { background: #F1EFE8; color: #000; }
+.c-amber .oc-icon { background: #F1EFE8; color: #000; }
+.c-slate .oc-icon { background: #F1EFE8; color: #000; }
+
+/* ── Text ── */
+.oc-card-label {
+    font-size: 16px;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin: 0;
+    font-weight: 800;
+}
+
+.oc-card-sub {
+    font-size: 13px;
+    color: #626161;
+    margin: 1px 0 0;
+}
+
+/* ── Arrow (wide card) ── */
+.oc-arrow {
+    margin-left: auto;
+    color: #bbb;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform 0.15s, color 0.15s;
+}
+
+.oc-card:hover .oc-arrow {
+    transform: translateX(3px);
+    color: #888;
 }
 </style>

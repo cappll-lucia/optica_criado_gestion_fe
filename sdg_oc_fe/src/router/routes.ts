@@ -39,61 +39,61 @@ export const routerRoutes = [
 			    auth: true,
 		    },
         },
-        {
-            path: '/marcas',
-            name: 'marcas',
-            component: () => import('../views/Marcas/Marcas.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
-        {
-            path: '/marcas/create',
-            name: 'marcas-create',
-            component: () => import('../views/Marcas/Marcas.Create.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
+        // {
+        //     path: '/marcas',
+        //     name: 'marcas',
+        //     component: () => import('../views/Marcas/Marcas.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
+        // {
+        //     path: '/marcas/create',
+        //     name: 'marcas-create',
+        //     component: () => import('../views/Marcas/Marcas.Create.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
 
-		    },
-        },
-        {
-            path: '/marcas/edit/:id',
-            name: 'marcas-edit',
-            component: () => import('../views/Marcas/Marcas.Edit.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
-        {
-            path: '/proveedores',
-            name: 'proveedores',
-            component: () => import('../views/Proveedores/Proveedores.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
-        {
-            path: '/proveedores/create',
-            name: 'proveedores-create',
-            component: () => import('../views/Proveedores/Proveedores.Create.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
-        {
-            path: '/proveedores/edit/:id',
-            name: 'proveedores-edit',
-            component: () => import('../views/Proveedores/Proveedores.Edit.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
+		//     },
+        // },
+        // {
+        //     path: '/marcas/edit/:id',
+        //     name: 'marcas-edit',
+        //     component: () => import('../views/Marcas/Marcas.Edit.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
+        // {
+        //     path: '/proveedores',
+        //     name: 'proveedores',
+        //     component: () => import('../views/Proveedores/Proveedores.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
+        // {
+        //     path: '/proveedores/create',
+        //     name: 'proveedores-create',
+        //     component: () => import('../views/Proveedores/Proveedores.Create.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
+        // {
+        //     path: '/proveedores/edit/:id',
+        //     name: 'proveedores-edit',
+        //     component: () => import('../views/Proveedores/Proveedores.Edit.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
         {
             path: '/obras-sociales',
             name: 'obras-sociales',
@@ -121,47 +121,47 @@ export const routerRoutes = [
                 requireAdmin: true,
 		    },
         },
-        {
-            path: '/productos',
-            name: 'productos',
-            component: () => import('../views/Productos/Productos.vue'),
-            meta: {
-			    auth: true,
-		    },
-        },
-        {
-            path: '/productos/create/lote',
-            name: 'productos_lote_create',
-            component: () => import('../views/Productos/Productos.Create.Lote.vue'),
-            meta: {
-			    auth: true,
-		    },
-        },
-        {
-            path: '/productos/create/single',
-            name: 'producto_create',
-            component: () => import('../views/Productos/Productos.Create.vue'),
-            meta: {
-			    auth: true,
-		    },
-        },
-        {
-            path: '/productos/edit/:id',
-            name: 'producto_edit',
-            component: () => import('../views/Productos/Productos.Edit.vue'),
-            meta: {
-			    auth: true,
-		    },
-        },
-        {
-            path: '/productos/update-price/lote',
-            name: 'productos_lote_update',
-            component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
-            meta: {
-			    auth: true,
-                requireAdmin: true,
-		    },
-        },
+        // {
+        //     path: '/productos',
+        //     name: 'productos',
+        //     component: () => import('../views/Productos/Productos.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },
+        // {
+        //     path: '/productos/create/lote',
+        //     name: 'productos_lote_create',
+        //     component: () => import('../views/Productos/Productos.Create.Lote.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },
+        // {
+        //     path: '/productos/create/single',
+        //     name: 'producto_create',
+        //     component: () => import('../views/Productos/Productos.Create.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },
+        // {
+        //     path: '/productos/edit/:id',
+        //     name: 'producto_edit',
+        //     component: () => import('../views/Productos/Productos.Edit.vue'),
+        //     meta: {
+		// 	    auth: true,
+		//     },
+        // },
+        // {
+        //     path: '/productos/update-price/lote',
+        //     name: 'productos_lote_update',
+        //     component: () => import('../views/Productos/Productos.UpdatePrice.Lote.vue'),
+        //     meta: {
+		// 	    auth: true,
+        //         requireAdmin: true,
+		//     },
+        // },
         {
             path: '/audiometrias/create',
             name: 'create-audiometrias',
