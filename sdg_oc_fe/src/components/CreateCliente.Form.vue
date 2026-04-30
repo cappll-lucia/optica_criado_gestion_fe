@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import {
-  createClienteCustomValidator,
-  createClienteObraSocialCustomValidator,
   TipoDocumento,
 } from "@/api/entities/clientes";
 import { Localidad } from "@/api/entities/localidad";
@@ -30,9 +28,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { condicionIvaDisplay, isValidNumber } from "@/lib/utils";
+import { condicionIvaDisplay } from "@/lib/utils";
 import { useLoaderStore } from "@/stores/LoaderStore";
-import { Cross2Icon } from "@radix-icons/vue";
 import { AsteriskIcon, PlusCircleIcon, PlusIcon, XIcon } from "lucide-vue-next";
 import { computed, onMounted, ref } from "vue";
 import CreateObrasSocialForm from "./CreateObrasSocial.Form.vue";
@@ -88,16 +85,12 @@ const newCliente = ref<{
 const clienteObrasSociales = ref<{ obraSocial: { id: number | undefined }; numeroSocio: string }[]>([]);
 
 const isValidCliente = ref<{
-  nroDocumento: boolean; tipoDocumento: boolean; categoriaFiscal: boolean;
-  nombre: boolean; apellido: boolean; email: boolean; sexo: boolean;
-  telefono: boolean; domicilio: boolean; fechaNac: boolean; localidad: boolean;
+  nombre: boolean; apellido: boolean; sexo: boolean; localidad: boolean;
 }>({
-  nroDocumento: true, tipoDocumento: true, categoriaFiscal: true,
-  nombre: true, apellido: true, email: true, sexo: true,
-  telefono: true, domicilio: true, fechaNac: true, localidad: true,
+  nombre: true, apellido: true, sexo: true, localidad: true,
 });
 
-const isValidClienteObraSocial = ref<{ obraSocial: boolean; numeroSocio: boolean }[]>([]);
+const isValidClienteObraSocial = ref<{ obraSocial: boolean }[]>([]);
 
 onMounted(async () => {
   localidades.value = await localidadesApi.getAll();
@@ -106,7 +99,7 @@ onMounted(async () => {
 
 const addObraSocial = () => {
   clienteObrasSociales.value.push({ obraSocial: { id: undefined }, numeroSocio: "" });
-  isValidClienteObraSocial.value.push({ obraSocial: true, numeroSocio: true });
+  isValidClienteObraSocial.value.push({ obraSocial: true });
 };
 
 const removeObraSocial = (index: number) => {
@@ -119,14 +112,27 @@ const condicionIvaOptions = Object.values(CondicionIva)
   .map((value) => value);
 
 const validateAndSubmit = async () => {
-  const validCliente = createClienteCustomValidator(newCliente.value, fechaNac.value);
-  isValidCliente.value = validCliente.isValid;
-  let validOS;
+  // campos obligatorios: nombre, apellido, sexo, localidad
+  const valid = {
+    nombre: !!newCliente.value.nombre?.trim(),
+    apellido: !!newCliente.value.apellido?.trim(),
+    sexo: !!newCliente.value.sexo,
+    localidad: !!newCliente.value.localidad.id,
+  };
+  isValidCliente.value = valid;
+
+  // OS: numeroSocio es opcional
+  let osValid = true;
   if (clienteObrasSociales.value.length) {
-    validOS = createClienteObraSocialCustomValidator(clienteObrasSociales.value);
-    isValidClienteObraSocial.value = validOS.isValid;
+    const osValidation = clienteObrasSociales.value.map((os) => ({
+      obraSocial: !!os.obraSocial.id,
+    }));
+    isValidClienteObraSocial.value = osValidation;
+    osValid = osValidation.every((v) => v.obraSocial);
   }
-  if ((validCliente.success && !clienteObrasSociales.value.length) || (validCliente.success && validOS?.success)) {
+
+  const clienteValid = Object.values(valid).every(Boolean);
+  if (clienteValid && osValid) {
     await onSubmit();
   }
 };
@@ -134,11 +140,13 @@ const validateAndSubmit = async () => {
 const onSubmit = async () => {
   loader.show();
   try {
-    newCliente.value.fechaNac = new Date(
-      parseInt(fechaNac.value.year),
-      parseInt(fechaNac.value.month) - 1,
-      parseInt(fechaNac.value.day)
-    );
+    if (fechaNac.value.day && fechaNac.value.month && fechaNac.value.year) {
+      newCliente.value.fechaNac = new Date(
+        parseInt(fechaNac.value.year),
+        parseInt(fechaNac.value.month) - 1,
+        parseInt(fechaNac.value.day)
+      );
+    }
     const createdCliente = await clientesApi.create(newCliente.value, clienteObrasSociales.value);
     emit("handleCreateCliente", createdCliente);
     loader.hide();
@@ -176,21 +184,21 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
   <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5">
 
     <!-- ── Datos personales ── -->
-    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
       <div class="px-6 py-4 border-b border-[#f0f0f0]">
         <span class="text-sm font-bold text-[#1a1a1a]">Datos personales</span>
       </div>
       <div class="px-6 py-5 grid grid-cols-2 gap-x-8 gap-y-5">
 
         <!-- Tipo Documento -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5 ml-[1rem]">
           <Label class="text-xs text-[#888]">Tipo de documento</Label>
           <div class="flex items-center gap-2">
             <Select
               :v-model="newCliente.tipoDocumento"
               @update:model-value="(value) => newCliente.tipoDocumento = Number(value) as TipoDocumento"
             >
-              <SelectTrigger class="h-9 text-sm flex-1" :class="!isValidCliente.tipoDocumento ? 'border-destructive' : ''">
+              <SelectTrigger class="h-9 text-sm flex-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -201,12 +209,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <TooltipProvider v-if="!isValidCliente.tipoDocumento">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Seleccionar tipo documento</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <span class="w-[1em] shrink-0" />
           </div>
         </div>
 
@@ -214,18 +217,13 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         <div class="flex flex-col gap-1.5">
           <Label class="text-xs text-[#888]">Número de documento</Label>
           <div class="flex items-center gap-2">
-            <Input type="number" class="h-9 text-sm flex-1" v-model="newCliente.nroDocumento" :class="!isValidCliente.nroDocumento ? 'border-destructive' : ''" />
-            <TooltipProvider v-if="!isValidCliente.nroDocumento">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar número documento</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Input type="number" class="h-9 text-sm flex-1" v-model="newCliente.nroDocumento" />
+            <span class="w-[1em] shrink-0"/>
           </div>
         </div>
 
         <!-- Nombre -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5  ml-[1rem]">
           <Label class="text-xs text-[#888]">Nombre</Label>
           <div class="flex items-center gap-2">
             <Input type="text" class="h-9 text-sm flex-1" v-model="newCliente.nombre" :class="!isValidCliente.nombre ? 'border-destructive' : ''" />
@@ -235,6 +233,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar nombre</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <span v-else class="w-[1em] shrink-0" />
           </div>
         </div>
 
@@ -249,11 +248,12 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar apellido</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <span v-else class="w-[1em] shrink-0" />
           </div>
         </div>
 
         <!-- Sexo -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5  ml-[1rem]">
           <Label class="text-xs text-[#888]">Sexo</Label>
           <div class="flex items-center gap-2">
             <Select :v-model="newCliente.sexo" @update:model-value="(value) => (newCliente.sexo = value)">
@@ -273,6 +273,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Seleccionar sexo</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <span v-else class="w-[1em] shrink-0" />
           </div>
         </div>
 
@@ -280,26 +281,19 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         <div class="flex flex-col gap-1.5">
           <Label class="text-xs text-[#888]">Fecha de nacimiento</Label>
           <div class="flex items-center gap-2">
-            <div class="flex gap-2 flex-1">
-              <Input type="text" v-model="fechaNac.day" placeholder="DD" class="h-9 text-sm w-16 text-center" maxlength="2" :class="!isValidCliente.fechaNac ? 'border-destructive' : ''" />
-              <Input type="text" v-model="fechaNac.month" placeholder="MM" class="h-9 text-sm w-16 text-center" maxlength="2" :class="!isValidCliente.fechaNac ? 'border-destructive' : ''" />
-              <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="h-9 text-sm w-20 text-center" maxlength="4" :class="!isValidCliente.fechaNac ? 'border-destructive' : ''" />
-            </div>
-            <TooltipProvider v-if="!isValidCliente.fechaNac">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar fecha nacimiento válida</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Input type="text" v-model="fechaNac.day" placeholder="DD" class="h-9 text-sm w-16 text-center" maxlength="2" />
+            <Input type="text" v-model="fechaNac.month" placeholder="MM" class="h-9 text-sm w-16 text-center" maxlength="2" />
+            <Input type="text" v-model="fechaNac.year" placeholder="AAAA" class="h-9 text-sm w-20 text-center" maxlength="4" />
+            <span class="w-[1em] shrink-0" />
           </div>
         </div>
 
         <!-- Categoría Fiscal -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5  ml-[1rem]">
           <Label class="text-xs text-[#888]">Categoría fiscal</Label>
           <div class="flex items-center gap-2">
             <Select :v-model="newCliente.categoriaFiscal" @update:model-value="(value) => (newCliente.categoriaFiscal = Number(value))">
-              <SelectTrigger class="h-9 text-sm flex-1" :class="!isValidCliente.categoriaFiscal ? 'border-destructive' : ''">
+              <SelectTrigger class="h-9 text-sm flex-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -310,12 +304,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <TooltipProvider v-if="!isValidCliente.categoriaFiscal">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Seleccionar categoría fiscal</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <span class="w-[1em] shrink-0" />
           </div>
         </div>
 
@@ -323,13 +312,8 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         <div class="flex flex-col gap-1.5">
           <Label class="text-xs text-[#888]">Email</Label>
           <div class="flex items-center gap-2">
-            <Input type="text" class="h-9 text-sm flex-1" v-model="newCliente.email" :class="!isValidCliente.email ? 'border-destructive' : ''" />
-            <TooltipProvider v-if="!isValidCliente.email">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar email válido</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Input type="text" class="h-9 text-sm flex-1" v-model="newCliente.email" />
+            <span class="w-[1em] shrink-0" />
           </div>
         </div>
 
@@ -337,23 +321,17 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
     </div>
 
     <!-- ── Contacto y ubicación ── -->
-    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
       <div class="px-6 py-4 border-b border-[#f0f0f0]">
         <span class="text-sm font-bold text-[#1a1a1a]">Contacto y ubicación</span>
       </div>
       <div class="px-6 py-5 grid grid-cols-2 gap-x-8 gap-y-5">
 
         <!-- Teléfono -->
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-1.5  ml-[1rem]">
           <Label class="text-xs text-[#888]">Teléfono</Label>
           <div class="flex items-center gap-2">
-            <Input type="number" v-decimal class="h-9 text-sm flex-1" v-model="newCliente.telefono" :class="!isValidCliente.telefono ? 'border-destructive' : ''" />
-            <TooltipProvider v-if="!isValidCliente.telefono">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar teléfono</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Input type="number" v-decimal class="h-9 text-sm flex-1" v-model="newCliente.telefono" />
           </div>
         </div>
 
@@ -379,27 +357,26 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                 <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Seleccionar localidad</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <span v-else class="w-[1em] shrink-0" />
           </div>
         </div>
 
         <!-- Domicilio -->
-        <div class="flex flex-col gap-1.5 col-span-2">
+        <div class="flex flex-col gap-1.5 col-span-2  ml-[1rem]">
           <Label class="text-xs text-[#888]">Domicilio</Label>
           <div class="flex items-center gap-2">
-            <Input type="text" class="h-9 text-sm flex-1" v-model="newCliente.domicilio" :class="!isValidCliente.domicilio ? 'border-destructive' : ''" />
-            <TooltipProvider v-if="!isValidCliente.domicilio">
-              <Tooltip>
-                <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar domicilio</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Input type="text" class="h-9 text-sm flex-1 mr-[1.5rem] " v-model="newCliente.domicilio" />
+            <span class="w-[1em] shrink-0" />
           </div>
         </div>
 
         <!-- Observaciones -->
-        <div class="flex flex-col gap-1.5 col-span-2">
+        <div class="flex flex-col gap-1.5 col-span-2  ml-[1rem]">
           <Label class="text-xs text-[#888]">Observaciones</Label>
-          <Textarea class="text-sm resize-none h-24" v-model="newCliente.observaciones" />
+          <div class="flex items-start gap-2">
+            <Textarea class="text-sm resize-none h-24 flex-1" v-model="newCliente.observaciones" />
+            <span class="w-[1em] shrink-0" />
+          </div>
         </div>
 
       </div>
@@ -427,7 +404,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         <div
           v-for="(osItem, index) in clienteObrasSociales"
           :key="index"
-          class="flex items-center gap-4 mb-4 last:mb-0 p-4 rounded-xl border border-[#f0f0f0] bg-[#fafafa]"
+          class="flex items-center gap-4 mb-4 last:mb-0 p-4 rounded-xl border border-[#f0f0f0] bg-[#fafafa] mx-[1rem]"
         >
           <!-- Obra Social -->
           <div class="flex flex-col gap-1.5 flex-1">
@@ -467,20 +444,15 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
                   <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Seleccionar obra social</p></TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+              <span v-else class="w-[1em] shrink-0" />
             </div>
           </div>
 
           <!-- Número socio -->
           <div class="flex flex-col gap-1.5 w-44">
             <Label class="text-xs text-[#888]">Número de socio</Label>
-            <div class="flex items-center gap-2">
-              <Input type="text" class="h-9 text-sm flex-1" v-model="osItem.numeroSocio" :class="!isValidClienteObraSocial[index]?.numeroSocio ? 'border-destructive' : ''" />
-              <TooltipProvider v-if="!isValidClienteObraSocial[index]?.numeroSocio">
-                <Tooltip>
-                  <TooltipTrigger class="text-destructive"><AsteriskIcon :size="14" /></TooltipTrigger>
-                  <TooltipContent class="text-destructive border-destructive text-xs font-thin"><p>Ingresar número de socio</p></TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            <div class="flex items-center gap-2 pr-[1em]">
+              <Input type="text" class="h-9 text-sm flex-1" v-model="osItem.numeroSocio" />
             </div>
           </div>
 
