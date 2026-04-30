@@ -80,12 +80,13 @@ const validateAndSubmit = async () => {
             </Breadcrumb>
 
 
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-[10px] bg-[#F1EFE8] flex items-center justify-center flex-shrink-0">
+           <div class="flex items-center gap-3 mb-6">
+                <!-- <div class="w-10 h-10 rounded-[10px] bg-[#F1EFE8] flex items-center justify-center flex-shrink-0">
                     <ShieldPlusIcon :size="20" class="text-[#444441]" />
-                </div>
-                <h1 class="text-[22px] font-medium tracking-tight text-[#1a1a1a]">Obras Sociales</h1>
+                </div> -->
+                <h1 class="page-title">Obras Sociales</h1>
             </div>
+
             <form
                 v-if="currentObraSocial"
                 :key="currentObraSocial.id"

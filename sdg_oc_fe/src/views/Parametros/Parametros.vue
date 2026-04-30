@@ -37,9 +37,9 @@ onMounted(async () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h1 class="oc-title">Parámetros</h1>
+      <h1 class="page-title">Parámetros</h1>
 
-      <div class="oc-grid">
+      <div class="oc-grid mt-6">
 
         <!-- <div @click="router.push('marcas')" class="oc-card c-blue wide">
           <div class="oc-icon">

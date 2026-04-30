@@ -181,7 +181,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
 </script>
 
 <template>
-  <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5">
+  <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5 mt-6">
 
     <!-- ── Datos personales ── -->
     <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
@@ -365,7 +365,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         <div class="flex flex-col gap-1.5 col-span-2  ml-[1rem]">
           <Label class="text-xs text-[#888]">Domicilio</Label>
           <div class="flex items-center gap-2">
-            <Input type="text" class="h-9 text-sm flex-1 mr-[1.5rem] " v-model="newCliente.domicilio" />
+            <Input type="text" class="h-9 text-sm flex-1  " v-model="newCliente.domicilio" />
             <span class="w-[1em] shrink-0" />
           </div>
         </div>

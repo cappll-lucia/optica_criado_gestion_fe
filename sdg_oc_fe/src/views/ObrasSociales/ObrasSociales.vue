@@ -15,7 +15,6 @@ import DataTable from '@/components/tables/obrasSociales/data-table.vue';
 import { obrasSocialesApi } from '@/api/libs/obrasSociales';
 import AlertError from '@/components/AlertError.vue';
 import { useLoaderStore } from '@/stores/LoaderStore';
-import { ShieldPlusIcon } from "lucide-vue-next";
 
 
 const loader = useLoaderStore();

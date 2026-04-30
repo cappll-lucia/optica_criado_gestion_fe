@@ -39,7 +39,7 @@ const handleCreateCliente = async (newCliente: Cliente) => {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <h1 class="text-[22px] font-medium tracking-tight text-[#1a1a1a] mb-6">Nuevo Cliente</h1>
+            <h1 class="page-title">Nuevo Cliente</h1>
 
             <CreateClienteForm
                 @handle-create-cliente="handleCreateCliente"
