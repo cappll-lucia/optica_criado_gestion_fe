@@ -82,7 +82,7 @@ const getAudiometriasByCliente = async(_idCliente: number)=>{
 }
 
 
-const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[]) => {
+const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string | undefined }[]) => {
     try {
         const newCliente = {
             ..._cliente,
@@ -95,7 +95,7 @@ const create = async (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id:
     }
 };
 
-const edit = async (_id: number, _cliente: EditedClienteType, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string}[]) => {
+const edit = async (_id: number, _cliente: EditedClienteType, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string | undefined }[]) => {
     try {
         const updatedCliente = {
             ..._cliente,
@@ -108,7 +108,7 @@ const edit = async (_id: number, _cliente: EditedClienteType, _obrasSociales: {o
     }
 };
 
-const addObraSocial = async (_id: number, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string}[]) => {
+const addObraSocial = async (_id: number, _obrasSociales: {obraSocial:{id: number|undefined}, numeroSocio: string | undefined }[]) => {
     try {
         const resp = await http.patch(`/cliente/${_id}`, {
             clienteObrasSociales: _obrasSociales
@@ -133,8 +133,8 @@ export const clientesApi = {
     getRecetasByCliente: (_idCliente: number)=> getRecetasByCliente(_idCliente),
     getRecetasSummaryByCliente: (_idCliente: number)=> getRecetasSummaryByCliente(_idCliente),
     getAudiometriasByCliente: (_idCliente: number)=> getAudiometriasByCliente(_idCliente),
-    create: (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> create(_cliente, _obrasSociales),
-    edit: (_id: number, _cliente: EditedClienteType,  _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> edit(_id, _cliente, _obrasSociales),
-    addObraSocial: (_id: number, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string}[])=> addObraSocial(_id, _obrasSociales),
+    create: (_cliente: NewClienteType, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string | undefined}[])=> create(_cliente, _obrasSociales),
+    edit: (_id: number, _cliente: EditedClienteType,  _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string | undefined}[])=> edit(_id, _cliente, _obrasSociales),
+    addObraSocial: (_id: number, _obrasSociales: {obraSocial:{id: number | undefined}, numeroSocio: string | undefined}[])=> addObraSocial(_id, _obrasSociales),
     remove: (_id: number)=> remove(_id),
-}
+}   

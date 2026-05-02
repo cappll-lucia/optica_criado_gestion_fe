@@ -59,7 +59,7 @@ const fechaNac = ref({ day: "", month: "", year: "" });
 
 const currentCliente = ref<Cliente>();
 
-const obrasSocialesCliente = ref<{ obraSocial: { id: number | undefined }; numeroSocio: string }[]>([]);
+const obrasSocialesCliente = ref<{ obraSocial: { id: number | undefined }; numeroSocio: string | undefined }[]>([]);
 
 const isValidCliente = ref<{
   nombre: boolean; apellido: boolean; sexo: boolean; localidad: boolean;
@@ -91,7 +91,7 @@ onMounted(async () => {
 });
 
 const addObraSocial = () => {
-  obrasSocialesCliente.value.push({ obraSocial: { id: undefined }, numeroSocio: "" });
+  obrasSocialesCliente.value.push({ obraSocial: { id: undefined }, numeroSocio: undefined });
   isValidClienteObraSocial.value.push({ obraSocial: true });
 };
 
@@ -101,6 +101,8 @@ const removeObraSocial = (index: number) => {
 };
 
 const validateAndSubmit = async () => {
+  console.log(currentCliente.value)
+  console.log(obrasSocialesCliente.value)
   if (!currentCliente.value) return;
   const valid = {
     nombre: !!currentCliente.value.nombre?.trim(),

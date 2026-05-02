@@ -82,7 +82,7 @@ const newCliente = ref<{
   localidad: { id: undefined },
 });
 
-const clienteObrasSociales = ref<{ obraSocial: { id: number | undefined }; numeroSocio: string }[]>([]);
+const clienteObrasSociales = ref<{ obraSocial: { id: number | undefined }; numeroSocio:  string | undefined  }[]>([]);
 
 const isValidCliente = ref<{
   nombre: boolean; apellido: boolean; sexo: boolean; localidad: boolean;
@@ -98,7 +98,7 @@ onMounted(async () => {
 });
 
 const addObraSocial = () => {
-  clienteObrasSociales.value.push({ obraSocial: { id: undefined }, numeroSocio: "" });
+  clienteObrasSociales.value.push({ obraSocial: { id: undefined }, numeroSocio: undefined });
   isValidClienteObraSocial.value.push({ obraSocial: true });
 };
 
