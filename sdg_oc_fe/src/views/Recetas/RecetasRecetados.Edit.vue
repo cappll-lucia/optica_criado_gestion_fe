@@ -315,7 +315,7 @@ const showCerca = computed(() =>
             <div class="flex flex-row w-full justify-between items-end gap-6 mt-4">
 
                 <!-- Cliente (solo lectura) -->
-                <div class="flex flex-col gap-1 w-[35%] text-[#888]">
+                <div class="flex flex-col gap-1  w-[35%] pr-16  text-[#888]">
                     <Label class="text-xs ">Cliente</Label>
                     <div class="h-9 flex items-center px-3 rounded-md border border-[#e5e5e5] bg-muted cursor-not-allowed  text-sm">
                         {{ currentReceta.cliente.apellido }}, {{ currentReceta.cliente.nombre }}
