@@ -1,0 +1,26 @@
+<svg width="100%" viewBox="0 0 680 400" role="img" xmlns="http://www.w3.org/2000/svg" style="">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Logo dos círculos solapados</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Círculo azul sólido a la izquierda, círculo con borde negro a la derecha, intersección verde</desc>
+
+  <defs>
+    <clipPath id="clipBlue">
+      <circle cx="300" cy="200" r="110"/>
+    </clipPath>
+    <clipPath id="clipRing">
+      <circle cx="415" cy="200" r="82"/>
+    </clipPath>
+  </defs>
+
+  <!-- Círculo azul sólido -->
+  <circle cx="300" cy="200" r="110" fill="#2563B0" style="fill:rgb(37, 99, 176);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Círculo derecho: fondo blanco con borde negro -->
+  <circle cx="415" cy="200" r="82" fill="white" stroke="#1A1A1A" stroke-width="16" style="fill:rgb(255, 255, 255);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:16px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Zona de intersección: verde, dentro del círculo derecho y sobre el azul -->
+  <circle cx="415" cy="200" r="82" fill="#6DC42A" clip-path="url(#clipBlue)" style="fill:rgb(109, 196, 42);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Reborde negro del círculo derecho encima (para que tape el verde en el borde) -->
+  <circle cx="415" cy="200" r="82" fill="none" stroke="#1A1A1A" stroke-width="16" style="fill:none;stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:16px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+</svg>

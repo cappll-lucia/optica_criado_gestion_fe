@@ -56,8 +56,8 @@ const userData = computed(() => userStore.getMe);
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <Avatar class="border border-gray-950">
-                        <AvatarImage src="/favicon.svg" alt="@radix-vue" />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarImage src="/src/assets/logo_svg_v2.svg" alt="@radix-vue" />
+                        <AvatarFallback>OC</AvatarFallback>
                     </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="px-4 w-[15rem]">
