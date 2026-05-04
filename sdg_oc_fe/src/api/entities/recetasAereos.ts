@@ -67,10 +67,6 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
   }) =>{
     const isValid = {
       tipoReceta: Object.keys(TipoReceta).includes(_newReceta.tipoReceta),
-      oftalmologo: Boolean(_newReceta.oftalmologo),
-      cristal: _newReceta.cristal ? Object.keys(TipoCristal).includes(_newReceta.cristal) : false,
-      color: _newReceta.color ? Object.keys(ColorCristal).includes(_newReceta.color) : false,
-      tratamiento: _newReceta.tratamiento ? Object.keys(TratamientoCristal).includes(_newReceta.tratamiento) : false,
       fecha: fechaValidator.safeParse(_fecha).success,
       cliente: Boolean(_newReceta.cliente.id)
     };
@@ -80,13 +76,9 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
 
   export const editRecetaAereosCustomValidator = (_newReceta:RecetasAereos | undefined, _fecha : {  day: string,  month: string,  year: string,}) =>{
     const isValid = {
-      tipoReceta: _newReceta ?  Object.keys(TipoReceta).includes(_newReceta.tipoReceta) : false,
-      oftalmologo: _newReceta ?  Boolean(_newReceta.oftalmologo) : false,
-      cristal: _newReceta ?  _newReceta.cristal ? Object.keys(TipoCristal).includes(_newReceta.cristal) : false : false,
-      color: _newReceta ?  _newReceta.color ? Object.keys(ColorCristal).includes(_newReceta.color) : false : false,
-      tratamiento: _newReceta ?  _newReceta.tratamiento ? Object.keys(TratamientoCristal).includes(_newReceta.tratamiento) : false : false,
+      tipoReceta: _newReceta ? Object.keys(TipoReceta).includes(_newReceta.tipoReceta) : false,
       fecha: fechaValidator.safeParse(_fecha).success,
-      cliente: _newReceta ?  Boolean(_newReceta.cliente.id) : false,
+      cliente: _newReceta ? Boolean(_newReceta.cliente.id) : false,
     };
     const success = Object.values(isValid).every(Boolean);
     return {success, isValid};
