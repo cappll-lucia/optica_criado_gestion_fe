@@ -17,19 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { computed, onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { router, previousRoute } from '@/router';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
-import { AsteriskIcon, PlusIcon, ImageUpIcon} from 'lucide-vue-next';
-import {  SlashIcon } from '@radix-icons/vue';
+import { AsteriskIcon, PlusIcon } from 'lucide-vue-next';
+import { SlashIcon, ValueNoneIcon, Cross2Icon } from '@radix-icons/vue';
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +33,6 @@ import {
 } from '@/components/ui/tooltip'
 import Input from '@/components/ui/input/Input.vue';
 import Label from '@/components/ui/label/Label.vue';
-import { Cross2Icon, ValueNoneIcon } from '@radix-icons/vue';
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
 import Button from '@/components/ui/button/Button.vue';
 import Accordion from '@/components/ui/accordion/Accordion.vue';
@@ -51,24 +45,18 @@ import { recetasApi } from '@/api/libs/recetas';
 import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
-import OCRRecetasContacto from '@/components/OCR.RecetasContacto.vue';
 
 const route = useRoute();
 const loader = useLoaderStore();
 
-const selectedCliente = ref<Cliente| null>(null);
+const selectedCliente = ref<Cliente | null>(null);
 const searchClienteOpen = ref<boolean>(false);
 
 const showError = ref<boolean>(false);
-const errorMessage =ref<string>('');
-
-const openOCR = ref<boolean>(false);
-
+const errorMessage = ref<string>('');
 
 const newReceta = ref<{
-    cliente: {
-        id: undefined | number
-    },
+    cliente: { id: undefined | number },
     fecha: Date | undefined;
     oftalmologo: string | undefined,
     quet_m1_od: number | undefined,
@@ -97,9 +85,7 @@ const newReceta = ref<{
     oi_marca: number | undefined,
     observaciones: string | undefined,
 }>({
-    cliente: {
-        id: undefined
-    },
+    cliente: { id: undefined },
     fecha: undefined,
     oftalmologo: undefined,
     quet_m1_od: undefined,
@@ -152,9 +138,7 @@ const newPruebas = ref<{
     observaciones: string,
 }[]>([])
 
-
 const isValidReceta = ref<{
-    oftalmologo: boolean,
     quet_m1_od: boolean,
     quet_m2_od: boolean,
     quet_m1_oi: boolean,
@@ -175,7 +159,6 @@ const isValidReceta = ref<{
     fecha: boolean,
     cliente: boolean
 }>({
-    oftalmologo: true,
     quet_m1_od: true,
     quet_m2_od: true,
     quet_m1_oi: true,
@@ -197,7 +180,7 @@ const isValidReceta = ref<{
     cliente: true
 })
 
-const isValidPrueba = ref<{    
+const isValidPrueba = ref<{
     od_cb: boolean,
     od_esferico: boolean,
     od_cilindrico: boolean,
@@ -210,856 +193,495 @@ const isValidPrueba = ref<{
     oi_diametro: boolean,
 }[]>([])
 
-const fechaReceta = ref({
-    day:'',
-    month:'',
-    year:'',
-})
+const fechaReceta = ref({ day: '', month: '', year: '' })
 
-
-onMounted(async()=>{
-    try{
+onMounted(async () => {
+    try {
         loader.show();
         const query = route.query
-        if(query.cliente){
+        if (query.cliente) {
             const foundCliente = await clientesApi.getOne(Number(query.cliente))
-            if(foundCliente) handleSelectCliente(foundCliente)
+            if (foundCliente) handleSelectCliente(foundCliente)
         }
         loader.hide();
-    }catch(err: any){
-        errorMessage.value=err.message as string
+    } catch (err: any) {
+        errorMessage.value = err.message as string
         showError.value = true;
         loader.hide();
     }
 })
 
-const handleSelectCliente = (cliente:Cliente)=>{
-    selectedCliente.value=cliente;
-    newReceta.value.cliente.id=cliente.id;
-    searchClienteOpen.value=false;
+const handleSelectCliente = (cliente: Cliente) => {
+    selectedCliente.value = cliente;
+    newReceta.value.cliente.id = cliente.id;
+    searchClienteOpen.value = false;
 }
-
 
 const addPrueba = () => {
     newPruebas.value.push({
-        od_diametro: undefined,
-        od_eje: undefined,
-        od_cilindrico: undefined,
-        od_esferico: undefined,
-        od_cb: undefined,
-        od_marca: '',
-        oi_diametro: undefined,
-        oi_eje: undefined,
-        oi_cilindrico: undefined,
-        oi_esferico: undefined,
-        oi_cb: undefined,
-        oi_marca: '',
-        confort: false,
-        movilidad: false,
-        centraje: false,
-        hiperemia: false,
-        agudeza_visual: false,
-        oi_edema: false,
-        od_edema: false,
-        observaciones: ''
+        od_diametro: undefined, od_eje: undefined, od_cilindrico: undefined,
+        od_esferico: undefined, od_cb: undefined, od_marca: '',
+        oi_diametro: undefined, oi_eje: undefined, oi_cilindrico: undefined,
+        oi_esferico: undefined, oi_cb: undefined, oi_marca: '',
+        confort: false, movilidad: false, centraje: false, hiperemia: false,
+        agudeza_visual: false, oi_edema: false, od_edema: false, observaciones: ''
     })
-
     isValidPrueba.value.push({
-        od_cb: true,
-        od_esferico: true,
-        od_cilindrico: true,
-        od_eje: true,
-        od_diametro: true,
-        oi_cb: true,
-        oi_esferico: true,
-        oi_cilindrico: true,
-        oi_eje: true,
-        oi_diametro: true,
+        od_cb: true, od_esferico: true, od_cilindrico: true, od_eje: true, od_diametro: true,
+        oi_cb: true, oi_esferico: true, oi_cilindrico: true, oi_eje: true, oi_diametro: true,
     })
 };
 
-const validateAndSubmit = async()=>{
+const validateAndSubmit = async () => {
     loader.show()
     const resultReceta = recetaContactoCustomValidator(newReceta.value, fechaReceta.value)
     isValidReceta.value = resultReceta.isValid;
     const resultPruebas = pruebaLentesContactoCustomValidator(newPruebas.value)
     isValidPrueba.value = resultPruebas.isValid;
-    if(resultPruebas.success && resultReceta.success){
+    console.log(isValidReceta.value)
+    console.log(isValidPrueba.value)
+    if (resultPruebas.success && resultReceta.success) {
         await onSubmit();
     }
     loader.hide();
 }
 
-
-const onSubmit = async()=>{
-    try{
+const onSubmit = async () => {
+    try {
         loader.show();
-        const recetaObj = {...newReceta.value, pruebasLentesContacto: newPruebas.value}
-        recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month)-1, parseInt(fechaReceta.value.day))
-       const createdReceta= await recetasApi.createRecetaContacto(recetaObj)
-       loader.hide();
-        toast({
-            title: 'Receta registrada con éxito',
-        })
+        const recetaObj = { ...newReceta.value, pruebasLentesContacto: newPruebas.value }
+        recetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month) - 1, parseInt(fechaReceta.value.day))
+        const createdReceta = await recetasApi.createRecetaContacto(recetaObj)
+        loader.hide();
+        toast({ title: 'Receta registrada con éxito' })
         router.push(`/recetas/${newReceta.value.cliente.id}?tab=contacto&recetaId=${createdReceta.id}`)
     } catch (err: any) {
-        errorMessage.value=err.message as string
+        errorMessage.value = err.message as string
         showError.value = true;
         loader.hide();
     };
 }
-const nombreCliente = computed(()=> selectedCliente.value?.apellido +", "+selectedCliente.value?.nombre)
 
-const loadImage1 = async(dataImage:  { queterometria: {OD: string[], OI: string[]}, observaciones: string})=>{
-    newReceta.value.quet_m1_od= dataImage.queterometria.OD[0] ? Number(dataImage.queterometria.OD[0]) : undefined
-    newReceta.value.quet_m2_od= dataImage.queterometria.OD[1] ? Number(dataImage.queterometria.OD[1]) : undefined
-    newReceta.value.quet_m1_oi= dataImage.queterometria.OI[0] ? Number(dataImage.queterometria.OI[0]) : undefined
-    newReceta.value.quet_m2_oi= dataImage.queterometria.OI[1] ? Number(dataImage.queterometria.OI[1]) : undefined
-    newReceta.value.observaciones_queterometria = dataImage.observaciones;
-}
+const nombreCliente = computed(() => selectedCliente.value?.apellido + ", " + selectedCliente.value?.nombre)
 
-const normalize = (value: string | number): number | undefined => {
-  if (value === null || value === undefined) return undefined;
-  const stringValue = String(value).replace(",", ".").replace(/[^\d.-]/g, "");
-  const parsed = parseFloat(stringValue);
-  return isNaN(parsed) ? undefined : parsed;
-};
-
-const loadImage2 = async (dataImage: {
-  lentes_definitivas: {
-    OD: { CB: number | string, Esf: number | string, Cil: number | string, Eje: number | string, Diam: number | string },
-    OI: { CB: number | string, Esf: number | string, Cil: number | string, Eje: number | string, Diam: number | string }
-  }
-}) => {
-  const { OD, OI } = dataImage.lentes_definitivas;
-  newReceta.value.od_cb = normalize(OD.CB);
-  newReceta.value.od_esferico = normalize(OD.Esf);
-  newReceta.value.od_cilindrico = normalize(OD.Cil);
-  newReceta.value.od_eje = normalize(OD.Eje);
-  newReceta.value.od_diametro = normalize(OD.Diam);
-
-  newReceta.value.oi_cb = normalize(OI.CB);
-  newReceta.value.oi_esferico = normalize(OI.Esf);
-  newReceta.value.oi_cilindrico = normalize(OI.Cil);
-  newReceta.value.oi_eje = normalize(OI.Eje);
-  newReceta.value.oi_diametro = normalize(OI.Diam);
-
-  openOCR.value = false;
-};
-
-const handleOcrError = async(error: any)=>{
-    errorMessage.value=error.message as string
-    showError.value = true;
-    openOCR.value=false;
-}
-
-
-const redirectCancel = ()=>{
-  if (previousRoute) {
-    router.push(previousRoute);
-  } else {
-    if(selectedCliente.value){
-        router.push(`/clientes/dashboard/${selectedCliente.value.id}`); 
+const redirectCancel = () => {
+    if (previousRoute) {
+        router.push(previousRoute);
+    } else {
+        if (selectedCliente.value) {
+            router.push(`/clientes/dashboard/${selectedCliente.value.id}`);
+        }
     }
-  }
 }
-
 </script>
 
 <template>
-    <div class="page">
-            <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Inicio
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/clientes">
-                        Clientes
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente" >
-                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
-                        {{nombreCliente}}
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator  v-if="selectedCliente">
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente">
-                    <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">
-                        Recetas
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator v-if="selectedCliente">
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Nueva receta lentes de contacto</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-        <div class="pt-2 mb-4 " >
-            <form @submit.prevent="validateAndSubmit" class=" forms-wide flex flex-col justify-start items-start px-[5rem] min-h-[45rem] ">
-                <div class="w-full ">
-                    <div class="grid grid-cols-3 items-center mb-4">
-                    <div></div>
-                    <h3 class="page-subtitle text-center">Nueva Receta - Lentes de contacto</h3>
-                    <div class="flex justify-end">
-                        <Dialog v-model:open="openOCR">
-                        <DialogTrigger>
-                            <Button type="button">
-                            <ImageUpIcon /> Carga con imágenes
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent class="max-w-[100rem] min-h-[40rem]">
-                            <OCRRecetasContacto 
-                            @handle-submit-image1="loadImage1"
-                            @handle-submit-image2="loadImage2"
-                            @handle-cancel="openOCR=false"
-                            @handle-error="handleOcrError"
-                            />
-                        </DialogContent>
-                        </Dialog>
-                    </div>
-                    </div>
-                    <Separator class="my-10 w-full" />
-                </div>
-                <div class="flex flex-col w-full justify-between items-start">
-                    <div class="flex flex-col w-full">
-                        <div class="flex flex-row w-full justify-center gap-x-20">
-                            <div class="h-[3rem]  w-[25rem]">
-                                    <div class="flex flex-row items-center justify-start">
-                                        <Label class="form-label w-[5rem] text-left">Cliente</Label>
-                                        <div class="flex flex-row justify-start items-center">
-                                            <Input type="text" 
-                                                class="w-[15rem] h-10"
-                                                readonly
-                                                :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
-                                                @click="searchClienteOpen = true"
-                                            />
-                                            <SelectClienteDialog
-                                                v-model="searchClienteOpen"
-                                                title="Nueva Audiometría: Seleccionar Cliente"
-                                                @select-cliente="handleSelectCliente"
-                                            />
-                                             <TooltipProvider  v-if="!isValidReceta.cliente" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Seleccionar cliente</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                    </div>
-                            </div>
+<div class="page">
+    <Breadcrumb>
+        <BreadcrumbList>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">{{ nombreCliente }}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">Recetas</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbPage>Nueva receta lentes de contacto</BreadcrumbPage>
+            </BreadcrumbItem>
+        </BreadcrumbList>
+    </Breadcrumb>
 
-                             <div class="h-[3rem] w-[23rem] flex flex-col justify-start items-end ">
-                                <div class="flex items-center justify-start w-full">
-                                    <Label class="w-[8rem]">Fecha Receta</Label>
-                                    <div class="flex gap-2 w-[60%]">
-                                        <Input type="text" v-model="fechaReceta.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaReceta.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaReceta.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
-                                    </div>
-                                    <TooltipProvider  v-if="!isValidReceta.fecha" >
-                                        <Tooltip>
-                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                            <p>Ingresar una fecha válida</p>
-                                        </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
-                            </div>
+    <div class="pt-2 mb-4">
+        <form @submit.prevent="validateAndSubmit" class="forms-wide flex flex-col justify-start items-start px-[5rem] !bg-white">
 
-                        </div>
-                        <Separator class="my-10 w-full" />
-                        <div class="flex flex-row w-full justify-center ">
-                            <div class="flex flex-row items-center justify-center detalle detalle-cerca">
-                                <h1 class="text-xl font-extrabold w-16 mr-20 ">Lentes Definitivas</h1>
-                                <div class="flex flex-row justify-center w-[85%] items-center">
-                                    <div class="flex flex-col">
-                                        <div class="flex h-10 items-center justify-items-start">
-                                            <p class="font-bold w-24 text-lg">O.D.</p>
+            <!-- Header -->
+            <div class="w-full">
+                <h3 class="page-subtitle text-center">Nueva Receta - Lentes de Contacto</h3>
+                <Separator class="my-6 w-full" />
+            </div>
 
-                                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                                            <Input type="decimal" v-model="newReceta.od_cb" :class="{'w-20' : !isValidReceta.od_cb, 'w-20 mr-4': isValidReceta.od_cb}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_cb" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 20</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
+            <!-- Fila 1: Cliente / Fecha -->
+            <div class="flex flex-row w-full justify-between items-end gap-6 mt-4">
 
-                                            <Separator orientation="vertical" class="mx-4" />
-                                            
-                                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" v-model="newReceta.od_esferico" :class="{'w-20' : !isValidReceta.od_esferico, 'w-20 mr-4': isValidReceta.od_esferico}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_esferico" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: -35 a 35</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                            <p class="font-bold w-12 text-right pr-4">Cil.: </p>
-                                            <Input type="decimal" v-model="newReceta.od_cilindrico" :class="{'w-20' : !isValidReceta.od_cilindrico, 'w-20 mr-4': isValidReceta.od_cilindrico}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_cilindrico" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: -10 a 10</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                            <p class="font-bold w-12 text-right pr-4">Eje: </p>
-                                            <Input type="decimal" v-model="newReceta.od_eje" :class="{'w-20' : !isValidReceta.od_eje, 'w-20 mr-4': isValidReceta.od_eje}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_eje" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 180</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                             <p class="font-bold w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                            <Input type="decimal" v-model="newReceta.od_diametro" :class="{'w-20' : !isValidReceta.od_diametro, 'w-20 mr-4': isValidReceta.od_diametro}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_diametro" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 30</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-
-
-                                        </div>
-                                        <Separator class="my-6" />
-                                        <div class="flex  h-10 items-center justify-items-start">
-                                            <p class="font-bold w-24 text-lg">O.I.</p>
-
-                                            <p class="font-bold w-12 text-right pr-4">C.B.: </p>
-                                            <Input type="decimal" v-model="newReceta.oi_cb" :class="{'w-20' : !isValidReceta.oi_cb, 'w-20 mr-4': isValidReceta.oi_cb}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_cb" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 20</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-                                            
-                                            <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                                            <Input type="decimal" v-model="newReceta.oi_esferico" :class="{'w-20' : !isValidReceta.oi_esferico, 'w-20 mr-4': isValidReceta.oi_esferico}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_esferico" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: -35 a 35</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                            <p class="font-bold w-12 text-right pr-4">Cil.: </p>
-                                            <Input type="decimal" v-model="newReceta.oi_cilindrico" :class="{'w-20' : !isValidReceta.oi_cilindrico, 'w-20 mr-4': isValidReceta.oi_cilindrico}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_cilindrico" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: -10 a 10</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                            <p class="font-bold w-12 text-right pr-4">Eje: </p>
-                                            <Input type="decimal" v-model="newReceta.oi_eje" :class="{'w-20' : !isValidReceta.oi_eje, 'w-20 mr-4': isValidReceta.oi_eje}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_eje" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 180</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-                                            <Separator orientation="vertical" class="mx-4" />
-
-                                             <p class="font-bold w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                            <Input type="decimal" v-model="newReceta.oi_diametro" :class="{'w-20' : !isValidReceta.oi_diametro, 'w-20 mr-4': isValidReceta.oi_diametro}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_diametro" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Rango permitido: 0 a 30</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                <!-- Cliente -->
+                <div class="flex flex-col gap-1 w-[35%]">
+                    <Label class="text-xs text-[#888]">Cliente</Label>
+                    <div class="flex flex-row items-center gap-2">
+                        <Input
+                            type="text"
+                            class="h-9 w-full"
+                            readonly
+                            :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : ''"
+                            placeholder="Buscar cliente..."
+                            @click="searchClienteOpen = true"
+                        />
+                        <SelectClienteDialog
+                            v-model="searchClienteOpen"
+                            title="Nueva Receta: Seleccionar Cliente"
+                            @select-cliente="handleSelectCliente"
+                        />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-destructive">
+                                    <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.cliente }" />
+                                </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Seleccionar cliente</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
-                
-                <Separator class="my-10 w-full" />
-                
-                <div class="flex flex-row w-full justify-start min-h-[40rem]  " >
-                    <div class="flex flex-col w-[16rem] justify-start items-start">
-                        <div class="flex flex-col justify-start items-start h-[18rem]">
-                            <span class="form-label font-bold text-xl w-full mb-4">Queterometría</span>                                
-                            <div class="flex flex-col justify-start w-100">
-                                <div class="flex flex-col justify-start w-100">
-                                    <div class="flex h-10 items-center justify-start">
-                                        <p class=" w-12 font-semibold text-left text-sm">O.D. </p>
-                                        <Input type="decimal" v-model="newReceta.quet_m1_od" :class="{'ml-2 w-14' : !isValidReceta.quet_m1_od, 'ml-2 w-14 mr-4': isValidReceta.quet_m1_od}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.quet_m1_od" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Rango permitido: 0 a 90</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
 
-                                        <Separator orientation="vertical" class="mx-4" />
-                                        
-                                        <Input type="decimal" v-model="newReceta.quet_m2_od" :class="{'ml-2 w-14' : !isValidReceta.quet_m2_od, 'ml-2 w-14 mr-4': isValidReceta.quet_m2_od}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.quet_m2_od" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Rango permitido: 0 a 90</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                    
-                                    <Separator  class="my-4" />
-                                    
-
-                                    <div class=" flex h-10 items-center justify-start">
-                                        <p class=" w-12 font-semibold text-left text-sm">O.I. </p>
-                                        <Input type="decimal" v-model="newReceta.quet_m1_oi" :class="{'ml-2 w-14' : !isValidReceta.quet_m1_oi, 'ml-2 w-14 mr-4': isValidReceta.quet_m1_oi}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.quet_m1_oi" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Rango permitido: 0 a 90</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-
-                                        <Separator orientation="vertical" class="mx-4" />
-                                        
-                                        <Input type="decimal" v-model="newReceta.quet_m2_oi" :class="{'ml-2 w-14' : !isValidReceta.quet_m2_oi, ' ml-2 w-14 mr-4': isValidReceta.quet_m2_oi}"  />
-                                        <TooltipProvider  v-if="!isValidReceta.quet_m2_oi" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-2"> <AsteriskIcon :size="9" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Rango permitido: 0 a 90</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                </div>
-
-
-                                <div class="flex flex-col items-start mt-6 justify-items-start">
-                                    <p class=" w-20 mb-1 font-semibold text-left text-sm">Notas </p>
-                                    <Textarea type="decimal" v-model="newReceta.observaciones_queterometria" class="resize-none" />
-                                </div>
-                            </div>
-                        </div>
-                        <Separator class="my-8 w-full" />
-                        <div class="flex flex-col  justify-start items-start h-[22rem]">
-                            <span class="form-label font-bold text-xl w-full mb-4">Evaluación General</span>                                
-                            <div class="flex flex-col flex-wrap gap-x-4 gap-y-4 justify-start w-full">
-                                <div class="items-center flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.tonicidad"  />
-                                    <label for="tonicidad"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Tonicidad
-                                    </label>
-                                </div>
-                                <div class="items-center  flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.maquillaje"  />
-                                    <label for="maquillaje"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Maquillaje
-                                    </label>
-                                </div>
-                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.hendidura_palpebral"  />
-                                    <label for="hendidura_palpebral"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Hendidura Palpebral
-                                    </label>
-                                </div>
-                                <div class="items-center flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.altura_palpebral"  />
-                                    <label for="altura_palpebral"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Altura Palpebral
-                                    </label>
-                                </div>
-                                <div class="items-center flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.buen_parpadeo_amplitud"  />
-                                    <label for="buen_parpadeo_amplitud"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Parpadeo: Buena amplitud
-                                    </label>
-                                </div>
-                                <div class="items-center flex gap-x-2 min-h-[1.5rem]">
-                                    <Checkbox v-model:checked="newReceta.buen_parpadeo_ritmo"  />
-                                    <label for="buen_parpadeo_ritmo"
-                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Parpadeo: Buen ritmo
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="flex flex-row mt-4 justify-start items-center w-100">
-                                    <Label
-                                        class="text-sm mr-4 font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Esterometría:
-                                    </Label>
-                                        <Select v-model="newReceta.estesiometria" @update:model-value="(value) => newReceta.estesiometria=value"  >
-                                            <SelectTrigger>
-                                                <SelectValue class="w-[7rem] text-xs " placeholder="Seleccionar"  />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectItem class="text-xs" value="Hiperestésico">Hiperestésico</SelectItem>
-                                                    <SelectItem class="text-xs" value="Normoestésico">Normoestésico</SelectItem>
-                                                    <SelectItem class="text-xs" value="Hipoestésico">Hipoestésico</SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                        <TooltipProvider  v-if="!isValidReceta.estesiometria" >
-                                            <Tooltip>
-                                            <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                <p>Seleccionar estesiometría</p>
-                                            </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                            </div>
-                        </div>
+                <!-- Fecha -->
+                <div class="flex flex-col gap-1 w-[30%]">
+                    <Label class="text-xs text-[#888]">Fecha Receta</Label>
+                    <div class="flex flex-row items-center gap-2">
+                        <Input type="text" v-model="fechaReceta.day"   placeholder="DD"   class="h-9 w-16 text-center" maxlength="2" />
+                        <Input type="text" v-model="fechaReceta.month" placeholder="MM"   class="h-9 w-16 text-center" maxlength="2" />
+                        <Input type="text" v-model="fechaReceta.year"  placeholder="AAAA" class="h-9 w-20 text-center" maxlength="4" />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger class="bg-transparent text-destructive">
+                                    <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.fecha }" />
+                                </TooltipTrigger>
+                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                    <p>Ingresar una fecha válida</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
-                    <Separator orientation="vertical" class="mx-10 h-[43rem]" />
-                    <div class="flex flex-col w-[70%] h-full   justify-between items-start">
-                        <div class="flex flex-col w-[100%] justify-between items-start h-[18rem]">
-                            <div class="flex flex-row justify-between w-full   h-[9rem] ">
-                                <div class="flex flex-col w-90 ">
-                                    <span class="form-label font-bold text-xl w-full mb-4">Marcas</span>                                
-                                    <div class="flex flex-row justify-between items-center w-[100%]">
-                                        <div class="flex mr-10 h-10 items-center justify-start">
-                                            <p class=" w-10 font-semibold text-left text-lg">O.D. </p>                                        
-                                            <Input type="decimal" v-model="newReceta.od_marca" :class="{'ml-2 w-40' : !isValidReceta.od_marca, 'ml-2 w-40 mr-4': isValidReceta.od_marca}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.od_marca" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Ingresar marca</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                        <div class="flex w-50 h-10 items-center justify-start">
-                                            <p class=" w-10 font-semibold text-left text-lg">O.I. </p>                                        
-                                            <Input type="decimal" v-model="newReceta.oi_marca" :class="{'ml-2 w-40' : !isValidReceta.oi_marca, 'ml-2 w-40 mr-4': isValidReceta.oi_marca}"  />
-                                            <TooltipProvider  v-if="!isValidReceta.oi_marca" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Ingresar marca</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col w-60">
-                                    <span class="form-label font-bold text-xl w-full mb-4">Oftalmólogo</span> 
-                                    <div class="flex flex-row">
+                </div>
 
-                                        <Input v-model="newReceta.oftalmologo"  />
-                                        <TooltipProvider  v-if="!isValidReceta.oftalmologo" >
-                                            <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Ingresar oftalmólogo</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                        
-                                </div>
-                            </div>
-                            <div class="flex flex-col w-full mt-[2rem] justify-start items-start h-[15rem]">
-                                <span class="form-label font-bold text-xl w-full mb-4">Observaciones Receta</span> 
-                                <Textarea type="decimal" v-model="newReceta.observaciones" class="resize-none w-full h-full" />
-                            </div>
+                <!-- Oftalmólogo -->
+                <div class="flex flex-col gap-1 flex-1">
+                    <Label class="text-xs text-[#888]">Oftalmólogo</Label>
+                    <Input class="h-9 w-full" v-model="newReceta.oftalmologo" />
+                </div>
+            </div>
+
+            <Separator class="my-8 w-full" />
+
+            <!-- Lentes Definitivas -->
+            <div class="w-full rounded-2xl border border-[#e5e5e5] p-6">
+                <div class="flex flex-row items-center justify-center">
+ 
+                    <span class="font-bold text-xl text-[#1a1a1a] w-[9rem] text-left pr-20  ">Lentes Definitivas</span>
+ 
+                    <div class="flex flex-col gap-3 items-center">
+ 
+                        <!-- OD -->
+                        <div class="flex flex-row items-center gap-3">
+                            <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
                             
+                            <Label class="text-xs text-[#888]">C.B.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.od_cb" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Esf.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.od_esferico" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Cil.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.od_cilindrico" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Eje</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.od_eje" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <ValueNoneIcon class="h-4 w-4 text-[#888]" />
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.od_diametro" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
                         </div>
-                        <Separator class="my-8 w-full" />
-                        <div class="flex flex-col w-[100%] justify-between items-start min-h-[18rem]">
-                            <div class="flex flex-col justify-start w-full  min-h-[16rem] ">
-                                <span class="form-label font-bold text-xl w-full">Pruebas</span>
-                                <div v-for="prueba, index in newPruebas" class="flex w-full flex-row justify-between items-start">
-                                    <Accordion type="single" collapsible class="w-[45rem]">
-                                        <AccordionItem :value="`item-${index+1}`">
-                                            <AccordionTrigger>Prueba {{ index+1 }}</AccordionTrigger>
-                                            <AccordionContent class="ml-4 pl-4 border-l-[#E5E5E5]  border-l-[0px] mb-8 min-h-[16rem]">
-                                            <div class="flex flex-row min-h-10 justify-start items-center">
-                                                <p class="font-bold w-14 text-sm">O.D.</p>
+ 
+                        <!-- OI -->
+                        <div class="flex flex-row items-center gap-3">
+                            <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
+                            
+                            <Label class="text-xs text-[#888]">C.B.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.oi_cb" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Esf.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.oi_esferico" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Cil.</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.oi_cilindrico" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <Label class="text-xs text-[#888]">Eje</Label>
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.oi_eje" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
+                            <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
+                            
+                            <ValueNoneIcon class="h-4 w-4 text-[#888]" />
+                            <Input type="decimal" class="h-9 w-20" v-model="newReceta.oi_diametro" />
+                            <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
+                        </div>
+ 
+                    </div>
+                </div>
+            </div>
+ 
 
-                                                    <p class="text-sm w-12 text-right pr-4">C.B.: </p>
-                                                    <Input type="decimal" v-model="prueba.od_cb" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_cb, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_cb}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.od_cb" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 20</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+            <Separator class="my-8 w-full" />
 
-                                                    <Separator orientation="vertical" class="mx-2" />
-                                                    
-                                                    <p class="text-sm w-12 text-right pr-4">Esf.: </p>
-                                                    <Input type="decimal" v-model="prueba.od_esferico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_esferico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_esferico}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.od_esferico" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: -35 a 35</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+            <!-- Queratometría + Evaluación General | Marcas + Observaciones + Pruebas -->
+            <div class="flex flex-row w-full gap-8">
 
-                                                    <Separator orientation="vertical" class="mx-2" />
+                <!-- Columna izquierda -->
+                <div class="flex flex-col gap-6 w-[22rem] shrink-0">
 
-                                                    <p class="text-sm w-12 text-right pr-4">Cil.: </p>
-                                                    <Input type="decimal" v-model="prueba.od_cilindrico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_cilindrico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_cilindrico}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.od_cilindrico" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: -10 a 10</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                    <!-- Queratometría -->
+                    <div class="rounded-2xl border border-[#e5e5e5] p-6">
+                        <p class="font-bold text-base mb-5 text-[#1a1a1a]">Queratometría</p>
+                        <div class="flex flex-col gap-3">
 
-                                                    <Separator orientation="vertical" class="mx-2" />
+                            <!-- OD -->
+                            <div class="flex flex-row items-center gap-2">
+                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
+                                <Input type="decimal" class="h-9 w-20 ml-4" v-model="newReceta.quet_m1_od" />
+                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.quet_m1_od }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 90</p></TooltipContent></Tooltip></TooltipProvider>
+                                <Separator orientation="vertical" class="h-6 mx-1" />
+                                <Input type="decimal" class="h-9 w-20 ml-4" v-model="newReceta.quet_m2_od" />
+                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.quet_m2_od }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 90</p></TooltipContent></Tooltip></TooltipProvider>
+                            </div>
 
-                                                    <p class="text-sm w-12 text-right pr-4">Eje: </p>
-                                                    <Input type="decimal" v-model="prueba.od_eje" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_eje, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_eje}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.od_eje" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 180</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                            <Separator class="w-full" />
 
-                                                    <Separator orientation="vertical" class="mx-2" />
+                            <!-- OI -->
+                            <div class="flex flex-row items-center gap-2">
+                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
+                                <Input type="decimal" class="h-9 w-20 ml-4" v-model="newReceta.quet_m1_oi" />
+                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.quet_m1_oi }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 90</p></TooltipContent></Tooltip></TooltipProvider>
+                                <Separator orientation="vertical" class="h-6 mx-1" />
+                                <Input type="decimal" class="h-9 w-20 ml-4" v-model="newReceta.quet_m2_oi" />
+                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.quet_m2_oi }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 90</p></TooltipContent></Tooltip></TooltipProvider>
+                            </div>
 
-                                                    <p class="text-sm w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                                    <Input type="decimal" v-model="prueba.od_diametro" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.od_diametro, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.od_diametro}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.od_diametro" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 30</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                    
+                            <!-- Notas queterom -->
+                            <div class="flex flex-col gap-1 mt-2">
+                                <Label class="text-xs text-[#888]">Notas</Label>
+                                <Textarea class="resize-none h-20" v-model="newReceta.observaciones_queterometria" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evaluación General -->
+                    <div class="rounded-2xl border border-[#e5e5e5] p-6">
+                        <p class="font-bold text-base mb-5 text-[#1a1a1a]">Evaluación General</p>
+                            <!-- Estesiometría -->
+                            <div class="flex flex-col gap-1 mt-2">
+                                <Label class="text-xs text-[#888]">Estesiometría</Label>
+                                <div class="flex items-center gap-2">
+                                    <Select v-model="newReceta.estesiometria" @update:model-value="(value) => newReceta.estesiometria = value">
+                                        <SelectTrigger class="h-9 w-full">
+                                            <SelectValue placeholder="Seleccionar" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem value="Hiperestésico">Hiperestésico</SelectItem>
+                                                <SelectItem value="Normoestésico">Normoestésico</SelectItem>
+                                                <SelectItem value="Hipoestésico">Hipoestésico</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.estesiometria }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Seleccionar estesiometría</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
+                            </div>
+
+                        <!-- check box -->
+                        <div class="flex flex-col gap-3 mt-5">
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.tonicidad" />
+                                <label class="text-sm font-light">Tonicidad</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.maquillaje" />
+                                <label class="text-sm font-light">Maquillaje</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.hendidura_palpebral" />
+                                <label class="text-sm font-light">Hendidura Palpebral</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.altura_palpebral" />
+                                <label class="text-sm font-light">Altura Palpebral</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.buen_parpadeo_amplitud" />
+                                <label class="text-sm font-light">Parpadeo: Buena amplitud</label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="newReceta.buen_parpadeo_ritmo" />
+                                <label class="text-sm font-light">Parpadeo: Buen ritmo</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Columna derecha -->
+                <div class="flex flex-col gap-6 flex-1">
+
+                    <!-- Marcas + Observaciones -->
+                    <div class="rounded-2xl border border-[#e5e5e5] p-6">
+                        <div class="flex flex-row gap-8">
+
+                            <!-- Marcas -->
+                            <div class="flex flex-col gap-4 w-[40%]">
+                                <p class="font-bold text-base text-[#1a1a1a]">Marcas</p>
+                                <div class="flex flex-col gap-3">
+                                    <div class="flex flex-row items-center gap-2">
+                                        <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
+                                        <Input type="decimal" class="h-9 flex-1" v-model="newReceta.od_marca" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_marca }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar marca</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="flex flex-row items-center gap-2">
+                                        <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
+                                        <Input type="decimal" class="h-9 flex-1" v-model="newReceta.oi_marca" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_marca }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar marca</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Separator orientation="vertical" class="h-auto" />
+
+                            <!-- Observaciones -->
+                            <div class="flex flex-col gap-1 flex-1">
+                                <p class="font-bold text-base text-[#1a1a1a] mb-1">Observaciones</p>
+                                <Textarea class="resize-none w-full h-[7rem]" v-model="newReceta.observaciones" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pruebas -->
+                    <div class="rounded-2xl border border-[#e5e5e5] p-6">
+                        <p class="font-bold text-base mb-4 text-[#1a1a1a]">Pruebas</p>
+
+                        <div class="flex flex-col gap-2">
+                            <div v-for="(prueba, index) in newPruebas" :key="index" class="flex flex-row items-start gap-2">
+                                <Accordion type="single" collapsible class="flex-1">
+                                    <AccordionItem :value="`item-${index + 1}`">
+                                        <AccordionTrigger>Prueba {{ index + 1 }}</AccordionTrigger>
+                                        <AccordionContent class="px-2 pt-2">
+
+                                            <!-- OD prueba -->
+                                            <div class="flex flex-row flex-wrap items-center gap-2 mb-3">
+                                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
+                                                <Label class="text-xs text-[#888]">C.B.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.od_cb" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.od_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Esf.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.od_esferico" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Cil.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.od_cilindrico" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Eje</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.od_eje" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.od_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <ValueNoneIcon class="h-3 w-3 text-[#888]" />
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.od_diametro" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.od_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
                                             </div>
-                                            <div class="flex mt-2 flex-row min-h-10 justify-start items-center">
-                                                <p class="font-bold w-14 text-sm">O.I.</p>
 
-                                                    <p class="text-sm w-12 text-right pr-4">C.B.: </p>
-                                                    <Input type="decimal" v-model="prueba.oi_cb" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_cb, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cb}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.oi_cb" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 20</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-
-                                                    <Separator orientation="vertical" class="mx-2" />
-                                                    
-                                                    <p class="text-sm w-12 text-right pr-4">Esf.: </p>
-                                                    <Input type="decimal" v-model="prueba.oi_esferico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_esferico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_esferico}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.oi_esferico" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: -35 a 35</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-
-                                                    <Separator orientation="vertical" class="mx-2" />
-
-                                                    <p class="text-sm w-12 text-right pr-4">Cil.: </p>
-                                                    <Input type="decimal" v-model="prueba.oi_cilindrico" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_cilindrico, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_cilindrico}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.oi_cilindrico" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: -10 a 10</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-
-                                                    <Separator orientation="vertical" class="mx-2" />
-
-                                                    <p class="text-sm w-12 text-right pr-4">Eje: </p>
-                                                    <Input type="decimal" v-model="prueba.oi_eje" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_eje, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_eje}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.oi_eje" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 180</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-
-                                                    <Separator orientation="vertical" class="mx-2" />
-
-                                                    <p class="text-sm w-12 text-right flex justify-start items-center"><ValueNoneIcon class="h-4 w-4" /> <span class="pl-2">:</span> </p>
-                                                    <Input type="decimal" v-model="prueba.oi_diametro" :class="{'w-14 text-xs h-8' : !isValidPrueba[index]?.oi_diametro, 'w-14 text-xs h-8 mr-4': isValidPrueba[index]?.oi_diametro}"  />
-                                                    <TooltipProvider  v-if="!isValidPrueba[index]?.oi_diametro" >
-                                                        <Tooltip>
-                                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-1"> <AsteriskIcon :size="12" /> </TooltipTrigger>
-                                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                            <p>Rango permitido: 0 a 30</p>
-                                                        </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-
+                                            <!-- OI prueba -->
+                                            <div class="flex flex-row flex-wrap items-center gap-2 mb-4">
+                                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
+                                                <Label class="text-xs text-[#888]">C.B.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.oi_cb" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.oi_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Esf.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.oi_esferico" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Cil.</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.oi_cilindrico" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <Label class="text-xs text-[#888]">Eje</Label>
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.oi_eje" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.oi_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
+                                                <Separator orientation="vertical" class="h-5 mx-1" />
+                                                <ValueNoneIcon class="h-3 w-3 text-[#888]" />
+                                                <Input type="decimal" class="h-8 w-16 text-xs" v-model="prueba.oi_diametro" />
+                                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidPrueba[index]?.oi_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
                                             </div>
-                                            <div class="flex flex-col mt-8">
-                                            <div class="flex flex-row flex-wrap gap-y-4 mb-8">
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.confort"  />
-                                                    <label for="confort"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    Confort
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem]  flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.movilidad"  />
-                                                    <label for="movilidad"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    Movilidad
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.centraje"  />
-                                                    <label for="centraje"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    Centraje
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.hiperemia"  />
-                                                    <label for="hiperemia"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    Hiperemia
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.agudeza_visual"  />
-                                                    <label for="agudeza_visual"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    Agudeza visual
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.od_edema"  />
-                                                    <label for="od_edema"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    OD Edema 
-                                                    </label>
-                                                </div>
-                                                <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox v-model:checked="prueba.oi_edema"  />
-                                                    <label for="oi_edema"
-                                                        class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    OI Edema 
-                                                    </label>
-                                                </div>
-                                                </div>
 
-                                                <div class="flex flex-row ">
-                                                    <p class="text-sm w-24 text-right flex justify-start items-center">Marcas:</p>
-                                                    <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem] mr-8">
-                                                        <p class="text-sm text-right flex justify-start items-center">OD:</p>
-                                                        <Input type="decimal" v-model="prueba.od_marca" class="w-32 text-xs h-8 mr-4"  />
-                                                    </div>
-                                                    <div class="items-center w-[12rem] flex gap-x-2 min-h-[1.5rem]">
-                                                        <p class="text-sm text-right flex justify-start items-center">OI:</p>
-                                                        <Input type="decimal" v-model="prueba.oi_marca" class="w-32 text-xs h-8 mr-4"  />
-                                                    </div>
+                                            <!-- Checkboxes -->
+                                            <div class="flex flex-row flex-wrap gap-x-6 gap-y-3 mb-4">
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.confort" /><label class="text-sm font-light">Confort</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.movilidad" /><label class="text-sm font-light">Movilidad</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.centraje" /><label class="text-sm font-light">Centraje</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.hiperemia" /><label class="text-sm font-light">Hiperemia</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.agudeza_visual" /><label class="text-sm font-light">Agudeza visual</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.od_edema" /><label class="text-sm font-light">OD Edema</label></div>
+                                                <div class="flex items-center gap-2"><Checkbox v-model:checked="prueba.oi_edema" /><label class="text-sm font-light">OI Edema</label></div>
+                                            </div>
+
+                                            <!-- Marcas prueba -->
+                                            <div class="flex flex-row gap-6">
+                                                <div class="flex items-center gap-2">
+                                                    <Label class="text-xs text-[#888]">Marcas O.D.</Label>
+                                                    <Input type="decimal" class="h-8 w-32 text-xs" v-model="prueba.od_marca" />
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <Label class="text-xs text-[#888]">Marcas O.I.</Label>
+                                                    <Input type="decimal" class="h-8 w-32 text-xs" v-model="prueba.oi_marca" />
                                                 </div>
                                             </div>
+
                                         </AccordionContent>
                                     </AccordionItem>
-                                    </Accordion>
-                                    <Button variant="ghost" type="button" size="icon" class="ml-2 mt-2 text-red-400 "  @click="newPruebas.splice(index, 1)"><Cross2Icon /></Button>
-                                </div>
-                                <Button variant="outline" type="button" size="sm" class="mt-6 w-32 py-2 font-italic bg-secondary text-gray-600 border-b-2"  @click="addPrueba()"> <PlusIcon /> Nueva Prueba</Button>
+                                </Accordion>
+                                <Button variant="ghost" type="button" size="icon" class="mt-2 text-red-400" @click="newPruebas.splice(index, 1)">
+                                    <Cross2Icon />
+                                </Button>
                             </div>
                         </div>
+
+                        <Button variant="outline" type="button" size="sm" class="mt-4 w-36" @click="addPrueba()">
+                            <PlusIcon class="mr-1" /> Nueva Prueba
+                        </Button>
                     </div>
+
                 </div>
-                <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                    <Button type="button" variant="outline" class="w-[15%] mr-5" @click="redirectCancel">Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">Guardar</Button>
-                </div>
-            </form>
-        </div>
-        <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
-            :action="()=>{showError=false}" />
+            </div>
+
+            <!-- Footer -->
+            <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 gap-4">
+                <Button type="button" variant="outline" class="w-[15%]" @click="redirectCancel">Cancelar</Button>
+                <Button type="submit" class="w-[15%]">Guardar</Button>
+            </div>
+
+        </form>
     </div>
+
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar" :action="() => { showError = false }" />
+</div>
 </template>
