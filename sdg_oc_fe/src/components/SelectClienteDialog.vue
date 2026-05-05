@@ -56,7 +56,7 @@ onMounted(async () => {
 <template>
   <Dialog :open="modelValue" @update:open="emit('update:modelValue', $event)">
     <DialogTrigger as-child>
-      <Button variant="default" size="icon" class="w-9 h-9 ml-4">
+      <Button variant="default" size="icon" class="w-9 h-9">
         <MagnifyingGlassIcon />
       </Button>
     </DialogTrigger>

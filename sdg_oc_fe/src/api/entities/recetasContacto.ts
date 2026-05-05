@@ -77,7 +77,6 @@ export const recetaContactoCustomValidator = (_newReceta: {
     const validateEje = (value:unknown) => isValidNumber(value) && value >= 0 && value <= 180;
     const validateQuet = (value:unknown) => isValidNumber(value) && value >= 0 && value <= 90;
     const isValid = {
-        oftalmologo: Boolean(_newReceta.oftalmologo),
         quet_m1_od: validateQuet(_newReceta.quet_m1_od),
         quet_m2_od: validateQuet(_newReceta.quet_m2_od),
         quet_m1_oi: validateQuet(_newReceta.quet_m1_oi),
@@ -90,7 +89,7 @@ export const recetaContactoCustomValidator = (_newReceta: {
         od_diametro: validateDiametro(_newReceta.od_diametro),
         od_marca: Boolean(_newReceta.od_marca),
         oi_cb:validateCb( _newReceta.oi_cb),
-        oi_esferico: validateEsferico(_newReceta.od_cilindrico),
+        oi_esferico: validateEsferico(_newReceta.oi_esferico),
         oi_cilindrico: validateCilindrico(_newReceta.oi_cilindrico),
         oi_eje: validateEje(_newReceta.oi_eje),
         oi_diametro: validateDiametro(_newReceta.oi_diametro),

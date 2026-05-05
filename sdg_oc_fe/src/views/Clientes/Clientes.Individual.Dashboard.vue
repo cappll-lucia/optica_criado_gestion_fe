@@ -147,8 +147,8 @@ const loadData = async () => {
     if (!currentCliente.value) return;
     recetasCliente.value = await clientesApi.getRecetasSummaryByCliente(currentCliente.value.id);
     audiometriasCliente.value = await clientesApi.getAudiometriasByCliente(currentCliente.value.id);
-    ctaCorriente.value = await cuentaCorrienteApi.getOneByCliente(currentCliente.value.id);
-    ventasCliente.value = await ventasApi.getAllByCliente(currentCliente.value.id);
+    // ctaCorriente.value = await cuentaCorrienteApi.getOneByCliente(currentCliente.value.id);
+    // ventasCliente.value = await ventasApi.getAllByCliente(currentCliente.value.id);
   } catch (err: any) {
     errorMessage.value = err.message as string;
     showError.value = true;

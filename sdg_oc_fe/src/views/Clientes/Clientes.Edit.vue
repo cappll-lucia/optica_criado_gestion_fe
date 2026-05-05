@@ -27,8 +27,10 @@ const hanldeCancel = async(id: number)=>{
 </script>
 
 <template>
-<div class="page">
-        <Breadcrumb>
+    <div class="page lg:px-60">
+        <div class="max-w-[900px] mx-auto px-6 py-10">
+
+            <Breadcrumb class="mb-8">
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink href="/">
@@ -51,14 +53,16 @@ const hanldeCancel = async(id: number)=>{
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <div class="pt-2 mb-4 " >
-            <EditClienteForm
-                @handle-edit-cliente="handleEditCliente"
-                @hanlde-cancel="hanldeCancel"
-            />
-        </div>
+        
 
+        <h1 class="page-title">Editar Cliente</h1>
+
+        <EditClienteForm
+            @handle-edit-cliente="handleEditCliente"
+            @hanlde-cancel="hanldeCancel"
+        />
     
+    </div>
     </div>
 </template>
 
