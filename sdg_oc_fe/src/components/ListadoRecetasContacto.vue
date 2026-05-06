@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Separator } from '@/components/ui/separator';
-import { ChevronRightIcon, DownloadIcon, PlusIcon, ValueNoneIcon, Pencil1Icon } from '@radix-icons/vue'
+import { DownloadIcon, PlusIcon, ValueNoneIcon, Pencil1Icon } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
@@ -70,17 +70,17 @@ const printRecetas = () => {
     <div class="panel w-full flex flex-row h-full">
 
         <!-- Sidebar -->
-        <div class="w-[23%] p-2 pt-0 h-full">
-            <div class="flex justify-between mr-2 gap-2">
+        <div class="w-[30%] p-2 pt-0 h-full">
+            <div class="flex mr-2 gap-2 h-10 mb-2">
                 <button
-                    class="flex items-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/contacto/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class="flex items-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -117,44 +117,63 @@ const printRecetas = () => {
                 </Dialog>
             </div>
 
-            <Separator class="my-4 w-[95%]" />
-
-            <!-- Historia Clínica -->
-            <div class="mr-2 mb-1">
-                <div
-                    class="px-3 py-3 flex flex-row justify-between items-center rounded-md cursor-pointer transition-colors"
-                    :class="selectedHistoriaClinica ? 'bg-zinc-900 text-white' : 'hover:bg-zinc-100'"
-                    @click="() => { selectedHistoriaClinica = true; currentRec = undefined }">
-                    <span class="text-sm font-medium">Historia Clínica</span>
-                    <ChevronRightIcon class="w-4 h-4 shrink-0" :class="selectedHistoriaClinica ? 'text-zinc-300' : 'text-zinc-400'" />
-                </div>
+            <div class="flex items-center justify-between mr-2 mt-4 mb-3 px-1">
+                <span class="text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Historial</span>
+                <span class="text-[10px] font-semibold text-zinc-400">{{ (recetas?.length ?? 0) + (historiaClinica ? 1 : 0) }}</span>
             </div>
-            <Separator class="my-1 w-[95%]" />
 
-            <!-- Recetas -->
-            <div v-for="receta in recetas" :key="receta.id" class="mr-2">
+            <!-- Timeline -->
+            <div class="relative mr-2 pl-4">
+                <!-- vertical line -->
+                <div class="absolute left-[1.35rem] top-2 bottom-2 w-px bg-zinc-200" />
+
+                <!-- Historia Clínica item -->
                 <div
-                    class="px-3 py-3 flex flex-row justify-between items-center rounded-md cursor-pointer transition-colors"
-                    :class="currentRec === receta ? 'bg-zinc-900 text-white' : 'hover:bg-zinc-100'"
-                    @click="() => { selectedHistoriaClinica = false; currentRec = receta; }">
-                    <div class="flex flex-col flex-1">
-                        <span class="text-sm font-medium">{{ formatDate(receta.fecha.toString()) }}</span>
+                    class="relative flex items-center gap-3 mb-2 py-2.5 cursor-pointer group"
+                    @click="() => { selectedHistoriaClinica = true; currentRec = undefined }">
+                    <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
+                        :class="selectedHistoriaClinica ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent  min-h-[4rem] justify-center"
+                        :class="selectedHistoriaClinica ? 'bg-zinc-900' : 'hover:border-zinc-300'">
+                        <span class="text-sm font-semibold" :class="selectedHistoriaClinica ? 'text-white' : 'text-zinc-700'">
+                            Historia Clínica
+                        </span>
                     </div>
-                    <ChevronRightIcon class="w-4 h-4 shrink-0" :class="currentRec === receta ? 'text-zinc-300' : 'text-zinc-400'" />
                 </div>
-                <Separator class="my-1" />
+
+                <!-- Recetas -->
+                <div
+                    v-for="(receta, index) in recetas"
+                    :key="receta.id"
+                    class="relative flex items-center gap-3 mb-2 py-2.5 cursor-pointer group"
+                    @click="() => { selectedHistoriaClinica = false; currentRec = receta; }">
+                    <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
+                        :class="currentRec === receta ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent  min-h-[4rem] justify-center"
+                        :class="currentRec === receta ? 'bg-zinc-900' : 'hover:border-zinc-300'">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-sm font-semibold" :class="currentRec === receta ? 'text-white' : 'text-zinc-700'">
+                                {{ formatDate(receta.fecha.toString()) }}
+                            </span>
+                            <span v-if="index === 0"
+                                class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
+                                Vigente
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <Separator orientation="vertical" />
 
         <!-- Historia Clínica view -->
-        <div v-if="selectedHistoriaClinica" class="w-[75%] h-full px-8">
+        <div v-if="selectedHistoriaClinica" class="w-[72%] h-full px-8">
             <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" :cliente-id="idCliente" />
         </div>
 
         <!-- Receta detail view -->
-        <div v-else class="w-[75%] h-full px-8">
+        <div v-else class="w-[72%] h-full px-8">
             <div v-if="currentRec">
 
                 <!-- Header -->

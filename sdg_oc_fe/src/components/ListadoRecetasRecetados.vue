@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RecetasAereos } from '@/api/entities/recetasAereos';
 import { Separator } from '@/components/ui/separator'
-import { ChevronRightIcon, DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
+import { DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
 import { onMounted, ref } from 'vue';
 import ItemDetalleReceta from '@/components/ItemDetalleRecetaRecetados.vue'
 import {
@@ -69,17 +69,17 @@ const handleChangeReceta = (receta: RecetasAereos) => {
     <div class="panel w-full flex flex-row h-full">
 
         <!-- Sidebar -->
-        <div class="w-[25%] p-2 pt-0 h-full">
-            <div class="flex justify-between mr-2 h-10 gap-2">
+        <div class="w-[30%] p-2 pt-0 h-full">
+            <div class="flex mr-2 h-10 gap-2">
                 <button
-                    class="flex items-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class="flex items-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -109,29 +109,53 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                 </Dialog>
             </div>
 
-            <Separator class="my-4 w-[95%]" />
+            <div class="flex items-center justify-between mr-2 mt-4 mb-3 px-1">
+                <span class="text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Historial</span>
+                <span class="text-[10px] font-semibold text-zinc-400">{{ recetas.length }}</span>
+            </div>
 
-            <div v-for="receta in recetas" :key="receta.id" class="mr-2">
+            <!-- Timeline -->
+            <div class="relative mr-2 pl-4">
+                <!-- vertical line -->
+                <div class="absolute left-[1.35rem] top-2 bottom-2 w-px bg-zinc-200" />
+
                 <div
-                    class="px-3 py-3 flex  flex-row justify-between items-center rounded-md cursor-pointer transition-colors"
-                    :class="currentRec === receta ? 'bg-zinc-900 text-white' : 'hover:bg-zinc-100'"
+                    v-for="(receta, index) in recetas"
+                    :key="receta.id"
+                    class="relative flex items-center gap-3 py-2.5 cursor-pointer group  "
                     @click="handleChangeReceta(receta)">
-                    <div class="flex flex-col flex-1">
-                        <span class="text-sm font-medium">{{ formatDate(receta.fecha.toString()) }}</span>
-                        <span class="text-xs" :class="currentRec === receta ? 'text-zinc-400' : 'text-zinc-500'">
-                            {{ receta.tipoReceta }}
-                        </span>
+
+                    <!-- dot -->
+                    <div class="relative z-10 mb-2 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
+                        :class="currentRec === receta
+                            ? 'bg-[#000] border-black'
+                            : 'bg-white border-zinc-300  group-hover:bg-zinc-300'" />
+
+                    <!-- content -->
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent " 
+                        :class="currentRec === receta ? 'bg-zinc-900 text-white' : 'hover:border-zinc-300'"
+                        
+                        >
+                        <div class="flex items-center gap-2 flex-wrap  ">
+                            <span class="text-sm font-semibold">
+                                <!-- :class="currentRec === receta ? 'text-zinc-900' : 'text-zinc-700'"> -->
+                                {{ formatDate(receta.fecha.toString()) }}
+                            </span>
+                            <span v-if="index === 0"
+                                class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
+                                Vigente
+                            </span>
+                        </div>
+                        <span class="text-xs" :class="currentRec === receta ?  'text-white' : 'text-zinc-900'"" >{{ receta.tipoReceta }}</span>
                     </div>
-                    <ChevronRightIcon class="w-4 h-4 shrink-0" :class="currentRec === receta ? 'text-zinc-300' : 'text-zinc-400'" />
                 </div>
-                <Separator class="my-1" />
             </div>
         </div>
 
         <Separator orientation="vertical" />
 
         <!-- Detail view -->
-        <div class="w-[75%] h-full px-8">
+        <div class="w-[72%] h-full px-8">
             <div v-if="currentRec">
                 <!-- Header -->
                 <div class="flex flex-row justify-between items-start mb-1">
