@@ -85,6 +85,13 @@ body,
 
 }
 
+.inter-page{
+  /* max-w-[900px] mx-auto px-6 py-10 */
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-top:1rem;
+}
+
 .forms-wide{
   width: 100%
 }

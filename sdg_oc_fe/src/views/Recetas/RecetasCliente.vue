@@ -18,7 +18,6 @@ import { useRoute } from 'vue-router';
 import { clientesApi } from '@/api/libs/clientes';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
-import Button from '@/components/ui/button/Button.vue';
 import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
@@ -68,11 +67,9 @@ const loadData = async ()=>{
         currentCliente.value = await clientesApi.getOne(id)
         if(currentCliente){
             const res = await clientesApi.getRecetasByCliente(currentCliente.value.id);
-           
             recetasClienteAereos.value = res.recetasLentesAereos;
             recetasClienteContacto.value = res.recetasLentesContacto;
             historiaClinicaCliente.value = res.historiaClinicaContacto;
-            console.log(historiaClinicaCliente.value)
         }
         loader.hide();
     }catch(err: any){
@@ -89,104 +86,136 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
 
 <template>
     <div class="page" v-if="currentCliente">
+        <div class="inter-page">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Inicio
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
+                <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/clientes">
-                        Clientes
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
+                <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
                 <BreadcrumbItem>
                     <BreadcrumbLink :href="`/clientes/dashboard/${currentCliente?.id}`">
-                        {{nombreCliente}}
+                        {{ nombreCliente }}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
+                <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
                 <BreadcrumbItem>
                     <BreadcrumbPage>Recetas</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <div class=" flex flex-row justify-between w-full mb-4">
-            <h1 class="page-title ">Recetas: {{ nombreCliente }} </h1>
-            <div>
-                <Button class="text-xs mr-2 " @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)" >Nueva Receta Anteojos Recetados </Button>
-                <Button class="text-xs" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)" >Nueva Receta Lentes de Contacto </Button>
+        </div>
+
+        <div class="inter-page">
+        <div class="flex flex-row justify-between items-center w-full mb-4 mt-2">
+            <h1 class="page-title">Recetas: {{ nombreCliente }}</h1>
+            <div class="flex gap-2">
+                <button
+                    class="text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
+                    + Nueva Receta Anteojos
+                </button>
+                <button
+                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                    @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
+                    + Nueva Receta Contacto
+                </button>
             </div>
         </div>
+
         <div class="pt-2">
-            <Tabs :default-value="openTab" class="w-[100%]">
-                <TabsList class="w-[100%]">
-                    <TabsTrigger class="w-[50%]" value="recetados">
+            <Tabs :default-value="openTab" class="w-full">
+                <TabsList class="w-full bg-zinc-100 rounded-md p-1 border  border-zinc-200">
+                    <TabsTrigger
+                        class="w-1/2 text-sm  data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
+                        value="recetados">
                         Anteojos Recetados
                     </TabsTrigger>
-                    <TabsTrigger class="w-[50%]" value="contacto">
-                        Lentes De Contacto
+                    <TabsTrigger
+                        class="w-1/2 text-sm  data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
+                        value="contacto">
+                        Lentes de Contacto
                     </TabsTrigger>
                 </TabsList>
-                <TabsContent class="bg-secondary min-h-[60rem] px-2 py-6 rounded" value="recetados">
-                    <ListadoRecetasRecetados v-if="recetasClienteAereos && recetasClienteAereos.length>0 " :recetas="recetasClienteAereos" :nombreCliente="nombreCliente" :id-cliente="Number(currentCliente?.id)" :selectedId="selectedRecetaId" />
-                    <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
-                        <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">anteojos recetados </span> </h2>
-                        <Button @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
+
+                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border  border-zinc-200" value="recetados">
+                    <ListadoRecetasRecetados
+                        v-if="recetasClienteAereos && recetasClienteAereos.length > 0"
+                        :recetas="recetasClienteAereos"
+                        :nombreCliente="nombreCliente"
+                        :id-cliente="Number(currentCliente?.id)"
+                        :selectedId="selectedRecetaId" />
+                    <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-4">
+                        <p class="text-sm text-zinc-500">
+                            El cliente no tiene recetas de <span class="font-semibold text-zinc-700">anteojos recetados</span>
+                        </p>
+                        <button
+                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                            @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
+                            Registrar receta
+                        </button>
                     </div>
                 </TabsContent>
-                <TabsContent class="bg-secondary min-h-[60rem] px-2 py-6 rounded" value="contacto">
-                    <ListadoRecetasContacto v-if="(recetasClienteContacto && recetasClienteContacto.length > 0 || historiaClinicaCliente)" :nombreCliente="nombreCliente"  :id-cliente="Number(currentCliente?.id)" :recetas="recetasClienteContacto" :historiaClinica="historiaClinicaCliente" :selectedId="selectedContactoId"  />
-                    <div v-else class="flex min-h-[20rem] flex-col w-100 justify-center items-center">
-                        <h2 class="text-lg mb-8">El cliente no tiene recetas registradas para <span class="font-bold">lentes de contacto </span> </h2>
-                        <Button  class="w-[15rem] mb-8 " @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"> Registrar receta </Button>
-                        <Button class="w-[15rem]"  @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${currentCliente?.id}`)"> Registrar historia clínica </Button>
+
+                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-b-md border border-t-0 border-zinc-200" value="contacto">
+                    <ListadoRecetasContacto
+                        v-if="(recetasClienteContacto && recetasClienteContacto.length > 0) || historiaClinicaCliente"
+                        :nombreCliente="nombreCliente"
+                        :id-cliente="Number(currentCliente?.id)"
+                        :recetas="recetasClienteContacto"
+                        :historiaClinica="historiaClinicaCliente"
+                        :selectedId="selectedContactoId" />
+                    <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-3">
+                        <p class="text-sm text-zinc-500">
+                            El cliente no tiene recetas de <span class="font-semibold text-zinc-700">lentes de contacto</span>
+                        </p>
+                        <button
+                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors w-52"
+                            @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
+                            Registrar receta
+                        </button>
+                        <button
+                            class="text-xs px-4 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors w-52"
+                            @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${currentCliente?.id}`)">
+                            Registrar historia clínica
+                        </button>
                     </div>
                 </TabsContent>
             </Tabs>
         </div>
     </div>
+    </div>
+
+    <!-- Cliente no encontrado -->
     <div class="page" v-else>
-         <Breadcrumb>
+    <div class="inter-page">
+        <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Inicio
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
+                <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <BreadcrumbLink href="/clientes">
-                        Clientes
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
+                <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
                 <BreadcrumbItem>
                     <BreadcrumbPage>Recetas</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
-        <div class="pt-2 mb-4 " >
-            <div  class="flex flex-col justify-between items-start px-[5rem] ">
-                <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Cliente con id={{ route.params.idCliente }} no encontrado</h3>
-                </div>
-            </div>
+        <div class="pt-8 flex justify-center">
+            <h3 class="page-subtitle text-center text-zinc-500">
+                Cliente con id={{ route.params.idCliente }} no encontrado
+            </h3>
         </div>
     </div>
+    </div>
+
     <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar"
-            :action="()=>{showError=false}" />
+        :action="()=>{showError=false}" />
 </template>
