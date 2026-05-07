@@ -31,6 +31,7 @@ const detalleCerca = ref<DetalleRecetaAereos | undefined>();
 const detalleLejos = ref<DetalleRecetaAereos | undefined>();
 const selectedToPrint = ref<RecetasAereos[]>([]);
 const printOpen = ref<boolean>(false);
+const viewMode = ref<'detalle' | 'historial'>('detalle');
 
 onMounted(() => {
     if (props.selectedId) {
@@ -60,8 +61,15 @@ const printRecetas = () => {
 
 const handleChangeReceta = (receta: RecetasAereos) => {
     currentRec.value = receta;
+    viewMode.value = 'detalle';
     detalleCerca.value = currentRec.value?.detallesRecetaLentesAereos.find(det => det.tipo_detalle == 'Cerca')
     detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det => det.tipo_detalle == 'Lejos')
+}
+
+const formatDetalle = (det: DetalleRecetaAereos) => {
+    const sign = (n: number) => n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
+    return `O.D.Esf.${sign(det.od_esferico)}  Cil.${sign(det.od_cilindrico)}  A.${det.od_grados}°\n` +
+           `O.I.Esf.${sign(det.oi_esferico)}  Cil.${sign(det.oi_cilindrico)}  A.${det.oi_grados}°`;
 }
 </script>
 
@@ -72,7 +80,8 @@ const handleChangeReceta = (receta: RecetasAereos) => {
         <div class="w-[30%] p-2 pt-0 h-full">
             <div class="flex mr-2 h-10 gap-2">
                 <button
-                    class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                <button
+                    class="flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
@@ -109,9 +118,24 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                 </Dialog>
             </div>
 
-            <div class="flex items-center justify-between mr-2 mt-4 mb-3 px-1">
-                <span class="text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">Historial</span>
-                <span class="text-[10px] font-semibold text-zinc-400">{{ recetas.length }}</span>
+            <div class="flex items-center justify-center mr-2 mt-6 mb-2 gap-2 space-x-7 tracking-widest">
+                <span class="text-[10px] font-semibold uppercase transition-colors "
+                    :class="viewMode === 'detalle' ? 'text-zinc-900' : 'text-zinc-400'">
+                    Detalle
+                </span>
+                <!-- Toggle switch -->
+                <button
+                    class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none"
+                    :class="viewMode === 'historial' ? 'bg-zinc-900' : 'bg-zinc-300'"
+                    @click="() => { viewMode = viewMode === 'historial' ? 'detalle' : 'historial'; viewMode === 'historial' ? currentRec = undefined : currentRec = recetas[0] }">
+                    <span
+                        class="pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200"
+                        :class="viewMode === 'historial' ? 'translate-x-4' : 'translate-x-0'" />
+                </button>
+                <span class="text-[10px] font-semibold uppercase transition-colors "
+                    :class="viewMode === 'historial' ? 'text-zinc-900' : 'text-zinc-400'">
+                    Resumen
+                </span>
             </div>
 
             <!-- Timeline -->
@@ -156,7 +180,30 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
         <!-- Detail view -->
         <div class="w-[72%] h-full px-8">
-            <div v-if="currentRec">
+
+            <!-- MODO HISTORIAL: texto plano -->
+            <div v-if="viewMode === 'historial'" class="font-mono text-xs text-zinc-800 leading-relaxed whitespace-pre">
+                <div v-for="receta in recetas" :key="receta.id" class="mb-6">
+                    <p class="font-bold text-zinc-900 mb-1">
+                        ** ANTEOJOS {{ receta.tipoReceta.toUpperCase() }}
+                        <span class="font-normal ml-4 text-zinc-500">---> {{ formatDate(receta.fecha.toString()) }}</span>
+                    </p>
+                    <template v-for="det in receta.detallesRecetaLentesAereos" :key="det.tipo_detalle">
+                        <p>{{ formatDetalle(det) }}</p>
+                    </template>
+                    <p v-if="receta.cristal || receta.color || receta.armazon" class="mt-1">
+                        <span v-if="receta.cristal">Cristal: {{ receta.cristal }}</span><span v-if="receta.cristal && (receta.color || receta.armazon)">  |  </span>
+                        <span v-if="receta.color">Color: {{ receta.color }}</span><span v-if="receta.color && receta.armazon">  |  </span>
+                        <span v-if="receta.armazon">Armazón: {{ receta.armazon }}</span>
+                    </p>
+                    <p v-if="receta.tratamiento">Tratamiento: {{ receta.tratamiento }}</p>
+                    <p v-if="receta.observaciones" class="text-zinc-500">{{ receta.observaciones }}</p>
+                    <Separator class="mt-4" />
+                </div>
+            </div>
+
+            <!-- MODO DETALLE: vista individual -->
+            <div v-else-if="currentRec">
                 <!-- Header -->
                 <div class="flex flex-row justify-between items-start mb-1">
                     <div class="flex flex-col gap-1">
