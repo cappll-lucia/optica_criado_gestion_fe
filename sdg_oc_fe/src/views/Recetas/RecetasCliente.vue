@@ -143,12 +143,14 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 </TabsList>
 
                 <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border  border-zinc-200" value="recetados">
-                    <ListadoRecetasRecetados
-                        v-if="recetasClienteAereos && recetasClienteAereos.length > 0"
-                        :recetas="recetasClienteAereos"
-                        :nombreCliente="nombreCliente"
-                        :id-cliente="Number(currentCliente?.id)"
-                        :selectedId="selectedRecetaId" />
+                        <ListadoRecetasRecetados
+                            v-if="recetasClienteAereos && recetasClienteAereos.length > 0"
+                            :recetas="recetasClienteAereos"
+                            :nombreCliente="nombreCliente"
+                            :id-cliente="Number(currentCliente?.id)"
+                            :selectedId="selectedRecetaId"
+                            :nroDocumento="currentCliente?.nroDocumento"
+                            :tipoDocumento="currentCliente?.tipoDocumento" />
                     <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-4">
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">anteojos recetados</span>
@@ -161,7 +163,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                     </div>
                 </TabsContent>
 
-                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-b-md border border-t-0 border-zinc-200" value="contacto">
+                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border border-zinc-200" value="contacto">
                     <ListadoRecetasContacto
                         v-if="(recetasClienteContacto && recetasClienteContacto.length > 0) || historiaClinicaCliente"
                         :nombreCliente="nombreCliente"
