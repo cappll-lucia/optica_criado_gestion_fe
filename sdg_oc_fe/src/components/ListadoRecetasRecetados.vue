@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
 import { onMounted, ref, computed } from 'vue';
 import ItemDetalleReceta from '@/components/ItemDetalleRecetaRecetados.vue'
+import ItemResumenReceta from '@/components/ItemResumenRecetaRecetados.vue'
 import {
     Dialog,
     DialogContent,
@@ -82,6 +83,7 @@ const buildResumenText = (recetas: RecetasAereos[]): string => {
         receta.detallesRecetaLentesAereos.forEach(det => {
             lines.push(`   O.D.Esf.${sign(det.od_esferico)}  Cil.${sign(det.od_cilindrico)}  A.${det.od_grados}°`);
             lines.push(`   O.I.Esf.${sign(det.oi_esferico)}  Cil.${sign(det.oi_cilindrico)}  A.${det.oi_grados}°`);
+            lines.push(`   DNP ${sign(det.dnp)}`);
         });
         const extras: string[] = [];
         if (receta.cristal) extras.push(`Cristal: ${receta.cristal}`);
@@ -153,10 +155,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
     detalleLejos.value = currentRec.value?.detallesRecetaLentesAereos.find(det => det.tipo_detalle == 'Lejos')
 }
 
-const formatDetalle = (det: DetalleRecetaAereos) => {
-    return `O.D.Esf.${sign(det.od_esferico)}  Cil.${sign(det.od_cilindrico)}  A.${det.od_grados}°\n` +
-           `O.I.Esf.${sign(det.oi_esferico)}  Cil.${sign(det.oi_cilindrico)}  A.${det.oi_grados}°`;
-}
+
 </script>
 
 <template>
@@ -285,23 +284,10 @@ const formatDetalle = (det: DetalleRecetaAereos) => {
 
             <!-- MODO RESUMEN -->
             <div v-if="viewMode === 'historial'" class="font-mono text-xs text-zinc-800 leading-relaxed whitespace-pre">
-                <div v-for="receta in recetas" :key="receta.id" class="mb-6">
-                    <p class="font-bold text-zinc-900 mb-1">
-                        ** ANTEOJOS {{ receta.tipoReceta.toUpperCase() }}
-                        <span class="font-normal ml-4 text-zinc-500">---> {{ formatDate(receta.fecha.toString()) }}</span>
-                    </p>
-                    <template v-for="det in receta.detallesRecetaLentesAereos" :key="det.tipo_detalle">
-                        <p>{{ formatDetalle(det) }}</p>
-                    </template>
-                    <p v-if="receta.cristal || receta.color || receta.armazon" class="mt-1">
-                        <span v-if="receta.cristal">Cristal: {{ receta.cristal }}</span><span v-if="receta.cristal && (receta.color || receta.armazon)">  |  </span>
-                        <span v-if="receta.color">Color: {{ receta.color }}</span><span v-if="receta.color && receta.armazon">  |  </span>
-                        <span v-if="receta.armazon">Armazón: {{ receta.armazon }}</span>
-                    </p>
-                    <p v-if="receta.tratamiento">Tratamiento: {{ receta.tratamiento }}</p>
-                    <p v-if="receta.observaciones" class="text-zinc-500">{{ receta.observaciones }}</p>
-                    <Separator class="mt-4" />
-                </div>
+                <ItemResumenReceta
+                    v-for="receta in recetas"
+                    :key="receta.id"
+                    :receta="receta" />
             </div>
 
             <!-- MODO DETALLE -->
