@@ -164,13 +164,15 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                 </TabsContent>
 
                 <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border border-zinc-200" value="contacto">
-                    <ListadoRecetasContacto
-                        v-if="(recetasClienteContacto && recetasClienteContacto.length > 0) || historiaClinicaCliente"
-                        :nombreCliente="nombreCliente"
-                        :id-cliente="Number(currentCliente?.id)"
-                        :recetas="recetasClienteContacto"
-                        :historiaClinica="historiaClinicaCliente"
-                        :selectedId="selectedContactoId" />
+                <ListadoRecetasContacto
+                    v-if="(recetasClienteContacto && recetasClienteContacto.length > 0) || historiaClinicaCliente"
+                    :nombreCliente="nombreCliente"
+                    :id-cliente="Number(currentCliente?.id)"
+                    :recetas="recetasClienteContacto"
+                    :historiaClinica="historiaClinicaCliente"
+                    :selectedId="selectedContactoId"
+                    :nroDocumento="currentCliente?.nroDocumento"
+                    :tipoDocumento="currentCliente?.tipoDocumento" />
                     <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-3">
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">lentes de contacto</span>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import { DownloadIcon, PlusIcon, ValueNoneIcon, Pencil1Icon } from '@radix-icons/vue'
 import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -18,6 +17,7 @@ import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
+import { TipoDocumento } from '@/api/entities/clientes';
 
 const printOpen = ref<boolean>(false);
 const props = defineProps<{
@@ -26,11 +26,14 @@ const props = defineProps<{
     nombreCliente: string,
     idCliente: number,
     selectedId: string | undefined,
+    nroDocumento: number | undefined,
+    tipoDocumento: TipoDocumento | undefined,
 }>();
 
 const currentRec = ref<RecetaContacto | undefined>();
 const selectedHistoriaClinica = ref(false);
-const selectedToPrint = ref<RecetaContacto[]>([])
+const selectedToPrint = ref<RecetaContacto[]>([]);
+const viewMode = ref<'detalle' | 'resumen'>('detalle');
 
 onMounted(() => {
     if (props.selectedId) {
@@ -48,19 +51,79 @@ onMounted(() => {
     }
 })
 
+const allSelected = computed(() => selectedToPrint.value.length === (props.recetas?.length ?? 0));
+const toggleSelectAll = () => { selectedToPrint.value = allSelected.value ? [] : [...(props.recetas ?? [])]; };
+const isChecked = (receta: RecetaContacto) => selectedToPrint.value.some(r => r.id === receta.id);
+
 const handleCheckboxChange = (receta: RecetaContacto) => {
     const index = selectedToPrint.value.findIndex((selected) => selected.id === receta.id);
-    index !== -1
-        ? selectedToPrint.value.splice(index, 1)
-        : selectedToPrint.value.push(receta);
+    index !== -1 ? selectedToPrint.value.splice(index, 1) : selectedToPrint.value.push(receta);
 };
 
 const printRecetas = () => {
-    if (selectedToPrint.value.length === 0) {
-        alert("Por favor, selecciona al menos una receta para imprimir.");
-        return;
-    }
+    if (selectedToPrint.value.length === 0) { alert("Por favor, selecciona al menos una receta para imprimir."); return; }
     generateRecetasContactoPDF(selectedToPrint.value, props.nombreCliente);
+    printOpen.value = false;
+};
+
+const sign = (n: number) => n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
+
+const printResumenJPG = () => {
+    if (selectedToPrint.value.length === 0) { alert("Seleccioná al menos una receta."); return; }
+    const recetas = selectedToPrint.value;
+    const lines: string[] = [];
+    recetas.forEach(receta => {
+        lines.push(`** LENTES DE CONTACTO  --->  ${formatDate(receta.fecha.toString())}`);
+        lines.push(`   O.D.  CB:${receta.od_cb.toFixed(2)}  Esf.:${sign(receta.od_esferico)}  Cil.:${sign(receta.od_cilindrico)}  Eje:${receta.od_eje.toFixed(2)}  Diám.:${receta.od_diametro.toFixed(2)}`);
+        lines.push(`   O.I.  CB:${receta.oi_cb.toFixed(2)}  Esf.:${sign(receta.oi_esferico)}  Cil.:${sign(receta.oi_cilindrico)}  Eje:${receta.oi_eje.toFixed(2)}  Diám.:${receta.oi_diametro.toFixed(2)}`);
+        if (receta.od_marca || receta.oi_marca) lines.push(`   Marcas  OD: ${receta.od_marca ?? '—'}  |  OI: ${receta.oi_marca ?? '—'}`);
+        if (receta.observaciones) lines.push(`   Obs.: ${receta.observaciones}`);
+        if (receta.quet_m1_od || receta.quet_m1_oi) {
+            lines.push(`   Queratometría:`);
+            lines.push(`     OD: ${receta.quet_m1_od?.toFixed(2) ?? '—'} / ${receta.quet_m2_od?.toFixed(2) ?? '—'}`);
+            lines.push(`     OI: ${receta.quet_m1_oi?.toFixed(2) ?? '—'} / ${receta.quet_m2_oi?.toFixed(2) ?? '—'}`);
+            if (receta.observaciones_queterometria) lines.push(`     Notas: ${receta.observaciones_queterometria}`);
+        }
+        const evalItems: string[] = [];
+        if (receta.maquillaje) evalItems.push('Maquillaje');
+        if (receta.tonicidad) evalItems.push('Tonicidad');
+        if (receta.hendidura_palpebral) evalItems.push('Hendidura Palpebral');
+        if (receta.altura_palpebral) evalItems.push('Altura Palpebral');
+        if (receta.buen_parpadeo_amplitud) evalItems.push('Parpadeo Amplitud');
+        if (receta.buen_parpadeo_ritmo) evalItems.push('Parpadeo Ritmo');
+        if (evalItems.length) lines.push(`   Evaluación: ${evalItems.join(', ')}`);
+        if (receta.estesiometria) lines.push(`   Estesiometría: ${receta.estesiometria}`);
+        receta.pruebasLentesContacto?.forEach(p => {
+            lines.push(`   Prueba ${p.numeroPrueba}:`);
+            lines.push(`     OD  CB:${p.od_cb.toFixed(2)}  Esf.:${sign(p.od_esferico)}  Cil.:${sign(p.od_cilindrico)}  Eje:${p.od_eje.toFixed(2)}`);
+            lines.push(`     OI  CB:${p.oi_cb.toFixed(2)}  Esf.:${sign(p.oi_esferico)}  Cil.:${sign(p.oi_cilindrico)}  Eje:${p.oi_eje.toFixed(2)}`);
+            if (p.od_marca || p.oi_marca) lines.push(`     Marcas  OD: ${p.od_marca ?? '—'}  OI: ${p.oi_marca ?? '—'}`);
+        });
+        lines.push('');
+    });
+
+    const canvas = document.createElement('canvas');
+    const lineHeight = 18; const padding = 32; const fontSize = 13;
+    const tipoDoc = props.tipoDocumento === TipoDocumento.CUIT ? 'CUIT' : 'DNI';
+    const docLine = props.nroDocumento ? `${tipoDoc}: ${props.nroDocumento}` : '';
+    canvas.width = 700;
+    canvas.height = lines.length * lineHeight + padding * 2 + 3 * lineHeight + 10;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#111111';
+    ctx.font = `bold 15px "Courier New", monospace`;
+    ctx.fillText(props.nombreCliente, padding, padding + fontSize);
+    if (docLine) { ctx.font = `normal ${fontSize}px "Courier New", monospace`; ctx.fillText(docLine, padding, padding + fontSize + lineHeight); }
+    const sepY = padding + fontSize + lineHeight * (docLine ? 2 : 1) + 6;
+    ctx.fillRect(padding, sepY, canvas.width - padding * 2, 1);
+    const startY = sepY + lineHeight;
+    lines.forEach((line, i) => {
+        ctx.font = `${line.startsWith('**') ? 'bold' : 'normal'} ${fontSize}px "Courier New", monospace`;
+        ctx.fillText(line, padding, startY + i * lineHeight + fontSize);
+    });
+    const link = document.createElement('a');
+    link.download = `ResumenContacto_${props.nombreCliente}.jpg`;
+    link.href = canvas.toDataURL('image/jpeg', 0.95);
+    link.click();
     printOpen.value = false;
 };
 </script>
@@ -79,7 +142,7 @@ const printRecetas = () => {
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -87,33 +150,53 @@ const printRecetas = () => {
                     <DialogContent class="sm:max-w-md">
                         <DialogHeader>
                             <DialogTitle>Imprimir Recetas Lentes de Contacto</DialogTitle>
-                            <DialogDescription>Cliente: {{ nombreCliente }}</DialogDescription>
+                            <DialogDescription>{{ nombreCliente }}</DialogDescription>
                         </DialogHeader>
-                        <div v-if="recetas?.length" class="flex flex-col items-start justify-center">
-                            <div v-for="receta in recetas" class="flex items-center space-x-2 mb-4">
-                                <Checkbox :id="`${receta.id}`" @update:checked="handleCheckboxChange(receta)" />
-                                <label :for="`${receta.id}`" class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    {{ formatDate(receta.fecha.toString()) }}
-                                </label>
+                        <div v-if="recetas?.length" class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-zinc-100">
+                                <span class="text-xs text-zinc-500 font-medium">Seleccionar todas</span>
+                                <Checkbox :checked="allSelected" @update:checked="toggleSelectAll" />
+                            </div>
+                            <div v-for="receta in recetas" :key="receta.id" class="flex items-center justify-between">
+                                <span class="text-sm font-medium">{{ formatDate(receta.fecha.toString()) }}</span>
+                                <Checkbox :checked="isChecked(receta)" @update:checked="handleCheckboxChange(receta)" />
                             </div>
                         </div>
-                        <div v-else class="flex flex-col items-start justify-center">
+                        <div v-else>
                             <p class="text-sm text-zinc-500">El cliente no tiene recetas registradas</p>
                         </div>
-                        <DialogFooter class="sm:justify-end">
-                            <button v-if="recetas?.length"
-                                class="text-sm px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
-                                @click="printRecetas()">
-                                Imprimir Recetas
-                            </button>
-                            <button v-else
-                                class="text-sm px-4 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
-                                @click="printOpen = false">
-                                Cerrar
-                            </button>
-                        </DialogFooter>
+                        <Separator class="my-2" />
+                        <div class="flex flex-col gap-2">
+                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
+                            <div class="flex gap-2">
+                                <button v-if="recetas?.length"
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    @click="printRecetas()">PDF</button>
+                                <button v-if="recetas?.length"
+                                    class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                                    @click="printResumenJPG()">JPG Resumen</button>
+                                <button v-if="!recetas?.length"
+                                    class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                                    @click="printOpen = false">Cerrar</button>
+                            </div>
+                        </div>
                     </DialogContent>
                 </Dialog>
+            </div>
+
+            <!-- Toggle Detalle / Resumen (solo si hay recetas) -->
+            <div v-if="recetas?.length" class="flex items-center justify-center mr-2 mt-4 mb-1 gap-2 space-x-7 tracking-widest">
+                <span class="text-[10px] font-semibold uppercase transition-colors"
+                    :class="viewMode === 'detalle' ? 'text-zinc-900' : 'text-zinc-400'">Detalle</span>
+                <button
+                    class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none"
+                    :class="viewMode === 'resumen' ? 'bg-zinc-900' : 'bg-zinc-300'"
+                    @click="() => { viewMode = viewMode === 'resumen' ? 'detalle' : 'resumen'; if (viewMode === 'resumen') { currentRec = undefined; selectedHistoriaClinica = false; } else { currentRec = recetas?.[0]; } }">
+                    <span class="pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200"
+                        :class="viewMode === 'resumen' ? 'translate-x-4' : 'translate-x-0'" />
+                </button>
+                <span class="text-[10px] font-semibold uppercase transition-colors"
+                    :class="viewMode === 'resumen' ? 'text-zinc-900' : 'text-zinc-400'">Resumen</span>
             </div>
 
             <div class="flex items-center justify-between mr-2 mt-4 mb-3 px-1">
@@ -166,14 +249,38 @@ const printRecetas = () => {
 
         <Separator orientation="vertical" />
 
-        <!-- Historia Clínica view -->
-        <div v-if="selectedHistoriaClinica" class="w-[72%] h-full px-8">
-            <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" :cliente-id="idCliente" />
-        </div>
+        <!-- Panel derecho - ancho fijo siempre -->
+        <div class="w-[72%] h-full px-8">
 
-        <!-- Receta detail view -->
-        <div v-else class="w-[72%] h-full px-8">
-            <div v-if="currentRec">
+            <!-- MODO RESUMEN -->
+            <div v-if="viewMode === 'resumen'" class="font-mono text-xs text-zinc-800 leading-relaxed whitespace-pre">
+                <div v-for="receta in recetas" :key="receta.id" class="mb-6">
+                    <p class="font-bold text-zinc-900 mb-1">** LENTES DE CONTACTO <span class="font-normal text-zinc-500">---> {{ formatDate(receta.fecha.toString()) }}</span></p>
+                    <p>   O.D.  CB:{{ receta.od_cb.toFixed(2) }}  Esf.:{{ sign(receta.od_esferico) }}  Cil.:{{ sign(receta.od_cilindrico) }}  Eje:{{ receta.od_eje.toFixed(2) }}  Diám.:{{ receta.od_diametro.toFixed(2) }}</p>
+                    <p>   O.I.  CB:{{ receta.oi_cb.toFixed(2) }}  Esf.:{{ sign(receta.oi_esferico) }}  Cil.:{{ sign(receta.oi_cilindrico) }}  Eje:{{ receta.oi_eje.toFixed(2) }}  Diám.:{{ receta.oi_diametro.toFixed(2) }}</p>
+                    <p v-if="receta.od_marca || receta.oi_marca">   Marcas  OD: {{ receta.od_marca ?? '—' }}  |  OI: {{ receta.oi_marca ?? '—' }}</p>
+                    <p v-if="receta.observaciones" class="text-zinc-500">   Obs.: {{ receta.observaciones }}</p>
+                    <template v-if="receta.quet_m1_od || receta.quet_m1_oi">
+                        <p>   Queratometría  OD: {{ receta.quet_m1_od?.toFixed(2) ?? '—' }} / {{ receta.quet_m2_od?.toFixed(2) ?? '—' }}  |  OI: {{ receta.quet_m1_oi?.toFixed(2) ?? '—' }} / {{ receta.quet_m2_oi?.toFixed(2) ?? '—' }}</p>
+                        <p v-if="receta.observaciones_queterometria">   Notas querato.: {{ receta.observaciones_queterometria }}</p>
+                    </template>
+                    <div v-for="p in receta.pruebasLentesContacto" :key="p.numeroPrueba">
+                        <p class="font-bold">   Prueba {{ p.numeroPrueba }}:</p>
+                        <p>     OD  CB:{{ p.od_cb.toFixed(2) }}  Esf.:{{ sign(p.od_esferico) }}  Cil.:{{ sign(p.od_cilindrico) }}  Eje:{{ p.od_eje.toFixed(2) }}</p>
+                        <p>     OI  CB:{{ p.oi_cb.toFixed(2) }}  Esf.:{{ sign(p.oi_esferico) }}  Cil.:{{ sign(p.oi_cilindrico) }}  Eje:{{ p.oi_eje.toFixed(2) }}</p>
+                        <p v-if="p.od_marca || p.oi_marca">     Marcas  OD: {{ p.od_marca ?? '—' }}  OI: {{ p.oi_marca ?? '—' }}</p>
+                    </div>
+                    <Separator class="mt-4" />
+                </div>
+            </div>
+
+            <!-- Historia Clínica view -->
+            <div v-else-if="selectedHistoriaClinica">
+                <DetalleHistoriaClinicaContacto :historiaClinica="props.historiaClinica" :cliente-id="idCliente" />
+            </div>
+
+            <!-- Receta detail view -->
+            <div v-else-if="currentRec">
 
                 <!-- Header -->
                 <div class="flex flex-row justify-between items-start mb-1">
