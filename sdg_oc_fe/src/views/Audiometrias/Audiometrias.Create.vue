@@ -44,10 +44,11 @@ const audiometriaFile = ref<any>(null);
 const audiometriaURL = ref(); //TODO REMOVE
 
 
+const _today = new Date()
 const fechaInforme = ref({
-  day: '',
-  month: '',
-  year: ''
+  day: String(_today.getDate()).padStart(2, '0'),
+  month: String(_today.getMonth() + 1).padStart(2, '0'),
+  year: String(_today.getFullYear())
 })
 
 const newAudiometria = ref<{

@@ -193,7 +193,8 @@ const isValidPrueba = ref<{
     oi_diametro: boolean,
 }[]>([])
 
-const fechaReceta = ref({ day: '', month: '', year: '' })
+const _today = new Date()
+const fechaReceta = ref({ day: String(_today.getDate()).padStart(2, '0'), month: String(_today.getMonth() + 1).padStart(2, '0'), year: String(_today.getFullYear()) })
 
 onMounted(async () => {
     try {
@@ -286,7 +287,7 @@ const redirectCancel = () => {
             <BreadcrumbItem>
                 <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
             <BreadcrumbItem v-if="selectedCliente">
                 <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">{{ nombreCliente }}</BreadcrumbLink>
             </BreadcrumbItem>
