@@ -16,15 +16,15 @@ defineProps<{
                 <p class="font-bold w-20 text-lg">O.D.</p>
 
                 <p class="font-bold w-12 text-right pr-4">Esf.: </p>
-                <p class="w-12">{{ detalleReceta.od_esferico > 0 ? '+ ' + detalleReceta.od_esferico.toFixed(2) : detalleReceta.od_esferico.toFixed(2) }}</p>
+                <p class="w-14">{{ detalleReceta.od_esferico > 0 ? '+ ' + detalleReceta.od_esferico.toFixed(2) : detalleReceta.od_esferico.toFixed(2) }}</p>
                 <Separator orientation="vertical" class="mx-4" />
 
                 <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                <p class="w-12">{{ detalleReceta.od_cilindrico > 0 ? '+ ' + detalleReceta.od_cilindrico.toFixed(2) : detalleReceta.od_cilindrico.toFixed(2) }}</p>
+                <p class="w-14">{{ detalleReceta.od_cilindrico > 0 ? '+ ' + detalleReceta.od_cilindrico.toFixed(2) : detalleReceta.od_cilindrico.toFixed(2) }}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
                 <p class="font-bold w-12 text-right pr-4">A:</p>
-                <p class="w-12">{{ detalleReceta.od_grados }} °</p>
+                <p class="w-14">{{ detalleReceta.od_grados }} °</p>
 
             </div>
 
@@ -34,15 +34,15 @@ defineProps<{
                 <p class="font-bold w-20 text-lg">O.I.</p>
 
                 <p class="font-bold w-12 text-right pr-4">Esf.:</p>
-                <p class="w-12">{{ detalleReceta.oi_esferico > 0 ? '+ ' + detalleReceta.oi_esferico.toFixed(2) : detalleReceta.oi_esferico.toFixed(2) }}</p>
+                <p class="w-14">{{ detalleReceta.oi_esferico > 0 ? '+ ' + detalleReceta.oi_esferico.toFixed(2) : detalleReceta.oi_esferico.toFixed(2) }}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
                 <p class="font-bold w-12 text-right pr-4">Cil.:</p>
-                <p class="w-12">{{ detalleReceta.oi_cilindrico > 0 ? '+ ' + detalleReceta.oi_cilindrico.toFixed(2) : detalleReceta.oi_cilindrico.toFixed(2) }}</p>
+                <p class="w-14">{{ detalleReceta.oi_cilindrico > 0 ? '+ ' + detalleReceta.oi_cilindrico.toFixed(2) : detalleReceta.oi_cilindrico.toFixed(2) }}</p>
                 <Separator orientation="vertical" class="mx-4 " />
 
                 <p class="font-bold w-12 text-right pr-4">A:</p>
-                <p class="w-12">{{ detalleReceta.oi_grados }} °</p>
+                <p class="w-14">{{ detalleReceta.oi_grados }} °</p>
 
             </div>
         </div>

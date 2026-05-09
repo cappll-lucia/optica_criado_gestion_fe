@@ -165,14 +165,14 @@ const handleChangeReceta = (receta: RecetasAereos) => {
         <div class="w-[30%] p-2 pt-0 h-full">
             <div class="flex mr-2 h-10 gap-2">
                 <button
-                    class="flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class=" flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>

@@ -115,7 +115,7 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
             <h1 class="page-title">Recetas: {{ nombreCliente }}</h1>
             <div class="flex gap-2">
                 <button
-                    class="text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
                     + Nueva Receta Anteojos Recetados
                 </button>

@@ -15,7 +15,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
-import Input from './ui/input/Input.vue';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
@@ -80,7 +79,7 @@ const printRecetas = () => {
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -179,7 +178,7 @@ const printRecetas = () => {
                 <!-- Header -->
                 <div class="flex flex-row justify-between items-start mb-1">
                     <div class="flex items-center gap-3">
-                        <span class="text-xs text-zinc-400 w-24">Fecha Receta</span>
+                        <span class="text-sm text-zinc-400 bold w-24">Fecha Receta</span>
                         <span class="text-sm">{{ formatDate(currentRec.fecha.toString()) }}</span>
                     </div>
                     <button
@@ -198,31 +197,31 @@ const printRecetas = () => {
                     <div class="flex flex-col gap-1">
                         <!-- OD -->
                         <div class="flex h-9 items-center gap-3">
-                            <span class="font-semibold text-sm w-10 text-zinc-500">O.D.</span>
+                            <span class="font-bold text-lg w-10">O.D.</span>
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">C.B.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.od_cb.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">C.B.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.od_cb.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Esf.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.od_esferico.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Esf.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.od_esferico > 0 ? '+ ' + currentRec.od_esferico.toFixed(2) : currentRec.od_esferico.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Cil.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.od_cilindrico.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Cil.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.od_cilindrico > 0 ? '+ ' + currentRec.od_cilindrico.toFixed(2) : currentRec.od_cilindrico.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Eje</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.od_eje.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Eje:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.od_eje.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <ValueNoneIcon class="h-3.5 w-3.5 text-zinc-400" />
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.od_diametro.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-12">Diám.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.od_diametro.toFixed(2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -231,31 +230,31 @@ const printRecetas = () => {
 
                         <!-- OI -->
                         <div class="flex h-9 items-center gap-3">
-                            <span class="font-semibold text-sm w-10 text-zinc-500">O.I.</span>
+                            <span class="font-bold text-lg w-10">O.I.</span>
                             <div class="flex items-center gap-3">
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">C.B.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.oi_cb.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">C.B.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.oi_cb.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Esf.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.oi_esferico.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Esf.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.oi_esferico > 0 ? '+ ' + currentRec.oi_esferico.toFixed(2) : currentRec.oi_esferico.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Cil.</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.oi_cilindrico.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Cil.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.oi_cilindrico > 0 ? '+ ' + currentRec.oi_cilindrico.toFixed(2) : currentRec.oi_cilindrico.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <span class="text-xs text-zinc-400 w-8">Eje</span>
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.oi_eje.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-8">Eje:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.oi_eje.toFixed(2) }}</span>
                                 </div>
                                 <Separator orientation="vertical" class="h-5" />
                                 <div class="flex items-center gap-1">
-                                    <ValueNoneIcon class="h-3.5 w-3.5 text-zinc-400" />
-                                    <span class="text-sm font-medium w-14 text-right tabular-nums">{{ currentRec.oi_diametro.toFixed(2) }}</span>
+                                    <span class="font-bold text-sm w-12">Diám.:</span>
+                                    <span class="text-sm w-14 tabular-nums">{{ currentRec.oi_diametro.toFixed(2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -266,19 +265,19 @@ const printRecetas = () => {
 
                 <!-- Marcas + Observaciones -->
                 <div class="flex flex-row gap-12">
-                    <div class="flex flex-col gap-2">
-                        <span class="text-xs text-zinc-400">Marcas</span>
+                    <div class="flex flex-col gap-2 w-52">
+                        <span class="text-sm text-zinc-400 bold ">Marcas</span>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-zinc-500 w-8">O.D.</span>
+                            <span class="text-sm text-zinc-500 w-8">O.D.:</span>
                             <span class="text-sm">{{ currentRec.od_marca }}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-zinc-500 w-8">O.I.</span>
+                            <span class="text-sm text-zinc-500 w-8">O.I.:</span>
                             <span class="text-sm">{{ currentRec.oi_marca }}</span>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1 flex-1">
-                        <span class="text-xs text-zinc-400">Observaciones</span>
+                        <span class="text-sm text-zinc-400 bold ">Observaciones</span>
                         <span class="text-sm">{{ currentRec.observaciones ?? '—' }}</span>
                     </div>
                 </div>
@@ -305,52 +304,51 @@ const printRecetas = () => {
                                 <Separator orientation="vertical" class="h-5" />
                                 <span class="text-sm tabular-nums">{{ currentRec.quet_m2_oi.toFixed(2) }}</span>
                             </div>
-                            <div class="mt-3 flex flex-col gap-0.5">
-                                <span class="text-xs text-zinc-400">Notas</span>
+                            <div class="mt-5 flex flex-col gap-0.5 ">
+                                <span class="text-sm text-zinc-400 bold ">Notas</span>
                                 <span class="text-sm min-h-[3rem]">{{ currentRec.observaciones_queterometria ?? '—' }}</span>
                             </div>
                         </div>
                         <div v-else>
-                            <p class="text-xs text-zinc-400">Sin registros de queratometría</p>
+                            <p class="text-sm text-zinc-400 bold ">Sin registros de queratometría</p>
                         </div>
                     </div>
 
                     <!-- Evaluación General -->
-                    <div class="flex flex-col gap-3 flex-1">
+                    <div class="flex flex-col gap-3 flex-1 ">
                         <h3 class="text-sm font-semibold text-zinc-900">Evaluación General</h3>
-                        <div class="flex flex-row flex-wrap gap-y-3 gap-x-0">
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                        <div class="flex flex-row flex-wrap gap-y-3 gap-x-0 ">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.maquillaje" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Maquillaje</label>
                             </div>
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.tonicidad" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Tonicidad</label>
                             </div>
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.hendidura_palpebral" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Hendidura Palpebral</label>
                             </div>
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.altura_palpebral" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Altura Palpebral</label>
                             </div>
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.buen_parpadeo_amplitud" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Parpadeo: Buena Amplitud</label>
                             </div>
-                            <div class="items-center w-48 flex gap-x-2 min-h-[1.5rem]">
+                            <div class="items-center w-60 flex gap-x-2 min-h-[1.5rem]">
                                 <Checkbox v-model:checked="currentRec.buen_parpadeo_ritmo" class="pointer-events-none" />
                                 <label class="text-sm font-light leading-none">Parpadeo: Buen Ritmo</label>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 mt-2">
-                            <span class="text-xs text-zinc-400 w-28">Estesiometría</span>
-                            <Input
-                                type="text"
-                                class="text-zinc-900 bg-transparent pointer-events-none cursor-not-allowed w-48 text-xs h-8"
-                                :model-value="currentRec.estesiometria" />
+                        <div class="flex items-start gap-3 mt-2 flex-col">
+                            <span class="text-sm text-zinc-400 bold w-28">Estesiometría</span>
+                            <label
+                                class="text-sm font-light leading-none"
+                            >{{currentRec.estesiometria}}</label>
                         </div>
                     </div>
                 </div>
@@ -370,22 +368,22 @@ const printRecetas = () => {
                                         <span class="font-semibold text-sm w-10 text-zinc-500">O.D.</span>
                                         <div class="flex items-center gap-3">
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">C.B.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">C.B.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.od_cb.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Esf.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Esf.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.od_esferico.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Cil.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Cil.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.od_cilindrico.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Eje</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Eje</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.od_eje.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
@@ -403,22 +401,22 @@ const printRecetas = () => {
                                         <span class="font-semibold text-sm w-10 text-zinc-500">O.I.</span>
                                         <div class="flex items-center gap-3">
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">C.B.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">C.B.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.oi_cb.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Esf.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Esf.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.oi_esferico.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Cil.</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Cil.</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.oi_cilindrico.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
                                             <div class="flex items-center gap-1">
-                                                <span class="text-xs text-zinc-400 w-8">Eje</span>
+                                                <span class="text-sm text-zinc-400 bold w-8">Eje</span>
                                                 <span class="text-sm tabular-nums w-12 text-right">{{ prueba.oi_eje.toFixed(2) }}</span>
                                             </div>
                                             <Separator orientation="vertical" class="h-5" />
@@ -463,7 +461,7 @@ const printRecetas = () => {
 
                                     <!-- Marcas prueba -->
                                     <div class="flex items-center gap-4">
-                                        <span class="text-xs text-zinc-400 w-14">Marcas</span>
+                                        <span class="text-sm text-zinc-400 bold w-14">Marcas</span>
                                         <div class="flex items-center gap-2">
                                             <span class="text-xs text-zinc-500 font-medium">OD:</span>
                                             <span class="text-sm w-28">{{ prueba.od_marca }}</span>
@@ -478,7 +476,7 @@ const printRecetas = () => {
                         </Accordion>
                     </div>
                     <div v-else>
-                        <p class="text-xs text-zinc-400 mt-1">No hay pruebas registradas para esta receta</p>
+                        <p class="text-sm text-zinc-400 bold mt-1">No hay pruebas registradas para esta receta</p>
                     </div>
                 </div>
 
