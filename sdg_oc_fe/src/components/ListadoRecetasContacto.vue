@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import DetalleHistoriaClinicaContacto from '@/components/HistoriaClinicaContacto.vue';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { formatDate, generateRecetasContactoPDF } from '@/lib/utils.recetas';
+import { jsPDF } from 'jspdf';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
@@ -68,7 +69,7 @@ const printRecetas = () => {
 
 const sign = (n: number) => n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
 
-const printResumenJPG = () => {
+const printResumenPDF = () => {
     if (selectedToPrint.value.length === 0) { alert("Seleccioná al menos una receta."); return; }
     const recetas = selectedToPrint.value;
     const lines: string[] = [];
@@ -102,28 +103,43 @@ const printResumenJPG = () => {
         lines.push('');
     });
 
-    const canvas = document.createElement('canvas');
-    const lineHeight = 18; const padding = 32; const fontSize = 13;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 40;
+    const lineHeight = 16;
+    const fontSize = 10;
+    let y = margin;
+
     const tipoDoc = props.tipoDocumento === TipoDocumento.CUIT ? 'CUIT' : 'DNI';
     const docLine = props.nroDocumento ? `${tipoDoc}: ${props.nroDocumento}` : '';
-    canvas.width = 700;
-    canvas.height = lines.length * lineHeight + padding * 2 + 3 * lineHeight + 10;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#111111';
-    ctx.font = `bold 15px "Courier New", monospace`;
-    ctx.fillText(props.nombreCliente, padding, padding + fontSize);
-    if (docLine) { ctx.font = `normal ${fontSize}px "Courier New", monospace`; ctx.fillText(docLine, padding, padding + fontSize + lineHeight); }
-    const sepY = padding + fontSize + lineHeight * (docLine ? 2 : 1) + 6;
-    ctx.fillRect(padding, sepY, canvas.width - padding * 2, 1);
-    const startY = sepY + lineHeight;
-    lines.forEach((line, i) => {
-        ctx.font = `${line.startsWith('**') ? 'bold' : 'normal'} ${fontSize}px "Courier New", monospace`;
-        ctx.fillText(line, padding, startY + i * lineHeight + fontSize);
+
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(12);
+    doc.text(props.nombreCliente, margin, y);
+    y += lineHeight;
+
+    if (docLine) {
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(fontSize);
+        doc.text(docLine, margin, y);
+        y += lineHeight;
+    }
+
+    y += 4;
+    doc.setDrawColor(180);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += lineHeight;
+
+    doc.setFontSize(fontSize);
+    lines.forEach(line => {
+        const isBold = line.startsWith('**');
+        doc.setFont('courier', isBold ? 'bold' : 'normal');
+        const cleanLine = isBold ? line.slice(2) : line;
+        doc.text(cleanLine, margin, y);
+        y += lineHeight;
     });
-    const link = document.createElement('a');
-    link.download = `ResumenContacto_${props.nombreCliente}.jpg`;
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
-    link.click();
+
+    doc.save(`ResumenContacto_${props.nombreCliente}.pdf`);
     printOpen.value = false;
 };
 </script>
@@ -171,10 +187,10 @@ const printResumenJPG = () => {
                             <div class="flex gap-2">
                                 <button v-if="recetas?.length"
                                     class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
-                                    @click="printRecetas()">PDF</button>
+                                    @click="printRecetas()">PDF Tabular</button>
                                 <button v-if="recetas?.length"
-                                    class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
-                                    @click="printResumenJPG()">JPG Resumen</button>
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    @click="printResumenPDF()">PDF Resumen</button>
                                 <button v-if="!recetas?.length"
                                     class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                                     @click="printOpen = false">Cerrar</button>

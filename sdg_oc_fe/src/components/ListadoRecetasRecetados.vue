@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
+import { jsPDF } from 'jspdf';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { PlusIcon } from 'lucide-vue-next';
 import { router } from '@/router';
@@ -96,7 +97,7 @@ const buildResumenText = (recetas: RecetasAereos[]): string => {
     }).join('\n\n');
 };
 
-const printResumenJPG = () => {
+const printResumenPDF = () => {
     if (selectedToPrint.value.length === 0) {
         alert("Por favor, selecciona al menos una receta.");
         return;
@@ -104,47 +105,43 @@ const printResumenJPG = () => {
     const texto = buildResumenText(selectedToPrint.value);
     const lines = texto.split('\n');
 
-    const canvas = document.createElement('canvas');
-    const lineHeight = 18;
-    const padding = 32;
-    const fontSize = 13;
-    const headerLines = 3; // nombre, documento, separador
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 40;
+    const lineHeight = 16;
+    const fontSize = 10;
+    let y = margin;
 
-    canvas.width = 600;
-    canvas.height = lines.length * lineHeight + padding * 2 + headerLines * lineHeight + 10;
-
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#111111';
-
-    // Header: nombre y documento
     const tipoDoc = props.tipoDocumento === TipoDocumento.CUIT ? 'CUIT' : 'DNI';
     const docLine = props.nroDocumento ? `${tipoDoc}: ${props.nroDocumento}` : '';
 
-    ctx.font = `bold 15px "Courier New", monospace`;
-    ctx.fillText(props.nombreCliente, padding, padding + fontSize);
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(12);
+    doc.text(props.nombreCliente, margin, y);
+    y += lineHeight;
+
     if (docLine) {
-        ctx.font = `normal ${fontSize}px "Courier New", monospace`;
-        ctx.fillText(docLine, padding, padding + fontSize + lineHeight);
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(fontSize);
+        doc.text(docLine, margin, y);
+        y += lineHeight;
     }
 
-    // Separador
-    const sepY = padding + fontSize + lineHeight * (docLine ? 2 : 1) + 6;
-    ctx.fillRect(padding, sepY, canvas.width - padding * 2, 1);
+    y += 4;
+    doc.setDrawColor(180);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += lineHeight;
 
-    // Recetas
-    const startY = sepY + lineHeight;
-    lines.forEach((line, i) => {
+    doc.setFontSize(fontSize);
+    lines.forEach(line => {
         const isBold = line.startsWith('**');
-        ctx.font = `${isBold ? 'bold' : 'normal'} ${fontSize}px "Courier New", monospace`;
-        ctx.fillText(line, padding, startY + i * lineHeight + fontSize);
+        doc.setFont('courier', isBold ? 'bold' : 'normal');
+        const cleanLine = isBold ? line.slice(2) : line;
+        doc.text(cleanLine, margin, y);
+        y += lineHeight;
     });
 
-    const link = document.createElement('a');
-    link.download = `Resumen_${props.nombreCliente}.jpg`;
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
-    link.click();
+    doc.save(`Resumen_${props.nombreCliente}.pdf`);
     printOpen.value = false;
 };
 
@@ -213,12 +210,12 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                                 <button
                                     class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
                                     @click="printRecetas()">
-                                    PDF
+                                    PDF Tabular
                                 </button>
                                 <button
                                     class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
-                                    @click="printResumenJPG()">
-                                    JPG Resumen
+                                    @click="printResumenPDF()">
+                                    PDF Resumen
                                 </button>
                             </div>
                         </div>
