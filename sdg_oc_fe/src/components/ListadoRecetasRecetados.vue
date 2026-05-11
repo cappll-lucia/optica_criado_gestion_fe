@@ -255,7 +255,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     class="relative flex items-center gap-3 py-2.5 cursor-pointer group"
                     @click="handleChangeReceta(receta)">
 
-                    <div class="relative z-10 mb-2 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
+                    <div class="relative z-10  shrink-0 w-3 h-3 rounded-full border-2 transition-all"
                         :class="currentRec === receta
                             ? 'bg-[#000] border-black'
                             : 'bg-white border-zinc-300 group-hover:bg-zinc-300'" />
