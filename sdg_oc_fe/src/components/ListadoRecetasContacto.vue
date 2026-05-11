@@ -29,6 +29,8 @@ const props = defineProps<{
     selectedId: string | undefined,
     nroDocumento: number | undefined,
     tipoDocumento: TipoDocumento | undefined,
+    telefono: string | undefined,
+    email: string | undefined,
 }>();
 
 const currentRec = ref<RecetaContacto | undefined>();
@@ -118,10 +120,18 @@ const printResumenPDF = () => {
     doc.text(props.nombreCliente, margin, y);
     y += lineHeight;
 
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(fontSize);
     if (docLine) {
-        doc.setFont('courier', 'normal');
-        doc.setFontSize(fontSize);
         doc.text(docLine, margin, y);
+        y += lineHeight;
+    }
+    if (props.telefono) {
+        doc.text(`Tel.: ${props.telefono}`, margin, y);
+        y += lineHeight;
+    }
+    if (props.email) {
+        doc.text(`Email: ${props.email}`, margin, y);
         y += lineHeight;
     }
 
