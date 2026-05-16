@@ -47,6 +47,12 @@ export interface RecetasAereos extends BaseEntity{
     cliente: Cliente;
     observaciones: string,
     detallesRecetaLentesAereos: DetalleRecetaAereos[],
+    precioArmazon?: number;
+    precioCristales?: number;
+    senia?: number;
+    dnp?: number;
+    od_alt_pelicula?: number;
+    oi_alt_pelicula?: number;
 }
 
 
@@ -85,7 +91,7 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
   }
 
 export type NewRecetaType = {
-   tipoReceta: TipoReceta, 
+   tipoReceta: TipoReceta,
     oftalmologo:undefined | string,
     cristal:undefined | TipoCristal,
     color:undefined | ColorCristal,
@@ -95,10 +101,17 @@ export type NewRecetaType = {
     fecha: Date | undefined,
     cliente: { id: undefined | number }
     detallesRecetaLentesAereos: Array<NewDetalleType>
+    obrasSociales?: Array<{ id: number }>
+    precioArmazon: number | undefined,
+    precioCristales: number | undefined,
+    senia: number | undefined,
+    dnp: number | undefined,
+    od_alt_pelicula: number | undefined,
+    oi_alt_pelicula: number | undefined,
 }
 export type EditedRecetaType = {
   id: number,
-  tipoReceta: TipoReceta, 
+  tipoReceta: TipoReceta,
   oftalmologo:undefined | string,
   cristal:undefined | TipoCristal,
   color:undefined | ColorCristal,
@@ -108,4 +121,10 @@ export type EditedRecetaType = {
   fecha: Date | undefined,
   cliente: { id: undefined | number }
   detallesRecetaLentesAereos: Array<NewDetalleType>
+  precioArmazon?: number,
+  precioCristales?: number,
+  senia?: number,
+  dnp?: number,
+  od_alt_pelicula?: number,
+  oi_alt_pelicula?: number,
 }

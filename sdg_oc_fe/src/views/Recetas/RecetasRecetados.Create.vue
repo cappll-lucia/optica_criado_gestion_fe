@@ -28,8 +28,8 @@ import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { previousRoute, router } from '@/router';
-import { AsteriskIcon } from 'lucide-vue-next';
-import { SlashIcon } from '@radix-icons/vue';
+import { AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { SlashIcon, Cross2Icon } from '@radix-icons/vue';
 import { computed, onMounted, ref } from 'vue';
 import {
   Tooltip,
@@ -37,6 +37,11 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
 import AlertError from '@/components/AlertError.vue';
 import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
@@ -50,6 +55,39 @@ const searchClienteOpen = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 
+const selectedObrasSocialIds = ref<number[]>([]);
+const openNewClienteOS = ref<boolean>(false);
+
+const availableObrasSociales = computed(() =>
+    selectedCliente.value?.clienteObrasSociales?.filter(cos => !selectedObrasSocialIds.value.includes(cos.obraSocial.id)) ?? []
+);
+
+const addObraSocial = (id: string) => {
+    const numId = Number(id);
+    if (numId && !selectedObrasSocialIds.value.includes(numId)) {
+        selectedObrasSocialIds.value.push(numId);
+    }
+};
+
+const removeObraSocial = (id: number) => {
+    const idx = selectedObrasSocialIds.value.indexOf(id);
+    if (idx !== -1) selectedObrasSocialIds.value.splice(idx, 1);
+};
+
+const handleShowNewObraSocialCliente = () => {
+    openNewClienteOS.value = true;
+};
+
+const handleAddObraSocialCliente = async (obraSocialId: number) => {
+    if (selectedCliente.value?.id) {
+        selectedCliente.value = await clientesApi.getOne(selectedCliente.value.id);
+        if (!selectedObrasSocialIds.value.includes(obraSocialId)) {
+            selectedObrasSocialIds.value.push(obraSocialId);
+        }
+        openNewClienteOS.value = false;
+    }
+};
+
 const newReceta = ref<{
     tipoReceta: TipoReceta,
     oftalmologo: undefined | string,
@@ -60,6 +98,12 @@ const newReceta = ref<{
     observaciones: undefined | string,
     fecha: Date | undefined,
     cliente: { id: undefined | number },
+    precioArmazon: number | undefined,
+    precioCristales: number | undefined,
+    senia: number | undefined,
+    dnp: number | undefined,
+    od_alt_pelicula: number | undefined,
+    oi_alt_pelicula: number | undefined,
 }>({
     tipoReceta: TipoReceta.Lejos,
     oftalmologo: undefined,
@@ -70,6 +114,12 @@ const newReceta = ref<{
     observaciones: undefined,
     fecha: undefined,
     cliente: { id: undefined },
+    precioArmazon: undefined,
+    precioCristales: undefined,
+    senia: undefined,
+    dnp: undefined,
+    od_alt_pelicula: undefined,
+    oi_alt_pelicula: undefined,
 })
 
 const currentDetalleCerca = ref<{
@@ -204,7 +254,7 @@ const onSubmit = async () => {
                 break;
         }
         newRecetaObj.fecha = new Date(parseInt(fechaReceta.value.year), parseInt(fechaReceta.value.month) - 1, parseInt(fechaReceta.value.day))
-        const createdReceta = await recetasApi.createRecetaAereos(newRecetaObj);
+        const createdReceta = await recetasApi.createRecetaAereos({ ...newRecetaObj!, obrasSociales: selectedObrasSocialIds.value.map(id => ({ id })) });
         loader.hide();
         toast({ title: 'Receta registrada con éxito' })
         router.push(`/recetas/${newReceta.value.cliente.id}?tab=recetados&recetaId=${createdReceta.id}`)
@@ -219,6 +269,7 @@ const handleSelectCliente = (cliente: Cliente) => {
     selectedCliente.value = cliente;
     newReceta.value.cliente.id = cliente.id;
     searchClienteOpen.value = false;
+    selectedObrasSocialIds.value = [];
 }
 
 const validateAndSubmit = async () => {
@@ -541,6 +592,22 @@ const showCerca = computed(() =>
                 </div>
             </div>
 
+            <!-- Medidas adicionales -->
+            <div class="flex flex-row gap-6 w-full mt-6">
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">DNP</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="newReceta.dnp" />
+                </div>
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">Alt. Película O.D.</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="newReceta.od_alt_pelicula" />
+                </div>
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">Alt. Película O.I.</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="newReceta.oi_alt_pelicula" />
+                </div>
+            </div>
+
             <Separator class="my-8 w-full" />
 
             <!-- Sección Cristales -->
@@ -614,7 +681,7 @@ const showCerca = computed(() =>
 
                     </div>
 
-                    <!-- Columna derecha: armazón + oftalmólogo + observaciones -->
+                    <!-- Columna derecha: armazón + oftalmólogo + observaciones + precios -->
                     <div class="flex flex-col gap-5 flex-1">
 
                         <div class="flex flex-row gap-6">
@@ -631,6 +698,22 @@ const showCerca = computed(() =>
                             </div>
                         </div>
 
+                        <!-- Precios -->
+                        <div class="flex flex-row gap-6">
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Precio Armazón</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.precioArmazon" />
+                            </div>
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Precio Cristales</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.precioCristales" />
+                            </div>
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Seña</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.senia" />
+                            </div>
+                        </div>
+
                         <!-- Observaciones -->
                         <div class="flex flex-col gap-1">
                             <Label class="text-xs text-[#888]">Observaciones</Label>
@@ -639,6 +722,56 @@ const showCerca = computed(() =>
 
                     </div>
                 </div>
+            </div>
+
+            <!-- Obras Sociales -->
+            <div v-if="selectedCliente" class="w-full rounded-2xl border border-[#e5e5e5] p-6 mt-2">
+                <p class="font-bold text-base mb-4 text-[#1a1a1a]">Obras Sociales</p>
+                <div v-if="selectedObrasSocialIds.length > 0" class="flex flex-wrap gap-2 mb-4">
+                    <div v-for="id in selectedObrasSocialIds" :key="id"
+                         class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm">
+                        <span>{{ selectedCliente.clienteObrasSociales.find(cos => cos.obraSocial.id === id)?.obraSocial.nombre }}</span>
+                        <button type="button" @click="removeObraSocial(id)" class="text-[#aaa] hover:text-destructive">
+                            <Cross2Icon class="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+                <div v-if="selectedCliente.clienteObrasSociales.length > 0 || selectedObrasSocialIds.length > 0">
+                    <Select @update:model-value="(val) => addObraSocial(val)">
+                        <SelectTrigger class="h-9 w-72">
+                            <SelectValue placeholder="Agregar obra social..." />
+                        </SelectTrigger>
+                        <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                <SelectItem
+                                    v-for="cos in availableObrasSociales"
+                                    :key="cos.obraSocial.id"
+                                    :value="String(cos.obraSocial.id)"
+                                >
+                                    {{ cos.obraSocial.nombre }}
+                                </SelectItem>
+                                <Button
+                                    @click="handleShowNewObraSocialCliente()"
+                                    variant="ghost"
+                                    type="button"
+                                    class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"
+                                >
+                                    <PlusCircleIcon />
+                                    <span class="w-[9rem] text-wrap text-left">Asociar nueva obra social al cliente</span>
+                                </Button>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div v-else>
+                    <p class="py-4">No hay obras sociales registradas para el cliente</p>
+                    <Button type="button" @click="handleShowNewObraSocialCliente()">Registrar Obra Social</Button>
+                </div>
+                <Dialog v-model:open="openNewClienteOS">
+                    <DialogContent class="max-w-[33rem]">
+                        <AddObraSocialClienteForm :cliente="selectedCliente" @handle-add-obra-social-cliente="handleAddObraSocialCliente" />
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <!-- Footer -->

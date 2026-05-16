@@ -7,13 +7,17 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { AsteriskIcon, PlusIcon } from 'lucide-vue-next';
+import { AsteriskIcon, PlusCircleIcon, PlusIcon } from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
 import { computed, onMounted, ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import { RecetaContacto, recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { useRoute } from 'vue-router';
 import { recetasApi } from '@/api/libs/recetas';
+import { Cliente } from '@/api/entities/clientes';
+import { clientesApi } from '@/api/libs/clientes';
+import { RecetaLentesContactoObraSocial } from '@/api/entities/recetaLentesContactoObraSocial';
+import { recetaLentesContactoObraSocialApi } from '@/api/libs/recetaLentesContactoObraSocial';
 import Input from '@/components/ui/input/Input.vue';
 import {
   Tooltip,
@@ -29,6 +33,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
 import Accordion from '@/components/ui/accordion/Accordion.vue';
 import AccordionItem from '@/components/ui/accordion/AccordionItem.vue';
 import AccordionTrigger from '@/components/ui/accordion/AccordionTrigger.vue';
@@ -52,6 +61,53 @@ const showError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 
 const currentReceta = ref<RecetaContacto>();
+const clienteForOS = ref<Cliente>();
+const currentObrasSociales = ref<RecetaLentesContactoObraSocial[]>([]);
+const openNewClienteOS = ref<boolean>(false);
+
+const availableObrasSociales = computed(() =>
+    clienteForOS.value?.clienteObrasSociales?.filter(cos =>
+        !currentObrasSociales.value.some(a => a.obraSocialId === cos.obraSocial.id || a.obraSocial?.id === cos.obraSocial.id)
+    ) ?? []
+);
+
+const addObraSocial = async (id: string) => {
+    if (!currentReceta.value || !id) return;
+    try {
+        const created = await recetaLentesContactoObraSocialApi.create({
+            recetaLentesContacto: { id: currentReceta.value.id },
+            obraSocial: { id: Number(id) },
+        });
+        currentObrasSociales.value.push(created);
+    } catch (err: any) {
+        errorMessage.value = err.message;
+        showError.value = true;
+    }
+};
+
+const removeObraSocial = async (asociacionId: number) => {
+    try {
+        await recetaLentesContactoObraSocialApi.remove(asociacionId);
+        const idx = currentObrasSociales.value.findIndex(a => a.id === asociacionId);
+        if (idx !== -1) currentObrasSociales.value.splice(idx, 1);
+    } catch (err: any) {
+        errorMessage.value = err.message;
+        showError.value = true;
+    }
+};
+
+const handleShowNewObraSocialCliente = () => {
+    openNewClienteOS.value = true;
+};
+
+const handleAddObraSocialCliente = async (obraSocialId: number) => {
+    if (clienteForOS.value?.id) {
+        clienteForOS.value = await clientesApi.getOne(clienteForOS.value.id);
+        await addObraSocial(String(obraSocialId));
+        openNewClienteOS.value = false;
+    }
+};
+
 const currentPruebas = ref<{
     od_diametro: number | undefined,
     od_eje: number | undefined,
@@ -145,6 +201,12 @@ onMounted(async () => {
         fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
         fechaReceta.value.month = (currentReceta.value.fecha.getMonth() + 1).toString()
         fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+        const [obrasSociales, clienteFetched] = await Promise.all([
+            recetaLentesContactoObraSocialApi.getAll({ idRecetaLentesContacto: currentReceta.value.id }),
+            clientesApi.getOne(currentReceta.value.cliente.id),
+        ]);
+        currentObrasSociales.value = obrasSociales;
+        clienteForOS.value = clienteFetched;
         loader.hide();
     } catch (err: any) {
         errorMessage.value = err.message as string
@@ -300,27 +362,27 @@ const redirectCancel = () => {
                             <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
                             
                             <Label class="text-xs text-[#888]">C.B.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.od_cb" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.od_cb" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Esf.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.od_esferico" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.od_esferico" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Cil.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.od_cilindrico" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.od_cilindrico" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Eje</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.od_eje" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.od_eje" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <ValueNoneIcon class="h-4 w-4 text-[#888]" />
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.od_diametro" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.od_diametro" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
                         </div>
  
@@ -329,27 +391,27 @@ const redirectCancel = () => {
                             <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
                             
                             <Label class="text-xs text-[#888]">C.B.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.oi_cb" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.oi_cb" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_cb }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 20</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Esf.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.oi_esferico" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.oi_esferico" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Cil.</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.oi_cilindrico" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.oi_cilindrico" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <Label class="text-xs text-[#888]">Eje</Label>
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.oi_eje" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.oi_eje" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_eje }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 180</p></TooltipContent></Tooltip></TooltipProvider>
                             <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
                             
                             <ValueNoneIcon class="h-4 w-4 text-[#888]" />
-                            <Input type="decimal" class="h-9 w-20" v-model="currentReceta.oi_diametro" />
+                            <Input type="decimal" class="h-9 w-16" v-model="currentReceta.oi_diametro" />
                             <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_diametro }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 30</p></TooltipContent></Tooltip></TooltipProvider>
                         </div>
  
@@ -452,13 +514,23 @@ const redirectCancel = () => {
                                 <div class="flex flex-col gap-3">
                                     <div class="flex flex-row items-center gap-2">
                                         <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
-                                        <Input type="decimal" class="h-9 flex-1" v-model="currentReceta.od_marca" />
+                                        <Input type="text" class="h-9 flex-1" v-model="currentReceta.od_marca" />
                                         <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_marca }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar marca</p></TooltipContent></Tooltip></TooltipProvider>
                                     </div>
                                     <div class="flex flex-row items-center gap-2">
                                         <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
-                                        <Input type="decimal" class="h-9 flex-1" v-model="currentReceta.oi_marca" />
+                                        <Input type="text" class="h-9 flex-1" v-model="currentReceta.oi_marca" />
                                         <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_marca }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar marca</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-3 mt-2">
+                                    <div class="flex flex-col gap-1">
+                                        <Label class="text-xs text-[#888]">Precio</Label>
+                                        <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precio" />
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <Label class="text-xs text-[#888]">Seña</Label>
+                                        <Input type="decimal" class="h-9 w-full" v-model="currentReceta.senia" />
                                     </div>
                                 </div>
                             </div>
@@ -571,10 +643,59 @@ const redirectCancel = () => {
                 </div>
             </div>
 
+            <!-- Obras Sociales -->
+            <div class="w-full rounded-2xl border border-[#e5e5e5] p-6 mt-8">
+                <p class="font-bold text-base mb-4 text-[#1a1a1a]">Obras Sociales</p>
+                <div v-if="currentObrasSociales.length > 0" class="flex flex-wrap gap-2 mb-4">
+                    <div v-for="asoc in currentObrasSociales" :key="asoc.id"
+                         class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm">
+                        <span>{{ asoc.obraSocial?.nombre ?? clienteForOS?.clienteObrasSociales?.find(cos => cos.obraSocial.id === asoc.obraSocialId)?.obraSocial.nombre }}</span>
+                        <button type="button" @click="removeObraSocial(asoc.id)" class="text-[#aaa] hover:text-destructive">
+                            <Cross2Icon class="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+                <div v-if="clienteForOS && (clienteForOS.clienteObrasSociales.length > 0 || currentObrasSociales.length > 0)">
+                    <Select @update:model-value="(val) => addObraSocial(val)">
+                        <SelectTrigger class="h-9 w-72">
+                            <SelectValue placeholder="Agregar obra social..." />
+                        </SelectTrigger>
+                        <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                <SelectItem
+                                    v-for="cos in availableObrasSociales"
+                                    :key="cos.obraSocial.id"
+                                    :value="String(cos.obraSocial.id)"
+                                >
+                                    {{ cos.obraSocial.nombre }}
+                                </SelectItem>
+                                <Button
+                                    @click="handleShowNewObraSocialCliente()"
+                                    variant="ghost"
+                                    type="button"
+                                    class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"
+                                >
+                                    <PlusCircleIcon />
+                                    <span class="w-[9rem] text-wrap text-left">Asociar nueva obra social al cliente</span>
+                                </Button>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div v-else-if="clienteForOS">
+                    <p class="py-4">No hay obras sociales registradas para el cliente</p>
+                    <Button type="button" @click="handleShowNewObraSocialCliente()">Registrar Obra Social</Button>
+                </div>
+                <Dialog v-model:open="openNewClienteOS">
+                    <DialogContent class="max-w-[33rem]">
+                        <AddObraSocialClienteForm v-if="clienteForOS" :cliente="clienteForOS" @handle-add-obra-social-cliente="handleAddObraSocialCliente" />
+                    </DialogContent>
+                </Dialog>
+            </div>
+
             <!-- Footer -->
             <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 gap-4">
                 <Button type="button" variant="outline" class="w-[15%]" @click="redirectCancel">Cancelar</Button>
-                <Button type="button" variant="outline" class="w-[15%]" @click="console.log(currentReceta)">pritn</Button>
                 <Button type="submit" class="w-[15%]">Guardar</Button>
             </div>
 

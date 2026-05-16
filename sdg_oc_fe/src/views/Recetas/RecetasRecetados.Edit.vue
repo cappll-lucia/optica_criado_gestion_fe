@@ -24,15 +24,24 @@ import {
 import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { previousRoute, router } from '@/router';
-import { AsteriskIcon } from 'lucide-vue-next';
-import { SlashIcon } from '@radix-icons/vue';
+import { AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { SlashIcon, Cross2Icon } from '@radix-icons/vue';
 import { computed, onMounted, ref } from 'vue';
+import { Cliente } from '@/api/entities/clientes';
+import { clientesApi } from '@/api/libs/clientes';
+import { RecetaLentesAereosObraSocial } from '@/api/entities/recetaLentesAereosObraSocial';
+import { recetaLentesAereosObraSocialApi } from '@/api/libs/recetaLentesAereosObraSocial';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import AddObraSocialClienteForm from '@/components/AddObraSocialCliente.Form.vue';
 import AlertError from '@/components/AlertError.vue';
 import { useRoute } from 'vue-router';
 import { toast } from '@/components/ui/toast';
@@ -45,6 +54,52 @@ const showError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 
 const currentReceta = ref<RecetasAereos>()
+const clienteForOS = ref<Cliente>();
+const currentObrasSociales = ref<RecetaLentesAereosObraSocial[]>([]);
+const openNewClienteOS = ref<boolean>(false);
+
+const availableObrasSociales = computed(() =>
+    clienteForOS.value?.clienteObrasSociales?.filter(cos =>
+        !currentObrasSociales.value.some(a => a.obraSocialId === cos.obraSocial.id || a.obraSocial?.id === cos.obraSocial.id)
+    ) ?? []
+);
+
+const addObraSocial = async (id: string) => {
+    if (!currentReceta.value || !id) return;
+    try {
+        const created = await recetaLentesAereosObraSocialApi.create({
+            recetaLentesAereos: { id: currentReceta.value.id },
+            obraSocial: { id: Number(id) },
+        });
+        currentObrasSociales.value.push(created);
+    } catch (err: any) {
+        errorMessage.value = err.message;
+        showError.value = true;
+    }
+};
+
+const removeObraSocial = async (asociacionId: number) => {
+    try {
+        await recetaLentesAereosObraSocialApi.remove(asociacionId);
+        const idx = currentObrasSociales.value.findIndex(a => a.id === asociacionId);
+        if (idx !== -1) currentObrasSociales.value.splice(idx, 1);
+    } catch (err: any) {
+        errorMessage.value = err.message;
+        showError.value = true;
+    }
+};
+
+const handleShowNewObraSocialCliente = () => {
+    openNewClienteOS.value = true;
+};
+
+const handleAddObraSocialCliente = async (obraSocialId: number) => {
+    if (clienteForOS.value?.id) {
+        clienteForOS.value = await clientesApi.getOne(clienteForOS.value.id);
+        await addObraSocial(String(obraSocialId));
+        openNewClienteOS.value = false;
+    }
+};
 
 const currentDetalleCerca = ref<{
     tipo_detalle: TipoReceta,
@@ -172,6 +227,12 @@ onMounted(async () => {
         fechaReceta.value.day = currentReceta.value.fecha.getDate().toString()
         fechaReceta.value.month = (currentReceta.value.fecha.getMonth() + 1).toString()
         fechaReceta.value.year = currentReceta.value.fecha.getFullYear().toString()
+        const [obrasSociales, clienteFetched] = await Promise.all([
+            recetaLentesAereosObraSocialApi.getAll({ idRecetaLentesAereos: currentReceta.value.id }),
+            clientesApi.getOne(currentReceta.value.cliente.id),
+        ]);
+        currentObrasSociales.value = obrasSociales;
+        clienteForOS.value = clienteFetched;
         loader.hide();
     } catch (err: any) {
         errorMessage.value = err.message as string
@@ -497,6 +558,22 @@ const showCerca = computed(() =>
 
             </div>
 
+            <!-- Medidas adicionales -->
+            <div class="flex flex-row gap-6 w-full mt-6">
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">DNP</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.dnp" />
+                </div>
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">Alt. Película O.D.</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.od_alt_pelicula" />
+                </div>
+                <div class="flex flex-col gap-1 w-[15%]">
+                    <Label class="text-xs text-[#888]">Alt. Película O.I.</Label>
+                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.oi_alt_pelicula" />
+                </div>
+            </div>
+
             <Separator class="my-8 w-full" />
 
             <!-- Sección Cristales -->
@@ -567,7 +644,7 @@ const showCerca = computed(() =>
 
                     </div>
 
-                    <!-- Columna derecha: armazón + oftalmólogo + observaciones -->
+                    <!-- Columna derecha: armazón + oftalmólogo + observaciones + precios -->
                     <div class="flex flex-col gap-5 flex-1">
 
                         <div class="flex flex-row gap-6">
@@ -584,6 +661,22 @@ const showCerca = computed(() =>
                             </div>
                         </div>
 
+                        <!-- Precios -->
+                        <div class="flex flex-row gap-6">
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Precio Armazón</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioArmazon" />
+                            </div>
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Precio Cristales</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioCristales" />
+                            </div>
+                            <div class="flex flex-col gap-1 flex-1">
+                                <Label class="text-xs text-[#888]">Seña</Label>
+                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.senia" />
+                            </div>
+                        </div>
+
                         <!-- Observaciones -->
                         <div class="flex flex-col gap-1">
                             <Label class="text-xs text-[#888]">Observaciones</Label>
@@ -592,6 +685,56 @@ const showCerca = computed(() =>
 
                     </div>
                 </div>
+            </div>
+
+            <!-- Obras Sociales -->
+            <div class="w-full rounded-2xl border border-[#e5e5e5] p-6 mt-2">
+                <p class="font-bold text-base mb-4 text-[#1a1a1a]">Obras Sociales</p>
+                <div v-if="currentObrasSociales.length > 0" class="flex flex-wrap gap-2 mb-4">
+                    <div v-for="asoc in currentObrasSociales" :key="asoc.id"
+                         class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm">
+                        <span>{{ asoc.obraSocial?.nombre ?? clienteForOS?.clienteObrasSociales?.find(cos => cos.obraSocial.id === asoc.obraSocialId)?.obraSocial.nombre }}</span>
+                        <button type="button" @click="removeObraSocial(asoc.id)" class="text-[#aaa] hover:text-destructive">
+                            <Cross2Icon class="h-3 w-3" />
+                        </button>
+                    </div>
+                </div>
+                <div v-if="clienteForOS && (clienteForOS.clienteObrasSociales.length > 0 || currentObrasSociales.length > 0)">
+                    <Select @update:model-value="(val) => addObraSocial(val)">
+                        <SelectTrigger class="h-9 w-72">
+                            <SelectValue placeholder="Agregar obra social..." />
+                        </SelectTrigger>
+                        <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                            <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                <SelectItem
+                                    v-for="cos in availableObrasSociales"
+                                    :key="cos.obraSocial.id"
+                                    :value="String(cos.obraSocial.id)"
+                                >
+                                    {{ cos.obraSocial.nombre }}
+                                </SelectItem>
+                                <Button
+                                    @click="handleShowNewObraSocialCliente()"
+                                    variant="ghost"
+                                    type="button"
+                                    class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"
+                                >
+                                    <PlusCircleIcon />
+                                    <span class="w-[9rem] text-wrap text-left">Asociar nueva obra social al cliente</span>
+                                </Button>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div v-else-if="clienteForOS">
+                    <p class="py-4">No hay obras sociales registradas para el cliente</p>
+                    <Button type="button" @click="handleShowNewObraSocialCliente()">Registrar Obra Social</Button>
+                </div>
+                <Dialog v-model:open="openNewClienteOS">
+                    <DialogContent class="max-w-[33rem]">
+                        <AddObraSocialClienteForm v-if="clienteForOS" :cliente="clienteForOS" @handle-add-obra-social-cliente="handleAddObraSocialCliente" />
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <!-- Footer -->

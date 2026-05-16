@@ -72,11 +72,11 @@ export const createClienteCustomValidator = (_newCliente: {
 
 export const createClienteObraSocialCustomValidator = (_clienteOS:{
   obraSocial: {id: number| undefined},
-  numeroSocio: string
+  numeroSocio?: string
 }[])=>{
   const isValidArray = _clienteOS.map(_os=>({
       obraSocial: Boolean(_os.obraSocial.id),
-      numeroSocio: Boolean(_os.numeroSocio.trim().length > 0)
+      numeroSocio: true
   }))
   const success = _clienteOS.length > 0 && isValidArray.every(isValid =>
     Object.values(isValid).every(Boolean)

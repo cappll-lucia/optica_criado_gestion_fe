@@ -25,15 +25,17 @@ export interface RecetaContacto extends BaseEntity{
     od_cilindrico: number;
     od_eje: number;
     od_diametro: number;
-    od_marca: number;
+    od_marca: string;
     oi_cb: number;
     oi_esferico: number;
     oi_cilindrico: number;
     oi_eje: number;
     oi_diametro: number;
-    oi_marca: number;
+    oi_marca: string;
     observaciones: string;
     pruebasLentesContacto: PruebaLentesContacto[];
+    senia: number;
+    precio: number;
 }
 
 
@@ -57,13 +59,13 @@ export const recetaContactoCustomValidator = (_newReceta: {
     od_cilindrico: number | undefined;
     od_eje: number | undefined;
     od_diametro: number | undefined;
-    od_marca: number | undefined;
+    od_marca: string | undefined;
     oi_cb: number | undefined;
     oi_esferico: number | undefined;
     oi_cilindrico: number | undefined;
     oi_eje: number | undefined;
     oi_diametro: number | undefined;
-    oi_marca: number | undefined;
+    oi_marca: string | undefined;
     observaciones: string | undefined;
 }, _fecha : {
     day: string,
@@ -125,15 +127,18 @@ export type NewRecetaContactoType={
     od_cilindrico: number | undefined,
     od_eje: number | undefined,
     od_diametro: number | undefined,
-    od_marca: number | undefined,
+    od_marca: string | undefined,
     oi_cb: number | undefined,
     oi_esferico: number | undefined,
     oi_cilindrico: number | undefined,
     oi_eje: number | undefined,
     oi_diametro: number | undefined,
-    oi_marca: number | undefined,
+    oi_marca: string | undefined,
     observaciones: string | undefined,
     pruebasLentesContacto: Array<NewPruebasContactoType>
+    obrasSociales?: Array<{ id: number }>
+    senia?: number,
+    precio?: number,
 }
 
 export type EditedRecetaContactoType={
@@ -160,13 +165,15 @@ export type EditedRecetaContactoType={
     od_cilindrico: number,
     od_eje: number,
     od_diametro: number,
-    od_marca: number,
+    od_marca: string,
     oi_cb: number,
     oi_esferico: number,
     oi_cilindrico: number,
     oi_eje: number,
     oi_diametro: number,
-    oi_marca: number,
+    oi_marca: string,
     observaciones: string | undefined,
     pruebasLentesContacto: Array<NewPruebasContactoType>
+    senia?: number,
+    precio?: number,
 }

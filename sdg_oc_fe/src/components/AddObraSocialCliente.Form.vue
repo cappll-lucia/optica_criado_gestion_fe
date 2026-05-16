@@ -36,7 +36,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['handleAddObraSocialCliente']);
 
-const newClienteObraSocial = ref<{ obraSocial: { id: number|undefined }, numeroSocio: string } >({
+const newClienteObraSocial = ref<{ obraSocial: { id: number|undefined }, numeroSocio?: string } >({
     obraSocial: {id: undefined},
     numeroSocio: ''
 })
@@ -163,14 +163,6 @@ const submitNewObraSocial = async()=>{
         <div class="flex flex-row justify-start items-center">
             <Label class="w-[10rem] pr-[2rem]  text-right">Número socio</Label>
             <Input type="text" class="w-[15rem]" v-model="newClienteObraSocial.numeroSocio" />
-            <TooltipProvider  v-if="!isValidNewClienteOS.numeroSocio" >
-                <Tooltip>
-                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                    <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                        <p>Ingresar número de socio</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
         </div>
          <div class="w-full flex flex-row justify-end mt-8 mb-6 ">
             <Button type="submit" class="w-[25%] mr-20">Guardar</Button>
