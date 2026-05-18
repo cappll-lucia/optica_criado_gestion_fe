@@ -109,7 +109,6 @@ const currentDetalleCerca = ref<{
     oi_esferico: number | undefined,
     oi_cilindrico: number | undefined,
     oi_grados: number | undefined,
-    dnp: number | undefined,
 }>({
     tipo_detalle: TipoReceta.Cerca,
     od_esferico: undefined,
@@ -118,7 +117,6 @@ const currentDetalleCerca = ref<{
     oi_esferico: undefined,
     oi_cilindrico: undefined,
     oi_grados: undefined,
-    dnp: undefined,
 })
 
 const currentDetalleLejos = ref<{
@@ -129,7 +127,6 @@ const currentDetalleLejos = ref<{
     oi_esferico: number | undefined,
     oi_cilindrico: number | undefined,
     oi_grados: number | undefined,
-    dnp: number | undefined,
 }>({
     tipo_detalle: TipoReceta.Lejos,
     od_esferico: undefined,
@@ -138,17 +135,28 @@ const currentDetalleLejos = ref<{
     oi_esferico: undefined,
     oi_cilindrico: undefined,
     oi_grados: undefined,
-    dnp: undefined,
 })
 
 const isValidReceta = ref<{
     tipoReceta: boolean,
     fecha: boolean,
     cliente: boolean,
+    dnp: boolean,
+    precioArmazon: boolean,
+    precioCristales: boolean,
+    senia: boolean,
+    od_alt_pelicula: boolean,
+    oi_alt_pelicula: boolean,
 }>({
     tipoReceta: true,
     fecha: true,
     cliente: true,
+    dnp: true,
+    precioArmazon: true,
+    precioCristales: true,
+    senia: true,
+    od_alt_pelicula: true,
+    oi_alt_pelicula: true,
 })
 
 const isValidDetalleCerca = ref<{
@@ -159,7 +167,6 @@ const isValidDetalleCerca = ref<{
     oi_esferico: boolean,
     oi_cilindrico: boolean,
     oi_grados: boolean,
-    dnp: boolean,
 }>({
     tipo_detalle: true,
     od_esferico: true,
@@ -168,7 +175,6 @@ const isValidDetalleCerca = ref<{
     oi_esferico: true,
     oi_cilindrico: true,
     oi_grados: true,
-    dnp: true,
 })
 
 const isValidDetalleLejos = ref<{
@@ -179,7 +185,6 @@ const isValidDetalleLejos = ref<{
     oi_esferico: boolean,
     oi_cilindrico: boolean,
     oi_grados: boolean,
-    dnp: boolean,
 }>({
     tipo_detalle: true,
     od_esferico: true,
@@ -188,7 +193,6 @@ const isValidDetalleLejos = ref<{
     oi_esferico: true,
     oi_cilindrico: true,
     oi_grados: true,
-    dnp: true,
 })
 
 const fechaReceta = ref({
@@ -375,7 +379,6 @@ const showCerca = computed(() =>
             <!-- Fila 1: Cliente / Fecha / Tipo Receta -->
             <div class="flex flex-row w-full justify-between items-end gap-6 mt-4">
 
-                <!-- Cliente (solo lectura) -->
                 <div class="flex flex-col gap-1  w-[35%] pr-16  text-[#888]">
                     <Label class="text-xs ">Cliente</Label>
                     <div class="h-9 flex items-center px-3 rounded-md border border-[#e5e5e5] bg-muted cursor-not-allowed  text-sm">
@@ -481,18 +484,6 @@ const showCerca = computed(() =>
                             </div>
 
                         </div>
-
-                        <Separator orientation="vertical" class="h-20 mx-4" />
-
-                        <!-- DNP -->
-                        <div class="flex flex-col items-center gap-1 pl-6">
-                            <Label class="text-xs text-[#888] mr-2">DNP</Label>
-                            <div class="flex items-center gap-1">
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleLejos.dnp" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.dnp }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Campo requerido</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
@@ -542,17 +533,6 @@ const showCerca = computed(() =>
 
                         </div>
 
-                        <Separator orientation="vertical" class="h-20 mx-4" />
-
-                        <!-- DNP -->
-                        <div class="flex flex-col items-center gap-1 pl-6">
-                            <Label class="text-xs text-[#888] mr-2">DNP</Label>
-                            <div class="flex items-center gap-1">
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleCerca.dnp" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.dnp }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Campo requerido</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
@@ -562,15 +542,24 @@ const showCerca = computed(() =>
             <div class="flex flex-row gap-6 w-full mt-6">
                 <div class="flex flex-col gap-1 w-[15%]">
                     <Label class="text-xs text-[#888]">DNP</Label>
-                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.dnp" />
+                    <div class="flex flex-row items-center gap-2">
+                        <Input type="decimal" class="h-9 w-full" v-model="currentReceta.dnp" />
+                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.dnp }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>DNP requerido (mayor a 0)</p></TooltipContent></Tooltip></TooltipProvider>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-1 w-[15%]">
                     <Label class="text-xs text-[#888]">Alt. Película O.D.</Label>
-                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.od_alt_pelicula" />
+                    <div class="flex flex-row items-center gap-2">
+                        <Input type="decimal" class="h-9 w-full" v-model="currentReceta.od_alt_pelicula" />
+                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_alt_pelicula }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 50</p></TooltipContent></Tooltip></TooltipProvider>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-1 w-[15%]">
                     <Label class="text-xs text-[#888]">Alt. Película O.I.</Label>
-                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.oi_alt_pelicula" />
+                    <div class="flex flex-row items-center gap-2">
+                        <Input type="decimal" class="h-9 w-full" v-model="currentReceta.oi_alt_pelicula" />
+                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_alt_pelicula }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 50</p></TooltipContent></Tooltip></TooltipProvider>
+                    </div>
                 </div>
             </div>
 
@@ -665,15 +654,24 @@ const showCerca = computed(() =>
                         <div class="flex flex-row gap-6">
                             <div class="flex flex-col gap-1 flex-1">
                                 <Label class="text-xs text-[#888]">Precio Armazón</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioArmazon" />
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioArmazon" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioArmazon }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
                             </div>
                             <div class="flex flex-col gap-1 flex-1">
                                 <Label class="text-xs text-[#888]">Precio Cristales</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioCristales" />
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.precioCristales" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioCristales }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
                             </div>
                             <div class="flex flex-col gap-1 flex-1">
                                 <Label class="text-xs text-[#888]">Seña</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="currentReceta.senia" />
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="decimal" class="h-9 w-full" v-model="currentReceta.senia" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.senia }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
                             </div>
                         </div>
 

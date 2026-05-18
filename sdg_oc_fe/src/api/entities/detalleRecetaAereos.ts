@@ -10,7 +10,6 @@ export interface DetalleRecetaAereos {
     oi_esferico: number;
     oi_cilindrico: number;
     oi_grados: number;
-    dnp: number;
 }
 
 export const createDetalleAereosCustomValidator = (_detalle:{
@@ -21,7 +20,6 @@ export const createDetalleAereosCustomValidator = (_detalle:{
   oi_esferico: number | undefined, 
   oi_cilindrico: number | undefined, 
   oi_grados: number | undefined, 
-  dnp: number | undefined 
 }) =>{
   const isTipoDetalleValid = Object.keys(TipoReceta).includes(_detalle.tipo_detalle);
   const validateEsferico = (value: number | undefined) => value !== undefined && value >= -35 && value <= 35;
@@ -36,16 +34,15 @@ export const createDetalleAereosCustomValidator = (_detalle:{
     oi_esferico: validateEsferico(_detalle.oi_esferico),
     oi_cilindrico: validateCilindrico(_detalle.oi_cilindrico),
     oi_grados: validateGrados(_detalle.oi_grados),
-    dnp: Boolean(_detalle.dnp)
   };
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};
 }
+
 export const editDetalleAereosCustomValidator = (_detalle:EditedDetalleType | undefined) =>{
   const validateEsferico = (value:unknown) => isValidNumber(value) && value >= -35 && value <= 35;
   const validateCilindrico = (value:unknown) => isValidNumber(value) && value >= -10 && value <= 10;
   const validateGrados = (value:unknown) => isValidNumber(value) && value >= 0 && value <= 180;
-  const validateDnp = (value:unknown) => isValidNumber(value) && value >= 0;
   const isValid = {
     tipo_detalle: _detalle ? Object.keys(TipoReceta).includes(_detalle.tipo_detalle) : false,
     od_esferico: _detalle ?  validateEsferico(_detalle.od_esferico) : false,
@@ -54,7 +51,6 @@ export const editDetalleAereosCustomValidator = (_detalle:EditedDetalleType | un
     oi_esferico: _detalle ?  validateEsferico(_detalle.oi_esferico) : false,
     oi_cilindrico: _detalle ?  validateCilindrico(_detalle.oi_cilindrico) : false,
     oi_grados: _detalle ?  validateGrados(_detalle.oi_grados) : false,
-    dnp: _detalle ?  validateDnp(_detalle.dnp) : false
   };
   const success = Object.values(isValid).every(Boolean);
   return {success, isValid};
@@ -69,7 +65,6 @@ export type NewDetalleType = {
   oi_esferico: number | undefined, 
   oi_cilindrico: number | undefined, 
   oi_grados: number | undefined, 
-  dnp: number | undefined 
 }
 
 export type EditedDetalleType = {
@@ -80,5 +75,4 @@ export type EditedDetalleType = {
   oi_esferico: number | undefined, 
   oi_cilindrico: number | undefined, 
   oi_grados: number | undefined, 
-  dnp: number | undefined 
 }

@@ -56,16 +56,25 @@ export interface RecetasAereos extends BaseEntity{
 }
 
 
+const validatePositiveOrEmpty = (value: number | undefined) => value === undefined || value === null || value > 0;
+const validateAltPelicula = (value: number | undefined) => value !== undefined && value >= 0 && value <= 50;
+
 export const createRecetaAereosCustomValidator = (_newReceta: {
-    tipoReceta: TipoReceta, 
+    tipoReceta: TipoReceta,
     oftalmologo:undefined | string,
     cristal:undefined | TipoCristal,
     color:undefined | ColorCristal,
     tratamiento:undefined | TratamientoCristal,
     armazon:undefined | string,
     observaciones:undefined | string,
-    cliente: { id: undefined | number }
-  }, 
+    cliente: { id: undefined | number },
+    dnp: number | undefined,
+    precioArmazon: number | undefined,
+    precioCristales: number | undefined,
+    senia: number | undefined,
+    od_alt_pelicula: number | undefined,
+    oi_alt_pelicula: number | undefined,
+  },
   _fecha : {
     day: string,
     month: string,
@@ -74,7 +83,13 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
     const isValid = {
       tipoReceta: Object.keys(TipoReceta).includes(_newReceta.tipoReceta),
       fecha: fechaValidator.safeParse(_fecha).success,
-      cliente: Boolean(_newReceta.cliente.id)
+      cliente: Boolean(_newReceta.cliente.id),
+      dnp: _newReceta.dnp !== undefined && _newReceta.dnp !== null && _newReceta.dnp > 0,
+      precioArmazon: validatePositiveOrEmpty(_newReceta.precioArmazon),
+      precioCristales: validatePositiveOrEmpty(_newReceta.precioCristales),
+      senia: validatePositiveOrEmpty(_newReceta.senia),
+      od_alt_pelicula: validateAltPelicula(_newReceta.od_alt_pelicula),
+      oi_alt_pelicula: validateAltPelicula(_newReceta.oi_alt_pelicula),
     };
     const success = Object.values(isValid).every(Boolean);
     return {success, isValid};
@@ -85,6 +100,12 @@ export const createRecetaAereosCustomValidator = (_newReceta: {
       tipoReceta: _newReceta ? Object.keys(TipoReceta).includes(_newReceta.tipoReceta) : false,
       fecha: fechaValidator.safeParse(_fecha).success,
       cliente: _newReceta ? Boolean(_newReceta.cliente.id) : false,
+      dnp: _newReceta ? (_newReceta.dnp !== undefined && _newReceta.dnp !== null && _newReceta.dnp > 0) : false,
+      precioArmazon: _newReceta ? validatePositiveOrEmpty(_newReceta.precioArmazon) : true,
+      precioCristales: _newReceta ? validatePositiveOrEmpty(_newReceta.precioCristales) : true,
+      senia: _newReceta ? validatePositiveOrEmpty(_newReceta.senia) : true,
+      od_alt_pelicula: _newReceta ? validateAltPelicula(_newReceta.od_alt_pelicula) : true,
+      oi_alt_pelicula: _newReceta ? validateAltPelicula(_newReceta.oi_alt_pelicula) : true,
     };
     const success = Object.values(isValid).every(Boolean);
     return {success, isValid};
