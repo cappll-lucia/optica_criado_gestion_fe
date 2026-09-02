@@ -59,6 +59,7 @@ const selectedObrasSocialIds = ref<number[]>([]);
 const openNewClienteOS = ref<boolean>(false);
 const obraSocialSelectOpen = ref<boolean>(false);
 const obraSocialSelectValue = ref<string | undefined>(undefined);
+const obraSocialSelectKey = ref(0);
 
 const availableObrasSociales = computed(() =>
     selectedCliente.value?.clienteObrasSociales?.filter(cos => !selectedObrasSocialIds.value.includes(cos.obraSocial.id)) ?? []
@@ -76,12 +77,23 @@ const removeObraSocial = (id: number) => {
     const idx = selectedObrasSocialIds.value.indexOf(id);
     if (idx !== -1) selectedObrasSocialIds.value.splice(idx, 1);
     obraSocialSelectValue.value = undefined;
+    obraSocialSelectKey.value++;
 };
 
 const handleShowNewObraSocialCliente = () => {
     if (!selectedCliente.value) return;
     obraSocialSelectOpen.value = false;
     openNewClienteOS.value = true;
+};
+
+const handleAddObraSocialClick = () => {
+    if (!selectedCliente.value) return;
+    const hasAny = (selectedCliente.value.clienteObrasSociales?.length ?? 0) > 0 || selectedObrasSocialIds.value.length > 0;
+    if (hasAny) {
+        obraSocialSelectOpen.value = true;
+    } else {
+        handleShowNewObraSocialCliente();
+    }
 };
 
 const handleAddObraSocialCliente = async (obraSocialId: number) => {
@@ -386,461 +398,494 @@ const restoReceta = computed(() => {
         </BreadcrumbList>
     </Breadcrumb>
 
-    <div class="pt-2 mb-4">
-        <form @submit.prevent="validateAndSubmit" class="forms-wide flex flex-col justify-between items-start px-[5rem] !bg-white">
+    <div class="pt-4 mb-4">
+        <form @submit.prevent="validateAndSubmit" class="w-full flex flex-col gap-6">
 
             <!-- Header -->
-            <div class="w-full">
-                <h3 class="page-subtitle text-center">Nueva Receta - Anteojos Recetados</h3>
-                <Separator class="my-6 w-full" />
-            </div>
-
-            <!-- Fila 1: Cliente / Fecha / Tipo Receta / Oftalmólogo -->
-            <div class="flex flex-row w-full items-end gap-6 mt-4">
-
-                <!-- Cliente -->
-                <div class="flex flex-col gap-1 flex-[2]">
-                    <Label class="text-xs text-[#888]">Cliente</Label>
-                    <div class="flex flex-row items-center gap-2">
-                        <Input
-                            type="text"
-                            class="h-9 w-full"
-                            readonly
-                            :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : ''"
-                            placeholder="Buscar cliente..."
-                            @click="searchClienteOpen = true"
-                        />
-                        <SelectClienteDialog
-                            v-model="searchClienteOpen"
-                            title="Nueva Receta: Seleccionar Cliente"
-                            @select-cliente="handleSelectCliente"
-                        />
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger class="bg-transparent text-xs text-destructive">
-                                    <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.cliente }" />
-                                </TooltipTrigger>
-                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                    <p>Seleccionar cliente</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-
-                <!-- Fecha Receta -->
-                <div class="flex flex-col gap-1 flex-[1.5]">
-                    <Label class="text-xs text-[#888]">Fecha</Label>
-                    <div class="flex flex-row items-center gap-2">
-                        <Input type="text" v-model="fechaReceta.day"   placeholder="DD"   class="h-9 w-14 text-center" maxlength="2" />
-                        <Input type="text" v-model="fechaReceta.month" placeholder="MM"   class="h-9 w-14 text-center" maxlength="2" />
-                        <Input type="text" v-model="fechaReceta.year"  placeholder="AAAA" class="h-9 w-20 text-center" maxlength="4" />
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger class="bg-transparent text-xs text-destructive">
-                                    <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.fecha }" />
-                                </TooltipTrigger>
-                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                    <p>Ingresar una fecha válida</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-
-                <!-- Tipo Receta -->
-                <div class="flex flex-col gap-1 flex-1">
-                    <Label class="text-xs text-[#888]">Tipo receta</Label>
-                    <div class="flex flex-row items-center gap-2">
-                        <Select v-model="newReceta.tipoReceta" @update:model-value="(value) => newReceta.tipoReceta = value as TipoReceta">
-                            <SelectTrigger class="h-9 w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem v-for="tipo in Object.entries(TipoReceta)" :key="tipo[0]" :value="tipo[0]">
-                                        {{ tipo[1] }}
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger class="bg-transparent text-xs text-destructive">
-                                    <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.tipoReceta }" />
-                                </TooltipTrigger>
-                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                    <p>Seleccionar tipo de receta</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                </div>
-
-                <!-- Oftalmólogo -->
-                <div class="flex flex-col gap-1 flex-1">
-                    <Label class="text-xs text-[#888]">Oftalmólogo</Label>
-                    <Input class="h-9 w-full" v-model="newReceta.oftalmologo" placeholder="Opcional" />
+            <div class="flex flex-row items-start justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-[#1a1a1a]">Nueva Receta - Anteojos Recetados</h1>
+                    <p class="text-xl text-zinc-400 mt-1">
+                        {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }}
+                    </p>
                 </div>
             </div>
 
-            <Separator class="my-8 w-full" />
+            <!-- Grid principal: contenido + sidebar Precios -->
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start w-full">
 
-            <!-- Sección detalles ópticos -->
-            <div class="flex flex-col w-full gap-0 rounded-2xl border border-[#e5e5e5]">
+                <!-- COLUMNA IZQUIERDA -->
+                <div class="flex flex-col gap-6 min-w-0">
 
-                <!-- LEJOS -->
-                <div v-if="showLejos" class="rounded-2xl p-6">
-                    <div class="flex flex-row items-center justify-center">
-
-                        <span class="font-bold text-xl text-[#1a1a1a] w-16 pr-24 shrink-0">Lejos</span>
-
-                        <div class="flex flex-col gap-3 items-center">
-
-                            <!-- OD -->
-                            <div class="flex flex-row items-center gap-3">
-                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
-
-                                <Label class="text-xs text-[#888]">Esf.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleLejos.od_esferico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
-                                
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                
-                                <Label class="text-xs text-[#888]">Cil.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleLejos.od_cilindrico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
-                                
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                
-                                <Label class="text-xs text-[#888]">A</Label>
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleLejos.od_grados" />
-                                <span class="text-sm text-[#888]">°</span>
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-
-                            <!-- OI -->
-                            <div class="flex flex-row items-center gap-3">
-                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
-                                
-                                <Label class="text-xs text-[#888]">Esf.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleLejos.oi_esferico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
-                                
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                <Label class="text-xs text-[#888]">Cil.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleLejos.oi_cilindrico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
-                                
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                <Label class="text-xs text-[#888]">A</Label>
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleLejos.oi_grados" />
-                                <span class="text-sm text-[#888]">°</span>
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-
+                    <!-- Datos de la receta -->
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la receta</h4>
                         </div>
+                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-                    </div>
-                </div>
-
-                <Separator v-if="showCerca && showLejos" class="my-4 w-[80%] ml-[10%]" />
-
-                <!-- CERCA -->
-                <div v-if="showCerca" class="rounded-2xl p-6">
-                    <div class="flex flex-row items-center justify-center">
-
-                        <span class="font-bold text-xl text-[#1a1a1a] w-16 pr-24 shrink-0">Cerca</span>
-
-                        <div class="flex flex-col gap-3 items-center">
-
-                            <!-- OD -->
-                            <div class="flex flex-row items-center gap-3">
-                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.D.</span>
-                                
-                                <Label class="text-xs text-[#888]">Esf.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleCerca.od_esferico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                
-                                <Label class="text-xs text-[#888]">Cil.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleCerca.od_cilindrico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
-                                
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                <Label class="text-xs text-[#888]">A</Label>
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleCerca.od_grados" />
-                                <span class="text-sm text-[#888]">°</span>
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-
-                            <!-- OI -->
-                            <div class="flex flex-row items-center gap-3">
-                                <span class="font-bold text-sm w-8 text-[#1a1a1a]">O.I.</span>
-                                
-                                <Label class="text-xs text-[#888]">Esf.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleCerca.oi_esferico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                
-                                <Label class="text-xs text-[#888]">Cil.</Label>
-                                <Input type="decimal" class="h-9 w-24" v-model="currentDetalleCerca.oi_cilindrico" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
-                                <Separator orientation="vertical" class="h-6 mr-4 ml-2" />
-                                
-                                <Label class="text-xs text-[#888]">A</Label>
-                                <Input type="decimal" class="h-9 w-20" v-model="currentDetalleCerca.oi_grados" />
-                                <span class="text-sm text-[#888]">°</span>
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Medidas + Obras Sociales -->
-            <div class="flex flex-row gap-6 w-full mt-6">
-
-                <!-- Medidas -->
-                <div class="rounded-2xl border border-[#e5e5e5] p-6 shrink-0">
-                    <p class="font-bold text-base mb-4 text-[#1a1a1a]">Medidas</p>
-                    <div class="flex items-stretch gap-0">
-
-                        <!-- DNP destacado -->
-                        <div class="flex flex-col gap-1 justify-center pr-8">
-                            <Label class="text-xs text-[#888]">DNP</Label>
-                            <div class="flex items-center gap-2">
-                                <Input type="decimal" class="h-10 w-24 text-base" v-model="newReceta.dnp" />
-                                <span class="text-xs text-zinc-400">mm.</span>
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.dnp }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Requerido. DNP mayor a 0mm</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-
-                        <Separator orientation="vertical" class="mx-2 h-auto self-stretch" />
-
-                        <!-- Alt. película OD / OI apilados -->
-                        <div class="flex flex-col gap-3 justify-center pl-8">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-medium text-[#1a1a1a] w-6 shrink-0">O.D.</span>
-                                <div class="flex flex-col gap-1">
-                                    <Label class="text-xs text-[#888]">Alt. película <span class="text-[10px] text-zinc-400">mm.</span></Label>
-                                    <div class="flex items-center gap-2">
-                                        <Input type="decimal" class="h-9 w-24" v-model="newReceta.od_alt_pelicula" />
-                                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_alt_pelicula }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 50</p></TooltipContent></Tooltip></TooltipProvider>
-                                    </div>
+                            <!-- Cliente -->
+                            <div class="flex flex-col gap-1 xl:col-span-2">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Cliente</Label>
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input
+                                        type="text"
+                                        class="h-9 w-full"
+                                        readonly
+                                        :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : ''"
+                                        placeholder="Buscar cliente..."
+                                        @click="searchClienteOpen = true"
+                                    />
+                                    <SelectClienteDialog
+                                        v-model="searchClienteOpen"
+                                        title="Nueva Receta: Seleccionar Cliente"
+                                        @select-cliente="handleSelectCliente"
+                                    />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.cliente }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Seleccionar cliente</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-medium text-[#1a1a1a] w-6 shrink-0">O.I.</span>
-                                <div class="flex flex-col gap-1">
+
+                            <!-- Fecha Receta -->
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Fecha</Label>
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="text" v-model="fechaReceta.day"   placeholder="DD"   class="h-9 w-12 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaReceta.month" placeholder="MM"   class="h-9 w-12 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaReceta.year"  placeholder="AAAA" class="h-9 w-16 text-center" maxlength="4" />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.fecha }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Ingresar una fecha válida</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </div>
+
+                            <!-- Tipo Receta -->
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Tipo receta</Label>
+                                <div class="flex flex-row items-center gap-2">
+                                    <Select v-model="newReceta.tipoReceta" @update:model-value="(value) => newReceta.tipoReceta = value as TipoReceta">
+                                        <SelectTrigger class="h-9 w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem v-for="tipo in Object.entries(TipoReceta)" :key="tipo[0]" :value="tipo[0]">
+                                                    {{ tipo[1] }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidReceta.tipoReceta }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Seleccionar tipo de receta</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </div>
+
+                            <!-- Oftalmólogo -->
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Oftalmólogo</Label>
+                                <Input class="h-9 w-full" v-model="newReceta.oftalmologo" placeholder="Opcional" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graduación -->
+                    <div v-if="showLejos || showCerca" class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden w-full">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Graduación</h4>
+                        </div>
+                        <div class="p-6 overflow-x-auto">
+                            <div class="grid grid-cols-[4.5rem_2.75rem_5.5rem_5.5rem_5.5rem] gap-x-6 gap-y-2 items-center justify-center">
+                                <span></span>
+                                <span></span>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Esférico</Label>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Cilíndrico</Label>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Eje (°)</Label>
+
+                                <template v-if="showLejos">
+                                    <span class="row-span-2 self-center font-bold text-base text-[#1a1a1a]">Lejos</span>
+
+                                    <!-- OD -->
+                                    <span class="font-bold text-xs text-[#1a1a1a]">O.D.</span>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleLejos.od_esferico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleLejos.od_cilindrico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-14 text-center text-sm" v-model="currentDetalleLejos.od_grados" />
+                                        <span class="text-xs text-[#888]">°</span>
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.od_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+
+                                    <!-- OI -->
+                                    <span class="font-bold text-xs text-[#1a1a1a]">O.I.</span>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleLejos.oi_esferico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleLejos.oi_cilindrico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-14 text-center text-sm" v-model="currentDetalleLejos.oi_grados" />
+                                        <span class="text-xs text-[#888]">°</span>
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-[-5px] bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleLejos.oi_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                </template>
+
+                                <div v-if="showLejos && showCerca" class="col-span-5 border-t border-[#f0f0f0] my-4"></div>
+
+                                <template v-if="showCerca">
+                                    <span class="row-span-2 self-center font-bold text-base text-[#1a1a1a]">Cerca</span>
+
+                                    <!-- OD -->
+                                    <span class="font-bold text-xs text-[#1a1a1a]">O.D.</span>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleCerca.od_esferico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleCerca.od_cilindrico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-14 text-center text-sm" v-model="currentDetalleCerca.od_grados" />
+                                        <span class="text-xs text-[#888]">°</span>
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.od_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+
+                                    <!-- OI -->
+                                    <span class="font-bold text-xs text-[#1a1a1a]">O.I.</span>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleCerca.oi_esferico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_esferico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -35 a 35</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-16 text-center text-sm" v-model="currentDetalleCerca.oi_cilindrico" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_cilindrico }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: -10 a 10</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="relative flex items-center justify-center gap-1">
+                                        <Input type="decimal" class="h-9 w-14 text-center text-sm" v-model="currentDetalleCerca.oi_grados" />
+                                        <span class="text-xs text-[#888]">°</span>
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="absolute left-full ml-2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidDetalleCerca.oi_grados }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0° a 180°</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medidas/Obras sociales + Cristales y armazón/Observaciones -->
+                    <div class="flex flex-col lg:flex-row gap-6 w-full items-stretch">
+
+                    <!-- COLUMNA IZQUIERDA -->
+                    <div class="flex flex-col min-[580px]:flex-row lg:flex-col min-[580px]:items-stretch gap-6 w-full lg:w-auto">
+
+                    <!-- Medidas -->
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:shrink-0">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Medidas</h4>
+                        </div>
+                        <div class="p-8">
+                            <div class="flex items-stretch gap-0">
+
+                                <!-- DNP -->
+                                <div class="flex flex-col gap-1 justify-center pr-4">
+                                    <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">DNP</Label>
                                     <div class="flex items-center gap-2">
-                                        <Input type="decimal" class="h-9 w-24" v-model="newReceta.oi_alt_pelicula" />
+                                        <Input type="decimal" class="h-10 w-16 text-base" v-model="newReceta.dnp" />
+                                        <span class="text-xs text-zinc-400 shrink-0">mm.</span>
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.dnp }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Requerido. DNP mayor a 0mm</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                </div>
+
+                                <Separator orientation="vertical" class="mx-2 h-auto self-stretch" />
+
+                                <!-- Alt. película OD / OI apilados -->
+                                <div class="flex flex-col gap-1 justify-center pl-4">
+                                    <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Alt. película <span class="normal-case text-zinc-400">mm.</span></Label>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-medium text-[#1a1a1a] w-6 shrink-0">O.D.</span>
+                                        <Input type="decimal" class="h-9 w-16" v-model="newReceta.od_alt_pelicula" />
+                                        <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.od_alt_pelicula }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 50</p></TooltipContent></Tooltip></TooltipProvider>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-medium text-[#1a1a1a] w-6 shrink-0">O.I.</span>
+                                        <Input type="decimal" class="h-9 w-16" v-model="newReceta.oi_alt_pelicula" />
                                         <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.oi_alt_pelicula }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Rango: 0 a 50</p></TooltipContent></Tooltip></TooltipProvider>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
-
                     </div>
-                </div>
 
-                <!-- Obras Sociales -->
-                <div  class="rounded-2xl border border-[#e5e5e5] p-6 flex-1">
-                    <p class="font-bold text-base mb-4 text-[#1a1a1a]">Obras Sociales</p>
-                    <div v-if="selectedObrasSocialIds.length > 0" class="flex flex-wrap gap-2 mb-4">
-                        <div v-for="id in selectedObrasSocialIds" :key="id"
-                             class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm">
-                            <span>{{ selectedCliente?.clienteObrasSociales?.find(cos => cos.obraSocial.id === id)?.obraSocial.nombre }}</span>
-                            <button type="button" @click="removeObraSocial(id)" class="text-[#aaa] hover:text-destructive">
-                                <Cross2Icon class="h-3 w-3" />
-                            </button>
+                    <!-- Obras sociales -->
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Obras sociales</h4>
+                        </div>
+                        <div class="p-6 flex-1">
+                            <div v-if="selectedObrasSocialIds.length > 0" class="flex flex-col items-start gap-2 mb-4">
+                                <div v-for="id in selectedObrasSocialIds" :key="id"
+                                     class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm max-w-full">
+                                    <span class="truncate">{{ selectedCliente?.clienteObrasSociales?.find(cos => cos.obraSocial.id === id)?.obraSocial.nombre }}</span>
+                                    <button type="button" @click="removeObraSocial(id)" class="text-[#aaa] hover:text-destructive shrink-0">
+                                        <Cross2Icon class="h-3 w-3" />
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-if="(selectedCliente?.clienteObrasSociales?.length ?? 0) > 0 || selectedObrasSocialIds.length > 0">
+                                <Select :key="obraSocialSelectKey" :model-value="obraSocialSelectValue" v-model:open="obraSocialSelectOpen" @update:model-value="(val) => addObraSocial(val)">
+                                    <SelectTrigger class="h-9 w-full">
+                                        <SelectValue placeholder="Agregar obra social..." />
+                                    </SelectTrigger>
+                                    <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
+                                        <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
+                                            <SelectItem
+                                                v-for="cos in availableObrasSociales"
+                                                :key="cos.obraSocial.id"
+                                                :value="String(cos.obraSocial.id)"
+                                            >
+                                                {{ cos.obraSocial.nombre }}
+                                            </SelectItem>
+                                            <Button
+                                                @click="handleShowNewObraSocialCliente()"
+                                                variant="ghost"
+                                                type="button"
+                                                class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"
+                                            >
+                                                <PlusCircleIcon />
+                                                <span class="w-[9rem] text-wrap text-left">Asociar nueva obra social al cliente</span>
+                                            </Button>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div v-else class="flex flex-col items-start gap-2">
+                                <p class="text-sm text-[#888]">
+                                    {{ selectedCliente ? 'Sin cobertura asignada' : 'Seleccioná un cliente para gestionar sus obras sociales' }}
+                                </p>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger as-child>
+                                            <span>
+                                                <Button type="button" size="sm" variant="outline" :disabled="!selectedCliente" @click="handleAddObraSocialClick">
+                                                    Registrar obra social
+                                                </Button>
+                                            </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent v-if="!selectedCliente">
+                                            <p>Seleccionar un cliente primero</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <Dialog v-model:open="openNewClienteOS">
+                                <DialogContent class="max-w-[33rem]">
+                                    <AddObraSocialClienteForm v-if="selectedCliente" :cliente="selectedCliente" @handle-add-obra-social-cliente="handleAddObraSocialCliente" />
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
-                    <div v-if="(selectedCliente?.clienteObrasSociales?.length ?? 0) > 0 || selectedObrasSocialIds.length > 0">
-                        <Select :model-value="obraSocialSelectValue" v-model:open="obraSocialSelectOpen" @update:model-value="(val) => addObraSocial(val)">
-                            <SelectTrigger class="h-9 w-72">
-                                <SelectValue placeholder="Agregar obra social..." />
-                            </SelectTrigger>
-                            <SelectContent class="max-h-[20rem] w-[15rem] pr-1">
-                                <SelectGroup class="max-h-[20rem] w-[16rem] m-0 p-0 overflow-scroll">
-                                    <SelectItem
-                                        v-for="cos in availableObrasSociales"
-                                        :key="cos.obraSocial.id"
-                                        :value="String(cos.obraSocial.id)"
-                                    >
-                                        {{ cos.obraSocial.nombre }}
-                                    </SelectItem>
-                                    <Button
-                                        @click="handleShowNewObraSocialCliente()"
-                                        variant="ghost"
-                                        type="button"
-                                        class="w-full h-max p-2 bg-secondary rounded-none flex-row items-center justify-start text-sm"
-                                    >
-                                        <PlusCircleIcon />
-                                        <span class="w-[9rem] text-wrap text-left">Asociar nueva obra social al cliente</span>
-                                    </Button>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+
                     </div>
-                    <div v-else>
-                        <p class="py-4">No hay obras sociales registradas para el cliente</p>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger as-child>
-                                    <span>
-                                        <Button type="button" :disabled="!selectedCliente" @click="handleShowNewObraSocialCliente()">Registrar Obra Social</Button>
-                                    </span>
-                                </TooltipTrigger>
-                                <TooltipContent v-if="!selectedCliente">
-                                    <p>Seleccionar un cliente primero</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+
+                    <!-- COLUMNA DERECHA -->
+                    <div class="flex flex-col min-[580px]:flex-row lg:flex-col min-[580px]:items-stretch gap-6 w-full flex-1 min-w-0">
+
+                    <!-- Cristales y armazón -->
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Cristales y armazón</h4>
+                        </div>
+                        <div class="p-6 flex flex-col gap-4">
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Tipo de cristal</Label>
+                                <Select v-model="newReceta.cristal" @update:model-value="(value) => newReceta.cristal = value as TipoCristal">
+                                    <SelectTrigger class="h-9 w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem v-for="tipo in Object.entries(TipoCristal)" :key="tipo[0]" :value="tipo[0]">
+                                                {{ tipo[1] }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Color</Label>
+                                <Select v-model="newReceta.color" @update:model-value="(value) => newReceta.color = value as ColorCristal">
+                                    <SelectTrigger class="h-9 w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem v-for="color in Object.entries(ColorCristal)" :key="color[0]" :value="color[0]">
+                                                {{ color[1] }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Tratamiento</Label>
+                                <Select v-model="newReceta.tratamiento" @update:model-value="(value) => newReceta.tratamiento = value as TratamientoCristal">
+                                    <SelectTrigger class="h-9 w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem v-for="trat in Object.entries(TratamientoCristal)" :key="trat[0]" :value="trat[0]">
+                                                {{ trat[1] }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Armazón</Label>
+                                <Input class="h-9 w-full" v-model="newReceta.armazon" placeholder="Modelo o código" />
+                            </div>
+                        </div>
                     </div>
-                    <Dialog v-model:open="openNewClienteOS">
-                        <DialogContent class="max-w-[33rem]">
-                            <AddObraSocialClienteForm v-if="selectedCliente" :cliente="selectedCliente" @handle-add-obra-social-cliente="handleAddObraSocialCliente" />
-                        </DialogContent>
-                    </Dialog>
+
+                    <!-- Observaciones -->
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
+                        </div>
+                        <div class="p-6">
+                            <Textarea class="resize-none w-full min-h-[6rem]" v-model="newReceta.observaciones" />
+                        </div>
+                    </div>
+
+                    </div>
+
+                    </div>
+
+
                 </div>
+
+                <!-- COLUMNA DERECHA: Precios -->
+                <div class="lg:sticky lg:top-4 flex flex-col gap-6">
+                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Precios</h4>
+                        </div>
+                        <div class="p-6 flex flex-col gap-4">
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Precio armazón</Label>
+                                <div class="relative w-full">
+                                    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">$</span>
+                                    <Input type="decimal" class="h-10 pl-6 pr-8" v-model="newReceta.precioArmazon" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioArmazon }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Precio cristales</Label>
+                                <div class="relative w-full">
+                                    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">$</span>
+                                    <Input type="decimal" class="h-10 pl-6 pr-8" v-model="newReceta.precioCristales" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioCristales }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Seña recibida</Label>
+                                <div class="relative w-full">
+                                    <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">$</span>
+                                    <Input type="decimal" class="h-10 pl-6 pr-8" v-model="newReceta.senia" />
+                                    <TooltipProvider><Tooltip><TooltipTrigger class="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.senia }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1.5 pt-3 border-t border-[#e5e5e5] text-sm">
+                                <div class="flex justify-between text-zinc-500">
+                                    <span>Armazón</span>
+                                    <span>{{ newReceta.precioArmazon ? '$ ' + Number(newReceta.precioArmazon).toLocaleString('es-AR') : '$ —' }}</span>
+                                </div>
+                                <div class="flex justify-between text-zinc-500">
+                                    <span>+ Cristales</span>
+                                    <span>{{ newReceta.precioCristales ? '$ ' + Number(newReceta.precioCristales).toLocaleString('es-AR') : '$ —' }}</span>
+                                </div>
+                                <div class="flex justify-between text-zinc-500">
+                                    <span>− Seña</span>
+                                    <span>{{ newReceta.senia ? '- $ ' + Number(newReceta.senia).toLocaleString('es-AR') : '$ —' }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between rounded-xl bg-[#1a1a1a] px-4 py-3 text-white">
+                                <span class="text-[10px] font-medium tracking-wide uppercase">Total</span>
+                                <span class="text-base font-bold">{{ totalReceta > 0 ? '$ ' + totalReceta.toLocaleString('es-AR') : '$ —' }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between rounded-xl border px-4 py-3 bg-secondary">
+                                <span class="text-[10px] font-medium tracking-wide uppercase">Resto a pagar</span>
+                                <span class="text-base font-bold">{{ totalReceta > 0 ? '$ ' + restoReceta.toLocaleString('es-AR') : '$ —' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Cristales + Precios -->
-            <div class="flex flex-row gap-6 w-full mt-6">
-
-                <!-- Card Cristales -->
-                <div class="rounded-2xl border border-[#e5e5e5] p-6 flex flex-col gap-5 w-[32%]">
-                    <p class="font-bold text-base text-[#1a1a1a]">Cristales</p>
-
-                    <!-- Tipo cristal -->
-                    <div class="flex flex-col gap-1">
-                        <Label class="text-xs text-[#888]">Tipo</Label>
-                        <Select v-model="newReceta.cristal" @update:model-value="(value) => newReceta.cristal = value as TipoCristal">
-                            <SelectTrigger class="h-9 w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem v-for="tipo in Object.entries(TipoCristal)" :key="tipo[0]" :value="tipo[0]">
-                                        {{ tipo[1] }}
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+            <!-- Footer sticky -->
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+                <div class="flex flex-row items-center justify-between gap-6 py-3">
+                    <div class="flex items-center gap-6 text-sm">
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Total</span>
+                            <span class="font-semibold text-[#1a1a1a]">{{ totalReceta > 0 ? '$ ' + totalReceta.toLocaleString('es-AR') : '$ —' }}</span>
+                        </div>
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Seña</span>
+                            <span class="font-semibold text-[#1a1a1a]">{{ newReceta.senia ? '$ ' + Number(newReceta.senia).toLocaleString('es-AR') : '$ —' }}</span>
+                        </div>
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Resto</span>
+                            <span class="font-semibold" :class="restoReceta < 0 ? 'text-destructive' : 'text-[#1a1a1a]'">{{ totalReceta > 0 ? '$ ' + restoReceta.toLocaleString('es-AR') : '$ —' }}</span>
+                        </div>
                     </div>
-
-                    <!-- Color -->
-                    <div class="flex flex-col gap-1">
-                        <Label class="text-xs text-[#888]">Color</Label>
-                        <Select v-model="newReceta.color" @update:model-value="(value) => newReceta.color = value as ColorCristal">
-                            <SelectTrigger class="h-9 w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem v-for="color in Object.entries(ColorCristal)" :key="color[0]" :value="color[0]">
-                                        {{ color[1] }}
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- Tratamiento -->
-                    <div class="flex flex-col gap-1">
-                        <Label class="text-xs text-[#888]">Tratamiento</Label>
-                        <Select v-model="newReceta.tratamiento" @update:model-value="(value) => newReceta.tratamiento = value as TratamientoCristal">
-                            <SelectTrigger class="h-9 w-full">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem v-for="trat in Object.entries(TratamientoCristal)" :key="trat[0]" :value="trat[0]">
-                                        {{ trat[1] }}
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <!-- Armazón -->
-                    <div class="flex flex-col gap-1">
-                        <Label class="text-xs text-[#888]">Armazón</Label>
-                        <Input class="h-9 w-full" v-model="newReceta.armazon" />
+                    <div class="flex gap-3">
+                        <Button type="button" variant="outline" @click="redirectCancel">Cancelar</Button>
+                        <Button type="submit">Guardar receta</Button>
                     </div>
                 </div>
-
-                <!-- Card Precios -->
-                <div class="rounded-2xl border border-[#e5e5e5] p-6 flex flex-col gap-5 flex-1">
-                    <p class="font-bold text-base text-[#1a1a1a]">Precios</p>
-
-                    <div class="flex flex-col gap-4">
-                        <div class="flex flex-col gap-1">
-                            <Label class="text-xs text-[#888]">Precio armazón</Label>
-                            <div class="flex flex-row items-center gap-2">
-                                <Label class="text-xs text-[#888]">$</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.precioArmazon" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioArmazon }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <Label class="text-xs text-[#888]">Precio cristales</Label>
-                            <div class="flex flex-row items-center gap-2">
-                                <Label class="text-xs text-[#888]">$</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.precioCristales" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.precioCristales }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="flex flex-col gap-0.5 border-t border-[#e5e5e5] pt-3">
-                            <Label class="text-[11px] text-zinc-400">Total</Label>
-                            <div class="flex items-baseline gap-1.5 px-1">
-                                <span class="text-xs text-zinc-400">$</span>
-                                <span class="text-sm font-medium text-[#1a1a1a]">{{ totalReceta > 0 ? totalReceta.toLocaleString('es-AR') : '—' }}</span>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <Label class="text-xs text-[#888]">Seña</Label>
-                            <div class="flex flex-row items-center gap-2">
-                                <Label class="text-xs text-[#888]">$</Label>
-                                <Input type="decimal" class="h-9 w-full" v-model="newReceta.senia" />
-                                <TooltipProvider><Tooltip><TooltipTrigger class="bg-transparent text-destructive"><AsteriskIcon :size="12" :class="{ 'invisible': isValidReceta.senia }" /></TooltipTrigger><TooltipContent class="text-destructive border-destructive font-thin text-xs"><p>Ingresar monto mayor a 0</p></TooltipContent></Tooltip></TooltipProvider>
-                            </div>
-                        </div>
-
-                        <!-- Resto -->
-                        <div class="flex flex-col gap-0.5 border-t border-[#e5e5e5] pt-3">
-                            <Label class="text-[11px] text-zinc-400">Resto</Label>
-                            <div class="flex items-baseline gap-1.5 px-1">
-                                <span class="text-xs text-zinc-400">$</span>
-                                <span class="text-sm font-medium" :class="restoReceta < 0 ? 'text-destructive' : 'text-[#1a1a1a]'">{{ totalReceta > 0 ? restoReceta.toLocaleString('es-AR') : '—' }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                
             </div>
-                              <!-- Observaciones -->
-                <!-- <div class="flex w-full flex-row flex-1"> -->
-                <div class="rounded-2xl mt-6 border border-[#e5e5e5] p-6 flex flex-col w-full flex-1">
-                    <p class="font-bold text-base text-[#1a1a1a]">Observaciones</p>
-                    <Textarea class="resize-none w-full flex-1 min-h-[7rem]" v-model="newReceta.observaciones" />
-                </div>
-            
-
-            <!-- Footer -->
-            <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 gap-4">
-                <Button type="button" variant="outline" class="w-[15%]" @click="redirectCancel">Cancelar</Button>
-                <Button type="submit" class="w-[15%]">Guardar</Button>
-            </div>
-
-            
 
         </form>
     </div>
