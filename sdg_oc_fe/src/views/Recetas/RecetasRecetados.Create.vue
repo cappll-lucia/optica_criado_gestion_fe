@@ -58,6 +58,7 @@ const errorMessage = ref<string>('');
 const selectedObrasSocialIds = ref<number[]>([]);
 const openNewClienteOS = ref<boolean>(false);
 const obraSocialSelectOpen = ref<boolean>(false);
+const obraSocialSelectValue = ref<string | undefined>(undefined);
 
 const availableObrasSociales = computed(() =>
     selectedCliente.value?.clienteObrasSociales?.filter(cos => !selectedObrasSocialIds.value.includes(cos.obraSocial.id)) ?? []
@@ -68,11 +69,13 @@ const addObraSocial = (id: string) => {
     if (numId && !selectedObrasSocialIds.value.includes(numId)) {
         selectedObrasSocialIds.value.push(numId);
     }
+    obraSocialSelectValue.value = undefined;
 };
 
 const removeObraSocial = (id: number) => {
     const idx = selectedObrasSocialIds.value.indexOf(id);
     if (idx !== -1) selectedObrasSocialIds.value.splice(idx, 1);
+    obraSocialSelectValue.value = undefined;
 };
 
 const handleShowNewObraSocialCliente = () => {
@@ -656,7 +659,7 @@ const restoReceta = computed(() => {
                         </div>
                     </div>
                     <div v-if="(selectedCliente?.clienteObrasSociales?.length ?? 0) > 0 || selectedObrasSocialIds.length > 0">
-                        <Select v-model:open="obraSocialSelectOpen" @update:model-value="(val) => addObraSocial(val)">
+                        <Select :model-value="obraSocialSelectValue" v-model:open="obraSocialSelectOpen" @update:model-value="(val) => addObraSocial(val)">
                             <SelectTrigger class="h-9 w-72">
                                 <SelectValue placeholder="Agregar obra social..." />
                             </SelectTrigger>
