@@ -3,7 +3,7 @@ import { RecetasAereos } from '@/api/entities/recetasAereos';
 import { Separator } from '@/components/ui/separator'
 import { DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
 import { onMounted, ref, computed } from 'vue';
-import ItemDetalleReceta from '@/components/ItemDetalleRecetaRecetados.vue'
+import Label from '@/components/ui/label/Label.vue';
 import ItemResumenReceta from '@/components/ItemResumenRecetaRecetados.vue'
 import {
     Dialog,
@@ -14,7 +14,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { formatDate, generateRecetasRecetadosPDF } from '@/lib/utils.recetas';
+import { formatDate, generateRecetasRecetadosPDF, getLogoDataUrl } from '@/lib/utils.recetas';
 import { jsPDF } from 'jspdf';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { PlusIcon } from 'lucide-vue-next';
@@ -51,6 +51,11 @@ onMounted(() => {
 
 const allSelected = computed(() => selectedToPrint.value.length === props.recetas.length)
 
+const showLejosDetalle = computed(() =>
+    !!detalleLejos.value && ['Lejos', 'Multifocal', 'Bifocal'].includes(currentRec.value?.tipoReceta ?? ''));
+const showCercaDetalle = computed(() =>
+    !!detalleCerca.value && ['Cerca', 'Multifocal', 'Bifocal'].includes(currentRec.value?.tipoReceta ?? ''));
+
 const toggleSelectAll = () => {
     if (allSelected.value) {
         selectedToPrint.value = []
@@ -77,7 +82,11 @@ const printRecetas = () => {
     printOpen.value = false
 };
 
-const sign = (n: number) => n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
+const sign = (n: number | string | undefined | null) => {
+    if (n == null) return '-';
+    const num = Number(n);
+    return num > 0 ? `+${num.toFixed(2)}` : num.toFixed(2);
+};
 
 const buildResumenText = (recetas: RecetasAereos[]): string => {
     return recetas.map(receta => {
@@ -86,20 +95,26 @@ const buildResumenText = (recetas: RecetasAereos[]): string => {
         receta.detallesRecetaLentesAereos.forEach(det => {
             lines.push(`   O.D.Esf.${sign(det.od_esferico)}  Cil.${sign(det.od_cilindrico)}  A.${det.od_grados}°`);
             lines.push(`   O.I.Esf.${sign(det.oi_esferico)}  Cil.${sign(det.oi_cilindrico)}  A.${det.oi_grados}°`);
-            lines.push(`   DNP ${sign(det.dnp)}`);
         });
+        const medidas: string[] = [];
+        if (receta.dnp != null) medidas.push(`DNP ${sign(receta.dnp)}mm.`);
+        if (receta.od_alt_pelicula != null) medidas.push(`Alt. película O.D. ${receta.od_alt_pelicula}mm.`);
+        if (receta.oi_alt_pelicula != null) medidas.push(`Alt. película O.I. ${receta.oi_alt_pelicula}mm.`);
+        if (medidas.length) lines.push('   ' + medidas.join('  |  '));
         const extras: string[] = [];
         if (receta.cristal) extras.push(`Cristal: ${receta.cristal}`);
         if (receta.color) extras.push(`Color: ${receta.color}`);
         if (receta.armazon) extras.push(`Armazón: ${receta.armazon}`);
         if (extras.length) lines.push('   ' + extras.join('  |  '));
         if (receta.tratamiento) lines.push(`   Tratamiento: ${receta.tratamiento}`);
-        if (receta.observaciones) lines.push(`   ${receta.observaciones}`);
+        if (receta.observaciones) lines.push(`   Obs.:  ${receta.observaciones}`);
+        const obrasSociales = receta.recetaLentesAereosObrasSociales?.map(ros => ros.obraSocial.nombre) ?? [];
+        if (obrasSociales.length) lines.push(`   Obras sociales: ${obrasSociales.join(', ')}`);
         return lines.join('\n');
     }).join('\n\n');
 };
 
-const printResumenPDF = () => {
+const printResumenPDF = async () => {
     if (selectedToPrint.value.length === 0) {
         alert("Por favor, selecciona al menos una receta.");
         return;
@@ -113,6 +128,16 @@ const printResumenPDF = () => {
     const lineHeight = 16;
     const fontSize = 10;
     let y = margin;
+
+    try {
+        const logo = await getLogoDataUrl();
+        const logoWidth = 180;
+        const logoHeight = logoWidth / (1090 / 229);
+        doc.addImage(logo, 'PNG', margin, y, logoWidth, logoHeight);
+        y += logoHeight + 26;
+    } catch {
+        // logo no disponible, se continúa sin él
+    }
 
     const tipoDoc = props.tipoDocumento === TipoDocumento.CUIT ? 'CUIT' : 'DNI';
     const docLine = props.nroDocumento ? `${tipoDoc}: ${props.nroDocumento}` : '';
@@ -154,6 +179,10 @@ const printResumenPDF = () => {
     doc.save(`Resumen_${props.nombreCliente}.pdf`);
     printOpen.value = false;
 };
+
+const totalReceta = (receta: RecetasAereos) => (Number(receta.precioArmazon) || 0) + (Number(receta.precioCristales) || 0);
+const restoReceta = (receta: RecetasAereos) => totalReceta(receta) - (Number(receta.senia) || 0);
+const formatMonto = (n: number) => n > 0 ? '$ ' + n.toLocaleString('es-AR') : '$ —';
 
 const handleChangeReceta = (receta: RecetasAereos) => {
     currentRec.value = receta;
@@ -275,7 +304,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                             </span>
                             <span v-if="index === 0"
                                 class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
-                                Vigente
+                                Última
                             </span>
                         </div>
                         <span class="text-xs" :class="currentRec === receta ? 'text-white' : 'text-zinc-900'">{{ receta.tipoReceta }}</span>
@@ -299,17 +328,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
             <!-- MODO DETALLE -->
             <div v-else-if="currentRec">
-                <div class="flex flex-row justify-between items-start mb-1">
-                    <div class="flex flex-col gap-1">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-zinc-400 w-20">Tipo</span>
-                            <span class="text-sm font-medium">{{ currentRec.tipoReceta }}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs text-zinc-400 w-20">Fecha</span>
-                            <span class="text-sm">{{ formatDate(currentRec.fecha.toString()) }}</span>
-                        </div>
-                    </div>
+                <div class="flex flex-row justify-end items-center mb-4">
                     <button
                         class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                         @click="router.push(`/recetas/recetados/edit/${currentRec?.id}`)">
@@ -318,50 +337,179 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </button>
                 </div>
 
-                <Separator class="my-5" />
+                <div class="flex flex-col gap-6">
 
-                <div v-if="currentRec?.tipoReceta == 'Lejos' && detalleLejos">
-                    <ItemDetalleReceta :detalleReceta="detalleLejos" title="Lejos" />
-                </div>
-                <div v-else-if="currentRec?.tipoReceta == 'Cerca' && detalleCerca">
-                    <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
-                </div>
-                <div v-else-if="(currentRec?.tipoReceta == 'Multifocal' || currentRec?.tipoReceta == 'Bifocal') && detalleLejos && detalleCerca">
-                    <ItemDetalleReceta :detalleReceta="detalleLejos" title="Lejos" />
-                    <Separator class="my-6" />
-                    <ItemDetalleReceta :detalleReceta="detalleCerca" title="Cerca" />
-                </div>
+                    <!-- Datos de la receta -->
+                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                        <div class="px-6 py-4 border-b border-zinc-200">
+                            <h4 class="font-bold text-sm text-zinc-900">Datos de la receta</h4>
+                        </div>
+                        <div class="p-6 grid grid-cols-3 gap-y-5">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-zinc-400">Tipo</span>
+                                <span class="w-fit text-sm font-semibold px-2.5 py-1 rounded-md border border-zinc-300 bg-zinc-100 text-zinc-900">{{ currentRec.tipoReceta }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Fecha</span>
+                                <span class="text-sm font-medium">{{ formatDate(currentRec.fecha.toString()) }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Oftalmólogo</span>
+                                <span class="text-sm text-zinc-500">{{ currentRec.oftalmologo ?? '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <Separator class="my-6" />
+                    <!-- Graduación -->
+                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                        <div class="px-6 py-4 border-b border-zinc-200">
+                            <h4 class="font-bold text-sm text-zinc-900">Graduación</h4>
+                        </div>
+                        <div class="p-6 overflow-x-auto">
+                            <div class="grid grid-cols-[4.5rem_2.75rem_5.5rem_5.5rem_5.5rem] gap-x-6 gap-y-2 items-center justify-center">
+                                <span></span>
+                                <span></span>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Esférico</Label>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Cilíndrico</Label>
+                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Eje (°)</Label>
 
-                <div class="grid grid-cols-3 gap-y-5">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs text-zinc-400">Cristal</span>
-                        <span class="text-sm">{{ currentRec.cristal ?? '—' }}</span>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs text-zinc-400">Color</span>
-                        <span class="text-sm">{{ currentRec.color ?? '—' }}</span>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs text-zinc-400">Tratamiento</span>
-                        <span class="text-sm">{{ currentRec.tratamiento ?? '—' }}</span>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs text-zinc-400">Oftalmólogo</span>
-                        <span class="text-sm">{{ currentRec.oftalmologo ?? '—' }}</span>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-xs text-zinc-400">Armazón</span>
-                        <span class="text-sm">{{ currentRec.armazon ?? '—' }}</span>
-                    </div>
-                </div>
+                                <template v-if="showLejosDetalle && detalleLejos">
+                                    <span class="row-span-2 self-center font-bold text-base text-zinc-900">Lejos</span>
 
-                <Separator class="my-6" />
+                                    <span class="font-bold text-xs text-zinc-900">O.D.</span>
+                                    <span class="text-sm text-center">{{ sign(detalleLejos.od_esferico) }}</span>
+                                    <span class="text-sm text-center">{{ sign(detalleLejos.od_cilindrico) }}</span>
+                                    <span class="text-sm text-center">{{ detalleLejos.od_grados }}°</span>
 
-                <div class="flex flex-col gap-1">
-                    <span class="text-xs text-zinc-400">Observaciones</span>
-                    <span class="text-sm min-h-[4rem]">{{ currentRec.observaciones ?? '—' }}</span>
+                                    <span class="font-bold text-xs text-zinc-900">O.I.</span>
+                                    <span class="text-sm text-center">{{ sign(detalleLejos.oi_esferico) }}</span>
+                                    <span class="text-sm text-center">{{ sign(detalleLejos.oi_cilindrico) }}</span>
+                                    <span class="text-sm text-center">{{ detalleLejos.oi_grados }}°</span>
+                                </template>
+
+                                <div v-if="showLejosDetalle && showCercaDetalle" class="col-span-5 border-t border-zinc-100 my-2"></div>
+
+                                <template v-if="showCercaDetalle && detalleCerca">
+                                    <span class="row-span-2 self-center font-bold text-base text-zinc-900">Cerca</span>
+
+                                    <span class="font-bold text-xs text-zinc-900">O.D.</span>
+                                    <span class="text-sm text-center">{{ sign(detalleCerca.od_esferico) }}</span>
+                                    <span class="text-sm text-center">{{ sign(detalleCerca.od_cilindrico) }}</span>
+                                    <span class="text-sm text-center">{{ detalleCerca.od_grados }}°</span>
+
+                                    <span class="font-bold text-xs text-zinc-900">O.I.</span>
+                                    <span class="text-sm text-center">{{ sign(detalleCerca.oi_esferico) }}</span>
+                                    <span class="text-sm text-center">{{ sign(detalleCerca.oi_cilindrico) }}</span>
+                                    <span class="text-sm text-center">{{ detalleCerca.oi_grados }}°</span>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medidas -->
+                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                        <div class="px-6 py-4 border-b border-zinc-200">
+                            <h4 class="font-bold text-sm text-zinc-900">Medidas</h4>
+                        </div>
+                        <div class="p-6 grid grid-cols-3 gap-y-5">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">DNP</span>
+                                <span class="text-sm">{{ currentRec.dnp != null ? `${currentRec.dnp} mm.` : '—' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Alt. película O.D.</span>
+                                <span class="text-sm">{{ currentRec.od_alt_pelicula != null ? `${currentRec.od_alt_pelicula} mm.` : '—' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Alt. película O.I.</span>
+                                <span class="text-sm">{{ currentRec.oi_alt_pelicula != null ? `${currentRec.oi_alt_pelicula} mm.` : '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cristales y armazón -->
+                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                        <div class="px-6 py-4 border-b border-zinc-200">
+                            <h4 class="font-bold text-sm text-zinc-900">Cristales y armazón</h4>
+                        </div>
+                        <div class="p-6 grid grid-cols-3 gap-y-5">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Cristal</span>
+                                <span class="text-sm">{{ currentRec.cristal ?? '—' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Color</span>
+                                <span class="text-sm">{{ currentRec.color ?? '—' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Tratamiento</span>
+                                <span class="text-sm">{{ currentRec.tratamiento ?? '—' }}</span>
+                            </div>
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-xs text-zinc-400">Armazón</span>
+                                <span class="text-sm">{{ currentRec.armazon ?? '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Obras sociales + Precios -->
+                    <div class="flex flex-col lg:flex-row gap-6 items-stretch">
+                        <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
+                            <div class="px-6 py-4 border-b border-zinc-200">
+                                <h4 class="font-bold text-sm text-zinc-900">Obras sociales</h4>
+                            </div>
+                            <div class="p-6 flex-1">
+                                <div v-if="currentRec.recetaLentesAereosObrasSociales && currentRec.recetaLentesAereosObrasSociales.length > 0"
+                                    class="flex flex-col items-start gap-2">
+                                    <span v-for="ros in currentRec.recetaLentesAereosObrasSociales" :key="ros.obraSocial.id"
+                                        class="bg-zinc-100 border border-zinc-200 rounded-full px-3 py-1 text-sm">
+                                        {{ ros.obraSocial.nombre }}
+                                    </span>
+                                </div>
+                                <span v-else class="text-sm text-zinc-400">No se registró cobertura</span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
+                            <div class="px-6 py-4 border-b border-zinc-200">
+                                <h4 class="font-bold text-sm text-zinc-900">Precios</h4>
+                            </div>
+                            <div class="p-6 flex flex-col gap-1.5 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-400">Armazón</span>
+                                    <span>{{ formatMonto(Number(currentRec.precioArmazon) || 0) }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-400">Cristales</span>
+                                    <span>{{ formatMonto(Number(currentRec.precioCristales) || 0) }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-400">Seña</span>
+                                    <span>{{ Number(currentRec.senia) > 0 ? '- ' + formatMonto(Number(currentRec.senia)) : '$ —' }}</span>
+                                </div>
+                                <Separator class="my-1" />
+                                <div class="flex justify-between font-semibold">
+                                    <span>Total</span>
+                                    <span>{{ formatMonto(totalReceta(currentRec)) }}</span>
+                                </div>
+                                <div class="flex justify-between font-semibold">
+                                    <span>Resto a pagar</span>
+                                    <span>{{ formatMonto(restoReceta(currentRec)) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                        <div class="px-6 py-4 border-b border-zinc-200">
+                            <h4 class="font-bold text-sm text-zinc-900">Observaciones</h4>
+                        </div>
+                        <div class="p-6">
+                            <span class="text-sm">{{ currentRec.observaciones ?? '—' }}</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

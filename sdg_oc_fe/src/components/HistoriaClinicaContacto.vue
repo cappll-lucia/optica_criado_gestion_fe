@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Pencil1Icon } from '@radix-icons/vue';
 
@@ -24,299 +23,181 @@ const props = defineProps<{
         <Button class="w-[20rem]" @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${clienteId}`)" >Registrar historia clínica</Button>
     </div>
     <div class="datos flex flex-col" v-if="props.historiaClinica">
-        <div class="flex flex-row justify-between items-center">
-            <div class="flex flex-col ">
-                <span class="text-lg font-bold">Historia Clínica Lentes de Contacto </span>
-            </div>
-            <div class="flex flex-col ">
-                <Button variant="outline" size="default" class="bg-transparent hover:bg-[#d7e5ec]"
-                    @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
-                    Editar
-                    <Pencil1Icon class="w-4 h-4" />
-                </Button>
-            </div>
-        </div>
-        <Separator class="my-6" />
-
-        <div class="flex flex-col justify-between">
-            <span class="text-ls font-bold">Antecedentes Oculares </span>
-            <div class="flex flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.patologicas" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Patológicos
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.traumaticas" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Traumáticos
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sensLuzNatural" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sensibilidad Luz Natural
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sensLuzArtificial"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sensibilidad Luz Artificial
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sensPolvo" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sensibilidad Polvo
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sensFrio" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sensibilidad Frio
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sensHumo" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sensibilidad Humo
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light ">{{ props.historiaClinica.observacionesSens || ' - ' }} </span>
+        <div class="flex flex-row justify-end items-center mb-4">
+            <Button variant="outline" size="sm" class="bg-white"
+                @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
+                <Pencil1Icon class="w-3.5 h-3.5 mr-1.5" />
+                Editar
+            </Button>
         </div>
 
-        <Separator class="my-6" />
+        <div class="flex flex-col gap-6">
 
-        <div class="flex flex-col justify-between">
-            <span class="text-ls font-bold">Antecedentes Generales </span>
-            <div class="flex flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none"
-                            v-model:checked="props.historiaClinica.transtornosNeurologicos" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Trastornos Neurológicos
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.regimenEventual" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Régimen Eventual
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none"
-                            v-model:checked="props.historiaClinica.glandulasEndocinas" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Glandulas Endócrinas
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none"
-                            v-model:checked="props.historiaClinica.sistemaCardiovascular" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sistema Cardiovascular
-                        </label>
-                    </div>
-
+            <!-- Antecedentes Oculares -->
+            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-200">
+                    <h4 class="font-bold text-sm text-zinc-900">Antecedentes Oculares</h4>
                 </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem] ">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.embarazo" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Embarazo
-                        </label>
+                <div class="p-6">
+                    <div class="grid grid-cols-4 gap-y-3">
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.patologicas" />
+                            <label class="text-sm font-light leading-none">Patológicos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.traumaticas" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Traumáticos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sensLuzNatural" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sensibilidad Luz Natural</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sensLuzArtificial" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sensibilidad Luz Artificial</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sensPolvo" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sensibilidad Polvo</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sensFrio" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sensibilidad Frío</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sensHumo" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sensibilidad Humo</label>
+                        </div>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.estomatologia" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Estomatologia
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.caries" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Caries
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.digestivo" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Digestivos
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.alergiaDigestiva"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Alergia Digestiva
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.alergiaRespiratoria"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Alergia Respiratoria
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.alergiaCutanea" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Alergia Cutanea
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.alergiaOtras" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Otras Alergias
-                        </label>
-                    </div>
-
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.rinitisPrimaveral"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Rinitis Primaveral
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.sinusitisCronica"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Sinusitis Cronica
-                        </label>
+                    <div class="flex flex-col gap-0.5 mt-5 pt-4 border-t border-zinc-100">
+                        <span class="text-xs text-zinc-400">Observaciones</span>
+                        <span class="text-sm">{{ props.historiaClinica.observacionesSens || '—' }}</span>
                     </div>
                 </div>
             </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <span class="text-sm font-light">{{ props.historiaClinica.observacionesAntecedentes || ' - ' }}
-            </span>
-        </div>
 
-        <Separator class="my-6" />
-
-        <div class="flex flex-col justify-between">
-            <span class="text-ls font-bold">Tratamientos Recientes o En Curso </span>
-            <div class="flex flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.antibioticos" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Antibioticos
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.antiestaminicos" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Antiestamínicos
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.pildoraContraceptiva"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Píladora Contraceptiva
-                        </label>
-                    </div>
+            <!-- Antecedentes Generales -->
+            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-200">
+                    <h4 class="font-bold text-sm text-zinc-900">Antecedentes Generales</h4>
                 </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.anorexigenos" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Anorexígenos
-                        </label>
+                <div class="p-6">
+                    <div class="grid grid-cols-4 gap-y-3">
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.transtornosNeurologicos" />
+                            <label class="text-sm font-light leading-none">Trastornos Neurológicos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.regimenEventual" />
+                            <label class="text-sm font-light leading-none">Régimen Eventual</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.glandulasEndocinas" />
+                            <label class="text-sm font-light leading-none">Glándulas Endócrinas</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.sistemaCardiovascular" />
+                            <label class="text-sm font-light leading-none">Sistema Cardiovascular</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.embarazo" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Embarazo</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.estomatologia" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Estomatología</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.caries" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Caries</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.digestivo" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Digestivos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.alergiaDigestiva" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Alergia Digestiva</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.alergiaRespiratoria" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Alergia Respiratoria</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.alergiaCutanea" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Alergia Cutánea</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.alergiaOtras" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Otras Alergias</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.rinitisPrimaveral" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Rinitis Primaveral</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.sinusitisCronica" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Sinusitis Crónica</label>
+                        </div>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.neurolepticos" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Neurolépticos
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.tratamientoDigestivo"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Tratamiento Digestivo
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.tranquilizantes" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Tranquilizantes
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.dirueticos" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Diureticos
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.corticoides" class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Corticoides
-                        </label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="props.historiaClinica.parasimpaticoliticos"
-                            class="pointer-events-none" />
-                        <label for="terms1"
-                            class="text-sm font-light leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Porosimpaticoliticos
-                        </label>
+                    <div class="flex flex-col gap-0.5 mt-5 pt-4 border-t border-zinc-100">
+                        <span class="text-xs text-zinc-400">Observaciones</span>
+                        <span class="text-sm">{{ props.historiaClinica.observacionesAntecedentes || '—' }}</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Tratamientos Recientes o En Curso -->
+            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-200">
+                    <h4 class="font-bold text-sm text-zinc-900">Tratamientos Recientes o En Curso</h4>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-4 gap-y-3">
+                        <div class="flex items-center gap-2">
+                            <Checkbox class="pointer-events-none" v-model:checked="props.historiaClinica.antibioticos" />
+                            <label class="text-sm font-light leading-none">Antibióticos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.antiestaminicos" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Antiestamínicos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.pildoraContraceptiva" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Píldora Contraceptiva</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.anorexigenos" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Anorexígenos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.neurolepticos" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Neurolépticos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.tratamientoDigestivo" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Tratamiento Digestivo</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.tranquilizantes" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Tranquilizantes</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.dirueticos" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Diuréticos</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.corticoides" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Corticoides</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox v-model:checked="props.historiaClinica.parasimpaticoliticos" class="pointer-events-none" />
+                            <label class="text-sm font-light leading-none">Parasimpaticolíticos</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>

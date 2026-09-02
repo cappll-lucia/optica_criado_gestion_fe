@@ -26,6 +26,20 @@ export const formatDate = (dateString: string | Date) => {
   });
 };
 
+let logoDataUrlCache: string | null = null;
+export async function getLogoDataUrl(): Promise<string> {
+  if (logoDataUrlCache) return logoDataUrlCache;
+  const response = await fetch('/oc_logo_no_bg.png');
+  const blob = await response.blob();
+  logoDataUrlCache = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+  return logoDataUrlCache;
+}
+
 export const formatTime = (dateString: string | Date) => {
   const date = new Date(dateString);
   return date.toLocaleTimeString('es-AR', {

@@ -1,6 +1,7 @@
 import { Cliente } from './clientes';
 import type {BaseEntity} from  './entities';
 import { DetalleRecetaAereos, NewDetalleType } from './detalleRecetaAereos';
+import { ObraSocial } from './obraSocial';
 import { fechaValidator } from '@/lib/utils';
 
 export enum TipoReceta {
@@ -53,6 +54,7 @@ export interface RecetasAereos extends BaseEntity{
     dnp?: number;
     od_alt_pelicula?: number;
     oi_alt_pelicula?: number;
+    recetaLentesAereosObrasSociales?: Array<{ obraSocial: ObraSocial }>;
 }
 
 
