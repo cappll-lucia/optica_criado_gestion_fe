@@ -60,7 +60,7 @@ const errorMessage =ref<string>('');
 
 const availableObrasSociales = computed(() => {
   const assignedIds = new Set(
-    props.cliente.clienteObrasSociales
+    (props.cliente.clienteObrasSociales ?? [])
       .map(item => item.obraSocial?.id)
       .filter(id => id !== undefined)
   );
@@ -88,7 +88,7 @@ const submitNewObraSocial = async()=>{
     }
     try{
         loadingForm.value=true;
-        const obrasSociales = [...props.cliente.clienteObrasSociales, newClienteObraSocial.value]
+        const obrasSociales = [...(props.cliente.clienteObrasSociales ?? []), newClienteObraSocial.value]
         console.log("--", obrasSociales)
         await clientesApi.addObraSocial(props.cliente.id, obrasSociales);
         emit('handleAddObraSocialCliente', newClienteObraSocial.value.obraSocial.id );
