@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 
-import { SlashIcon, AsteriskIcon} from 'lucide-vue-next';
+import { SlashIcon, AsteriskIcon, EarIcon } from 'lucide-vue-next';
 import {
   Tooltip,
   TooltipContent,
@@ -19,12 +19,11 @@ import {
 import {Textarea} from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/toast'
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input'
 import { audiometriaCustomValidator } from '@/api/entities/audiometrias';
 import { audiometriasApi } from '@/api/libs/audiometrias';
 import AlertError from '@/components/AlertError.vue';
-import { router } from '@/router/index';
+import { previousRoute, router } from '@/router/index';
 import {computed, onMounted, ref } from 'vue'
 import { Cliente } from '@/api/entities/clientes';
 import { clientesApi } from '@/api/libs/clientes';
@@ -119,7 +118,7 @@ const validateAndSubmit = async () => {
         if(!isValidAudiometria.value.file){
             if (!audiometriaFile.value) {
                 errorPDF.value = 'Suba el archivo del informe';
-                audiometriaFile.value = null; 
+                audiometriaFile.value = null;
                 return;
             }
             if (audiometriaFile.value?.type !== 'application/pdf') {
@@ -156,9 +155,13 @@ const handleSelectCliente = (cliente:Cliente)=>{
 }
 
 const redirectCancel = ()=>{
-    selectedCliente.value
-    ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
-    : router.push(`/`)
+    if (previousRoute) {
+        router.push(previousRoute);
+    } else {
+        selectedCliente.value
+        ? router.push(`/clientes/dashboard/${selectedCliente.value.id}`)
+        : router.push(`/`)
+    }
 }
 const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ selectedCliente.value?.nombre);
 
@@ -167,155 +170,175 @@ const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ sele
 
 <template>
 <div class="page">
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Inicio
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/clientes">
-                        Clientes
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente" >
-                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
-                        {{nombreCliente}}
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator  v-if="selectedCliente">
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente">
-                    <BreadcrumbLink :href="`/audiometrias/${selectedCliente?.id}`">
-                        Audiometrias
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Nueva audiometría</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-        <div class="pt-2 mb-4 " >
-            <form @submit.prevent="validateAndSubmit" class="forms-wide h-[45rem] flex flex-col justify-start items-start  px-[5rem]">
-                 <div class="w-full ">
-                    <h3 class="page-subtitle text-center" >Registrar Nueva Audiometría</h3>
-                    <Separator class="my-6 w-full" />
+    <div class="inter-page">
+    <Breadcrumb>
+        <BreadcrumbList>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
+                    {{ nombreCliente }}
+                </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/audiometrias/${selectedCliente?.id}`">Audiometrias</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbPage>Nueva audiometría</BreadcrumbPage>
+            </BreadcrumbItem>
+        </BreadcrumbList>
+    </Breadcrumb>
+
+    <div class="pt-4 mb-4">
+        <form @submit.prevent="validateAndSubmit" class="w-full flex flex-col gap-6">
+
+            <!-- Header -->
+            <div class="flex flex-row items-stretch justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <EarIcon :size="28" />
+                    </div>
+                    <div>
+                        <h2 class="page-title">Nueva Audiometría</h2>
+                        <p class="text-xl text-zinc-400 mt-1">
+                            {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }} · {{ fechaInforme.day }}/{{ fechaInforme.month }}/{{ fechaInforme.year }}
+                        </p>
+                    </div>
                 </div>
-                <div class="flex flex-row w-[100%] h-[40rem] justify-center items-start">
-                
-                 <div class="flex flex-col w-[55%] h-full justify-center items-center ">
-                         <div class="h-[5rem]  w-[43rem] ">
-                                    <div class="flex flex-row items-center justify-start ">
-                                        <Label class="form-label w-[7rem] mr-[2rem] text-right ">Cliente</Label>
-                                        <div class="flex flex-row justify-start items-center">
-                                            <Input type="text" 
-                                                class="w-[20rem] h-10"
-                                                readonly
-                                                :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : 'Buscar'"
-                                                @click="searchClienteOpen = true"
-                                            />
-                                            <SelectClienteDialog
-                                                v-model="searchClienteOpen"
-                                                title="Nueva Audiometría: Seleccionar Cliente"
-                                                @select-cliente="handleSelectCliente"
-                                            />
-                                             <TooltipProvider v-if="!isValidAudiometria.cliente" >
-                                                <Tooltip>
-                                                <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4"> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                                <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                                    <p>Seleccionar cliente</p>
-                                                </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </div>
-                                    </div>
-                            </div>
+            </div>
 
+            <!-- Grid principal: contenido + sidebar PDF -->
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start w-full">
 
-                         <div class="h-[5rem] w-[43rem] ">
-                                <div class="flex flex-row items-center justify-start w-full ">
-                                    <Label class="w-[7rem] mr-[2rem] text-right">Fecha Informe</Label>
-                                    <div class="flex gap-2">
-                                        <Input type="text" v-model="fechaInforme.day" placeholder="DD" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaInforme.month" placeholder="MM" class="w-16 text-center" maxlength="2" />
-                                        <Input type="text" v-model="fechaInforme.year" placeholder="AAAA" class="w-20 text-center" maxlength="4" />
-                                    </div>
-                                    <TooltipProvider v-if="!isValidAudiometria.fechaInforme" >
+                <!-- COLUMNA IZQUIERDA -->
+                <div class="flex flex-col gap-6 min-w-0">
+
+                    <!-- Datos de la audiometría -->
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la audiometría</h4>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                            <!-- Cliente -->
+                            <div class="flex flex-col gap-1 sm:col-span-2">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Cliente</Label>
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input
+                                        type="text"
+                                        class="h-9 w-full"
+                                        readonly
+                                        :value="selectedCliente ? `${selectedCliente.apellido}, ${selectedCliente.nombre}` : ''"
+                                        placeholder="Buscar cliente..."
+                                        @click="searchClienteOpen = true"
+                                    />
+                                    <SelectClienteDialog
+                                        v-model="searchClienteOpen"
+                                        title="Nueva Audiometría: Seleccionar Cliente"
+                                        @select-cliente="handleSelectCliente"
+                                    />
+                                    <TooltipProvider>
                                         <Tooltip>
-                                        <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                        <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                            <p>Ingresar una fecha válida</p>
-                                        </TooltipContent>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidAudiometria.cliente }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Seleccionar cliente</p>
+                                            </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
                             </div>
-                    
-                        <div class="h-[5rem] w-[43rem] ">
-                            <div class="flex flex-row items-center justify-start w-full ">
-                                <Label class="w-[7rem] mr-[2rem] text-right ">PDF</Label>
-                                    <Input type="file" class="w-[25rem]" accept=".pdf" @change="handleFileUpload" />
-                                <TooltipProvider v-if="!isValidAudiometria.file" >
-                                    <Tooltip>
-                                    <TooltipTrigger class="bg-transparent text-xs text-destructive ml-4 "> <AsteriskIcon :size="14" /> </TooltipTrigger>
-                                    <TooltipContent class="text-destructive border-destructive font-thin text-xs">
-                                        <p>{{errorPDF}}</p>
-                                    </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                             </div>
-                    </div>
 
-                    <div class="h-[12rem] w-[43rem] ">
-                        <div class="flex flex-row items-start justify-start">
-                            <Label class="w-[7rem] mr-[2rem] text-right ">Observaciones</Label>
-                                <Textarea
-                                    class="resize-none w-[25rem] h-[12rem]"
-                                    v-model="newAudiometria.observaciones"
-                                />
+                            <!-- Fecha Informe -->
+                            <div class="flex flex-col gap-1">
+                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Fecha informe</Label>
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="text" v-model="fechaInforme.day"   placeholder="DD"   class="h-9 w-12 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaInforme.month" placeholder="MM"   class="h-9 w-12 text-center" maxlength="2" />
+                                    <Input type="text" v-model="fechaInforme.year"  placeholder="AAAA" class="h-9 w-16 text-center" maxlength="4" />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidAudiometria.fechaInforme }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>Ingresar una fecha válida</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                 <div class="flex flex-col w-[40%] mr-7 h-full">
-                        <div v-if="audiometriaURL" class="w-[95%] h-[100%] border rounded-lg overflow-hidden">
-                            <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0"
-                            allowfullscreen></iframe>
+
+                    <!-- Observaciones -->
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
                         </div>
-                        <div v-else class="flex justify-center items-center w-full h-full border rounded-md">
-                            <span class="font-light color-secondary">Ningún PDF Seleccionado</span>
+                        <div class="p-6">
+                            <Textarea class="resize-none w-full min-h-[10rem]" v-model="newAudiometria.observaciones" />
                         </div>
-                </div>
+                    </div>
 
                 </div>
-                <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6 pr-8">
-                    <Button variant="outline" class="w-[15%] mr-5" @click="redirectCancel"  >Cancelar</Button>
-                    <Button type="submit" class="w-[15%]">Guardar</Button>
+
+                <!-- COLUMNA DERECHA: Informe PDF -->
+                <div class="lg:sticky lg:top-4 flex flex-col gap-6">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <h4 class="font-bold text-sm text-[#1a1a1a]">Informe PDF</h4>
+                        </div>
+                        <div class="p-6 flex flex-col gap-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex flex-row items-center gap-2">
+                                    <Input type="file" class="h-9 w-full" accept=".pdf" @change="handleFileUpload" />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger class="bg-transparent text-xs text-destructive">
+                                                <AsteriskIcon :size="14" :class="{ 'invisible': isValidAudiometria.file }" />
+                                            </TooltipTrigger>
+                                            <TooltipContent class="text-destructive border-destructive font-thin text-xs">
+                                                <p>{{ errorPDF || 'Suba el archivo del informe' }}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            </div>
+
+                            <div v-if="audiometriaURL" class="h-[26rem] rounded-lg border border-[#e5e5e5] overflow-hidden">
+                                <iframe :src="audiometriaURL" class="w-full h-full border-none" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <div v-else class="h-[26rem] flex items-center justify-center rounded-lg border border-dashed border-[#e5e5e5]">
+                                <span class="text-sm text-zinc-400">Ningún PDF seleccionado</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-            </form>
 
+            </div>
 
-        </div>
+            <!-- Footer sticky -->
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+                <div class="flex flex-row items-center justify-end gap-3 py-3">
+                    <Button type="button" variant="outline" @click="redirectCancel">Cancelar</Button>
+                    <Button type="submit">Guardar audiometría</Button>
+                </div>
+            </div>
 
-        <AlertError 
-            v-model="showError"
-            title="Error"
-            :message="errorMessage"
-            button="Aceptar"
-            :action="()=>{showError=false}"
-        />
-    
-    
+        </form>
     </div>
+    </div>
+
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar" :action="() => { showError = false }" />
+</div>
 </template>
