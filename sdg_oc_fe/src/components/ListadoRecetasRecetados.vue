@@ -337,7 +337,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </div>
 
                     <button
-                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                         @click="router.push(`/recetas/recetados/edit/${currentRec?.id}`)">
                         <Pencil1Icon class="w-3.5 h-3.5" />
                         Editar

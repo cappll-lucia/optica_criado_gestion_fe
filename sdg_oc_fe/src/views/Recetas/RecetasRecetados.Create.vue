@@ -28,7 +28,7 @@ import { Separator } from '@/components/ui/separator';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { previousRoute, router } from '@/router';
-import { AsteriskIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { AsteriskIcon, PlusCircleIcon, GlassesIcon } from 'lucide-vue-next';
 import { SlashIcon, Cross2Icon } from '@radix-icons/vue';
 import { computed, onMounted, ref } from 'vue';
 import {
@@ -402,12 +402,17 @@ const restoReceta = computed(() => {
         <form @submit.prevent="validateAndSubmit" class="w-full flex flex-col gap-6">
 
             <!-- Header -->
-            <div class="flex flex-row items-start justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
-                <div>
-                    <h1 class="text-2xl font-extrabold text-[#1a1a1a]">Nueva Receta - Anteojos Recetados</h1>
-                    <p class="text-xl text-zinc-400 mt-1">
-                        {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }}
-                    </p>
+            <div class="flex flex-row items-stretch justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <GlassesIcon :size="28" />
+                    </div>
+                    <div>
+                        <h2 class="page-title">Nueva Receta · Anteojos Recetados</h2>
+                        <p class="text-xl text-zinc-400 mt-1">
+                            {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }} · {{ fechaReceta.day }}/{{ fechaReceta.month }}/{{ fechaReceta.year }}
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -418,7 +423,7 @@ const restoReceta = computed(() => {
                 <div class="flex flex-col gap-6 min-w-0">
 
                     <!-- Datos de la receta -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la receta</h4>
                         </div>
@@ -506,13 +511,13 @@ const restoReceta = computed(() => {
                             <!-- Oftalmólogo -->
                             <div class="flex flex-col gap-1">
                                 <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Oftalmólogo</Label>
-                                <Input class="h-9 w-full" v-model="newReceta.oftalmologo" placeholder="Opcional" />
+                                <Input class="h-9 w-full" v-model="newReceta.oftalmologo" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Graduación -->
-                    <div v-if="showLejos || showCerca" class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden w-full">
+                    <div v-if="showLejos || showCerca" class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden w-full">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Graduación</h4>
                         </div>
@@ -608,7 +613,7 @@ const restoReceta = computed(() => {
                     <div class="flex flex-col min-[580px]:flex-row lg:flex-col min-[580px]:items-stretch gap-6 w-full lg:w-auto">
 
                     <!-- Medidas -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:shrink-0">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:shrink-0">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Medidas</h4>
                         </div>
@@ -647,7 +652,7 @@ const restoReceta = computed(() => {
                     </div>
 
                     <!-- Obras sociales -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Obras sociales</h4>
                         </div>
@@ -721,7 +726,7 @@ const restoReceta = computed(() => {
                     <div class="flex flex-col min-[580px]:flex-row lg:flex-col min-[580px]:items-stretch gap-6 w-full flex-1 min-w-0">
 
                     <!-- Cristales y armazón -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Cristales y armazón</h4>
                         </div>
@@ -782,7 +787,7 @@ const restoReceta = computed(() => {
                     </div>
 
                     <!-- Observaciones -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden min-[580px]:flex-1 min-[580px]:min-w-0">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
                         </div>
@@ -800,7 +805,7 @@ const restoReceta = computed(() => {
 
                 <!-- COLUMNA DERECHA: Precios -->
                 <div class="lg:sticky lg:top-4 flex flex-col gap-6">
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Precios</h4>
                         </div>

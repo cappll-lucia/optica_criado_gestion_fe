@@ -98,7 +98,7 @@ const validateAndSubmit = async () => {
                     <p class="text-sm text-[#aaa]">Modificá el nombre y guardá los cambios</p>
                 </div>
 
-                <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                     <div class="px-6 py-5">
                         <div class="flex flex-col gap-1.5">
                             <Label class="text-xs text-[#888]">Nombre</Label>

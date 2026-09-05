@@ -21,6 +21,7 @@ import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
+import { Eye, GlassesIcon } from 'lucide-vue-next';
 
 const route = useRoute();
 const loader = useLoaderStore();
@@ -115,12 +116,12 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
             <h1 class="page-title">Recetas: {{ nombreCliente }}</h1>
             <div class="flex gap-2">
                 <button
-                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
                     + Nueva Receta Anteojos Recetados
                 </button>
                 <button
-                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                     @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
                     + Nueva Receta Lentes de Contacto
                 </button>
@@ -128,21 +129,27 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         </div>
 
         <div class="pt-2">
-            <Tabs :default-value="openTab" class="w-full">
-                <TabsList class="w-full bg-zinc-100 rounded-md p-1 border  border-zinc-200">
+            <Tabs :default-value="openTab" class="w-full ">
+                <TabsList class="w-full  bg-zinc-100 rounded-lg p-1 border  border-zinc-200">
                     <TabsTrigger
-                        class="w-1/2 text-sm  data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
+                        class="w-1/2 text-sm rounded-lg h-10 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
                         value="recetados">
-                        Anteojos Recetados
+                        <div class="flex flex-row justify-center items-center">
+                        <GlassesIcon :size="20" class="mr-2" />
+                        <span> Anteojos Recetados</span> 
+                    </div>
                     </TabsTrigger>
                     <TabsTrigger
-                        class="w-1/2 text-sm  data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
-                        value="contacto">
-                        Lentes de Contacto
+                    class="w-1/2 text-sm rounded-lg h-10 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm text-zinc-500"
+                    value="contacto">
+                    <div class="flex flex-row justify-center items-center">
+                        <Eye :size="20" class="mr-2" />
+                        <span> Lentes de Contacto</span> 
+                    </div>
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border  border-zinc-200" value="recetados">
+                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-lg border  border-zinc-200" value="recetados">
                         <ListadoRecetasRecetados
                             v-if="recetasClienteAereos && recetasClienteAereos.length > 0"
                             :recetas="recetasClienteAereos"
@@ -158,14 +165,14 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">anteojos recetados</span>
                         </p>
                         <button
-                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                             @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
                             Registrar receta
                         </button>
                     </div>
                 </TabsContent>
 
-                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-md border border-zinc-200" value="contacto">
+                <TabsContent class="bg-zinc-50 min-h-[60rem] px-2 py-6 rounded-lg border border-zinc-200" value="contacto">
                 <ListadoRecetasContacto
                     v-if="(recetasClienteContacto && recetasClienteContacto.length > 0) || historiaClinicaCliente"
                     :nombreCliente="nombreCliente"
@@ -182,12 +189,12 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">lentes de contacto</span>
                         </p>
                         <button
-                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors w-52"
+                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors w-52"
                             @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
                             Registrar receta
                         </button>
                         <button
-                            class="text-xs px-4 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors w-52"
+                            class="text-xs px-4 py-2 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors w-52"
                             @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${currentCliente?.id}`)">
                             Registrar historia clínica
                         </button>

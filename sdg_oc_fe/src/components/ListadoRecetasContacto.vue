@@ -20,6 +20,7 @@ import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
 import { TipoDocumento } from '@/api/entities/clientes';
+import { Eye } from 'lucide-vue-next';
 
 const printOpen = ref<boolean>(false);
 const props = defineProps<{
@@ -320,16 +321,22 @@ const printResumenPDF = async () => {
 
             <!-- Receta detail view -->
             <div v-else-if="currentRec">
-
+                
                 <!-- Header -->
                 <div class="flex flex-row justify-between items-center mb-4">
-                    <h4 class="font-bold text-xl text-zinc-900">Receta Lentes de Contacto</h4>
+                    <div class="flex flex-row items-center gap-2">
+                        <div class="flex items-center justify-center p-2">
+                            <Eye :size="25" />
+                        </div>
+                        <h4 class="font-bold text-xl text-zinc-900">Receta Lentes de Contacto</h4>
+                    </div>
                     <button
-                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                         @click="router.push(`/recetas/contacto/edit/${currentRec?.id}`)">
                         <Pencil1Icon class="w-3.5 h-3.5" />
                         Editar
                     </button>
+                    
                 </div>
 
                 <div class="flex flex-col gap-6">

@@ -5,6 +5,7 @@ import { Pencil1Icon } from '@radix-icons/vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
+import { FileClock, HistoryIcon } from 'lucide-vue-next';
 
 
 const props = defineProps<{
@@ -24,12 +25,18 @@ const props = defineProps<{
     </div>
     <div class="datos flex flex-col" v-if="props.historiaClinica">
         <div class="flex flex-row justify-between items-center mb-4">
-            <h4 class="font-bold text-xl text-zinc-900 ">Historia Clínica</h4>
-            <Button variant="outline" size="sm" class="bg-white"
+            <div class="flex flex-row items-center gap-2">
+                        <div class="flex items-center justify-center p-2">
+                            <FileClock :size="25" />
+                        </div>
+                        <h4 class="font-bold text-xl text-zinc-900">Historia Clínica</h4>
+                    </div>
+            <button
+                class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                 @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
-                <Pencil1Icon class="w-3.5 h-3.5 mr-1.5" />
+                <Pencil1Icon class="w-3.5 h-3.5" />
                 Editar
-            </Button>
+            </button>
         </div>
 
         <div class="flex flex-col gap-6">

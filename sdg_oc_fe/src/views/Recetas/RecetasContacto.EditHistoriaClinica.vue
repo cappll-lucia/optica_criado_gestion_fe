@@ -14,14 +14,15 @@ import {
 import Button from '@/components/ui/button/Button.vue';
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue';
 import Label from '@/components/ui/label/Label.vue';
-import Separator from '@/components/ui/separator/Separator.vue';
 import Textarea from '@/components/ui/textarea/Textarea.vue';
 import { toast } from '@/components/ui/toast';
 import { router } from '@/router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import { SlashIcon } from '@radix-icons/vue';
+import { FileClock } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import AlertError from '@/components/AlertError.vue';
 
 const route = useRoute();
 const loader = useLoaderStore();
@@ -47,7 +48,6 @@ onMounted(async()=>{
             }
         }
         currentHistoriaClinica.value = await recetasApi.getHistoriaClinica(Number(route.params.id))
-        console.log(currentHistoriaClinica.value)
         loader.hide();
     }catch(err: any){
         errorMessage.value=err.message as string
@@ -81,351 +81,240 @@ const onSubmit = async()=>{
 
 
 <template>
-    <div class="page">
-            <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/">
-                        Inicio
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbLink href="/clientes">
-                        Clientes
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente" >
-                    <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">
-                        {{nombreCliente}}
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator  v-if="selectedCliente">
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem v-if="selectedCliente">
-                    <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">
-                        Recetas
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator v-if="selectedCliente">
-                    <SlashIcon />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Historia Clínica Lentes de Contacto</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-        <div class="pt-2 mb-4 flex justify-center " v-if="currentHistoriaClinica" >
-            <form @submit.prevent="onSubmit" class=" rounded-lg bg-secondary w-[65rem] flex flex-col justify-start items-center px-[5rem] py-[2rem] min-h-[60rem] ">
-                <div class="w-full flex flex-col justify-center">
-                    <h3 class="page-subtitle text-center">Editar historia clínica - Lentes de contacto</h3>
-                    <Label v-if="selectedCliente" class="text-center mt-4 text-lg">Cliente:  <span>{{ nombreCliente }}</span></Label>
-                    <Separator v-if="selectedCliente"  class="my-10 w-full" />
-                </div>
-                <div class="flex w-full flex-col justify-between">
-                <span class="text-ls font-bold">Antecedentes Oculares </span>
-                <div class="flex w-full flex-row mt-3 justify-between ">
-                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox  v-model:checked="currentHistoriaClinica.patologicas" />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Patológicos
-                            </Label>
-                        </div>
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.traumaticas"  />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Traumáticos
-                            </Label>
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.sensLuzNatural"  />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Sensibilidad Luz Natural
-                            </Label>
-                        </div>
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.sensLuzArtificial"
-                                />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Sensibilidad Luz Artificial
-                            </Label>
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.sensPolvo"  />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Sensibilidad Polvo
-                            </Label>
-                        </div>
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.sensFrio"  />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Sensibilidad Frio
-                            </Label>
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                        <div class="items-center flex gap-x-2">
-                            <Checkbox v-model:checked="currentHistoriaClinica.sensHumo"  />
-                            <Label for="terms1"
-                                class="text-sm font-light leading-none ">
-                                Sensibilidad Humo
-                            </Label>
-                        </div>
-                    </div>
-                </div>
-                <span class="text-sm font-bold mt-6">Observaciones: </span>
-                <Textarea
-                    v-model="currentHistoriaClinica.observacionesSens"
-                    class="resize-none h-[3rem]" 
-                />
-            </div>
+<div class="page">
+    <div class="inter-page">
+    <Breadcrumb>
+        <BreadcrumbList>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbLink href="/clientes">Clientes</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/clientes/dashboard/${selectedCliente?.id}`">{{ nombreCliente }}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem v-if="selectedCliente">
+                <BreadcrumbLink :href="`/recetas/${selectedCliente?.id}`">Recetas</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator v-if="selectedCliente"><SlashIcon /></BreadcrumbSeparator>
+            <BreadcrumbItem>
+                <BreadcrumbPage>Historia clínica lentes de contacto</BreadcrumbPage>
+            </BreadcrumbItem>
+        </BreadcrumbList>
+    </Breadcrumb>
 
-        <Separator class="my-6" />
+    <div class="pt-4 mb-4" v-if="currentHistoriaClinica">
+        <form @submit.prevent="onSubmit" class="w-full flex flex-col gap-6">
 
-        <div class="flex w-full flex-col justify-between">
-            <span class="text-ls font-bold">Antecedentes Generales </span>
-            <div class="flex w-full flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox 
-                            v-model:checked="currentHistoriaClinica.transtornosNeurologicos" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Trastornos Neurológicos
-                        </Label>
+            <!-- Header -->
+            <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <FileClock :size="28" />
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox  v-model:checked="currentHistoriaClinica.regimenEventual" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Régimen Eventual
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox 
-                            v-model:checked="currentHistoriaClinica.glandulasEndocinas" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Glandulas Endócrinas
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox 
-                            v-model:checked="currentHistoriaClinica.sistemaCardiovascular" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sistema Cardiovascular
-                        </Label>
-                    </div>
-
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem] ">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.embarazo"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Embarazo
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.estomatologia"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Estomatologia
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.caries"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Caries
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.digestivo"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Digestivos
-                        </Label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.alergiaDigestiva"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Alergia Digestiva
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.alergiaRespiratoria"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Alergia Respiratoria
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.alergiaCutanea"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Alergia Cutanea
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.alergiaOtras"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Otras Alergias
-                        </Label>
-                    </div>
-
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.rinitisPrimaveral"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Rinitis Primaveral
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.sinusitisCronica"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Sinusitis Cronica
-                        </Label>
+                    <div>
+                        <h2 class="page-title">Editar Historia Clínica · Lentes de Contacto</h2>
+                        <p class="text-xl text-zinc-400 mt-1">
+                            {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }}
+                        </p>
                     </div>
                 </div>
             </div>
-            <span class="text-sm font-bold mt-6">Observaciones: </span>
-            <Textarea
-                v-model="currentHistoriaClinica.observacionesAntecedentes"
-                class="resize-none h-[3rem]" 
-            />
-        </div>
 
-        <Separator class="my-6" />
+            <div class="flex flex-col gap-6 w-full">
 
-        <div class="flex w-full flex-col justify-between">
-            <span class="text-ls font-bold">Tratamientos Recientes o En Curso </span>
-            <div class="flex w-full  flex-row mt-3 justify-between ">
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox  v-model:checked="currentHistoriaClinica.antibioticos" />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Antibioticos
-                        </Label>
+                <!-- Antecedentes Oculares -->
+                <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                        <h4 class="font-bold text-sm text-[#1a1a1a]">Antecedentes Oculares</h4>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.antiestaminicos"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Antiestamínicos
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.pildoraContraceptiva"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Píladora Contraceptiva
-                        </Label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.anorexigenos"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Anorexígenos
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.neurolepticos"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Neurolépticos
-                        </Label>
-                    </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.tratamientoDigestivo"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Tratamiento Digestivo
-                        </Label>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3">
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.patologicas" />
+                                <Label class="text-sm font-light leading-none">Patológicos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.traumaticas" />
+                                <Label class="text-sm font-light leading-none">Traumáticos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sensLuzNatural" />
+                                <Label class="text-sm font-light leading-none">Sensibilidad Luz Natural</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sensLuzArtificial" />
+                                <Label class="text-sm font-light leading-none">Sensibilidad Luz Artificial</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sensPolvo" />
+                                <Label class="text-sm font-light leading-none">Sensibilidad Polvo</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sensFrio" />
+                                <Label class="text-sm font-light leading-none">Sensibilidad Frío</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sensHumo" />
+                                <Label class="text-sm font-light leading-none">Sensibilidad Humo</Label>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 mt-5 pt-4 border-t border-zinc-100">
+                            <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Observaciones</Label>
+                            <Textarea v-model="currentHistoriaClinica.observacionesSens" class="resize-none h-[3rem]" />
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.tranquilizantes"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Tranquilizantes
-                        </Label>
+
+                <!-- Antecedentes Generales -->
+                <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                        <h4 class="font-bold text-sm text-[#1a1a1a]">Antecedentes Generales</h4>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.dirueticos"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Diureticos
-                        </Label>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3">
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.transtornosNeurologicos" />
+                                <Label class="text-sm font-light leading-none">Trastornos Neurológicos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.regimenEventual" />
+                                <Label class="text-sm font-light leading-none">Régimen Eventual</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.glandulasEndocinas" />
+                                <Label class="text-sm font-light leading-none">Glándulas Endócrinas</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sistemaCardiovascular" />
+                                <Label class="text-sm font-light leading-none">Sistema Cardiovascular</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.embarazo" />
+                                <Label class="text-sm font-light leading-none">Embarazo</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.estomatologia" />
+                                <Label class="text-sm font-light leading-none">Estomatología</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.caries" />
+                                <Label class="text-sm font-light leading-none">Caries</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.digestivo" />
+                                <Label class="text-sm font-light leading-none">Digestivos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.alergiaDigestiva" />
+                                <Label class="text-sm font-light leading-none">Alergia Digestiva</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.alergiaRespiratoria" />
+                                <Label class="text-sm font-light leading-none">Alergia Respiratoria</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.alergiaCutanea" />
+                                <Label class="text-sm font-light leading-none">Alergia Cutánea</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.alergiaOtras" />
+                                <Label class="text-sm font-light leading-none">Otras Alergias</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.rinitisPrimaveral" />
+                                <Label class="text-sm font-light leading-none">Rinitis Primaveral</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.sinusitisCronica" />
+                                <Label class="text-sm font-light leading-none">Sinusitis Crónica</Label>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 mt-5 pt-4 border-t border-zinc-100">
+                            <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Observaciones</Label>
+                            <Textarea v-model="currentHistoriaClinica.observacionesAntecedentes" class="resize-none h-[3rem]" />
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-start align-top gap-3 w-[12rem]">
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.corticoides"  />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Corticoides
-                        </Label>
+
+                <!-- Tratamientos Recientes o En Curso -->
+                <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                        <h4 class="font-bold text-sm text-[#1a1a1a]">Tratamientos Recientes o En Curso</h4>
                     </div>
-                    <div class="items-center flex gap-x-2">
-                        <Checkbox v-model:checked="currentHistoriaClinica.parasimpaticoliticos"
-                             />
-                        <Label for="terms1"
-                            class="text-sm font-light leading-none ">
-                            Porosimpaticoliticos
-                        </Label>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3">
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.antibioticos" />
+                                <Label class="text-sm font-light leading-none">Antibióticos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.antiestaminicos" />
+                                <Label class="text-sm font-light leading-none">Antiestamínicos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.pildoraContraceptiva" />
+                                <Label class="text-sm font-light leading-none">Píldora Contraceptiva</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.anorexigenos" />
+                                <Label class="text-sm font-light leading-none">Anorexígenos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.neurolepticos" />
+                                <Label class="text-sm font-light leading-none">Neurolépticos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.tratamientoDigestivo" />
+                                <Label class="text-sm font-light leading-none">Tratamiento Digestivo</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.tranquilizantes" />
+                                <Label class="text-sm font-light leading-none">Tranquilizantes</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.dirueticos" />
+                                <Label class="text-sm font-light leading-none">Diuréticos</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.corticoides" />
+                                <Label class="text-sm font-light leading-none">Corticoides</Label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <Checkbox v-model:checked="currentHistoriaClinica.parasimpaticoliticos" />
+                                <Label class="text-sm font-light leading-none">Parasimpaticolíticos</Label>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+            </div>
+
+            <!-- Footer sticky -->
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+                <div class="flex flex-row items-center justify-end gap-3 py-3">
+                    <Button type="button" variant="outline" @click="router.push(`/recetas/${selectedCliente?.id}?tab=contacto&recetaId=hc`)">Cancelar</Button>
+                    <Button type="submit">Guardar</Button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="pt-4 mb-4" v-else>
+        <div class="flex flex-col justify-between items-start">
+            <div class="w-full">
+                <h3 class="page-subtitle text-center">Historia clínica con id={{ route.params.id }} no encontrada</h3>
             </div>
         </div>
-            <div class="form-footer w-full flex flex-row justify-end mt-8 mb-6">
-                <Button type="button" variant="outline" class="w-[15%] mr-5" @click="router.push(`/recetas/${selectedCliente?.id}?tab=contacto&recetaId=hc`)">Cancelar</Button>
-                <Button type="submit" class="w-[15%]">Guardar</Button>
-            </div>
-            </form>
-        </div>
-        <div class="pt-2 mb-4 " v-else >
-            <div  class="flex flex-col justify-between items-start px-[5rem] ">
-                <div class="w-full ">
-                    <h3 class="page-subtitle text-center">Historia clínica con id={{ route.params.id }} no encontrado</h3>
-                </div>
-            </div>
-        </div>
+    </div>
 
     </div>
+
+    <AlertError v-model="showError" title="Error" :message="errorMessage" button="Aceptar" :action="() => { showError = false }" />
+</div>
 </template>

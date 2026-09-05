@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { AsteriskIcon, PlusCircleIcon, PlusIcon } from 'lucide-vue-next';
+import { AsteriskIcon, PlusCircleIcon, PlusIcon, EyeIcon } from 'lucide-vue-next';
 import { Separator } from '@/components/ui/separator';
 import { computed, onMounted, ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
@@ -81,7 +81,14 @@ const addObraSocial = async (id: string) => {
             recetaLentesContacto: { id: currentReceta.value.id },
             obraSocial: { id: Number(id) },
         });
-        currentObrasSociales.value.push(created);
+        const obraSocialFull = clienteForOS.value?.clienteObrasSociales?.find(
+            cos => cos.obraSocial.id === Number(id)
+        )?.obraSocial;
+        currentObrasSociales.value.push({
+            ...created,
+            obraSocial: obraSocialFull ?? created.obraSocial,
+            obraSocialId: Number(id),
+        });
     } catch (err: any) {
         errorMessage.value = err.message;
         showError.value = true;
@@ -316,10 +323,17 @@ const redirectCancel = () => {
         <form @submit.prevent="validateAndSubmit" class="w-full flex flex-col gap-6">
 
             <!-- Header -->
-            <div class="flex flex-row items-start justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
-                <div>
-                    <h1 class="text-2xl font-extrabold text-[#1a1a1a]">Editar Receta - Lentes de Contacto</h1>
-                    <p class="text-sm text-zinc-400 mt-1">{{ nombreCliente }}</p>
+            <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <EyeIcon :size="28" />
+                    </div>
+                    <div>
+                        <h2 class="page-title">Editar Receta · Lentes de Contacto</h2>
+                        <p class="text-xl text-zinc-400 mt-1">
+                            {{ nombreCliente }} · {{ fechaReceta.day.padStart(2, '0') }}/{{ fechaReceta.month.padStart(2, '0') }}/{{ fechaReceta.year }}
+                        </p>
+                    </div>
                 </div>
                 <div class="flex gap-3 shrink-0">
                     <Button type="button" variant="outline" @click="redirectCancel">Cancelar</Button>
@@ -334,7 +348,7 @@ const redirectCancel = () => {
                 <div class="flex flex-col gap-6 min-w-0">
 
                     <!-- Datos de la receta -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la receta</h4>
                         </div>
@@ -343,7 +357,7 @@ const redirectCancel = () => {
                             <!-- Cliente -->
                             <div class="flex flex-col gap-1">
                                 <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Cliente</Label>
-                                <div class="h-9 flex items-center px-3 rounded-md border border-[#e5e5e5] bg-muted cursor-not-allowed text-sm">
+                                <div class="h-9 flex items-center px-3 rounded-lg border border-[#e5e5e5] bg-muted cursor-not-allowed text-sm">
                                     {{ currentReceta.cliente.apellido }}, {{ currentReceta.cliente.nombre }}
                                 </div>
                             </div>
@@ -351,7 +365,7 @@ const redirectCancel = () => {
                             <!-- Fecha -->
                             <div class="flex flex-col gap-1">
                                 <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Fecha</Label>
-                                <div class="h-9 flex items-center px-3 rounded-md border border-[#e5e5e5] bg-muted cursor-not-allowed text-sm">
+                                <div class="h-9 flex items-center px-3 rounded-lg border border-[#e5e5e5] bg-muted cursor-not-allowed text-sm">
                                     {{ fechaReceta.day.padStart(2, '0') }}/{{ fechaReceta.month.padStart(2, '0') }}/{{ fechaReceta.year }}
                                 </div>
                             </div>
@@ -359,13 +373,13 @@ const redirectCancel = () => {
                             <!-- Oftalmólogo -->
                             <div class="flex flex-col gap-1">
                                 <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Oftalmólogo</Label>
-                                <Input class="h-9 w-full" v-model="currentReceta.oftalmologo" placeholder="Opcional" />
+                                <Input class="h-9 w-full" v-model="currentReceta.oftalmologo" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Lentes Definitivas -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden w-full">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden w-full">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Lentes Definitivas</h4>
                         </div>
@@ -434,7 +448,7 @@ const redirectCancel = () => {
                     <div class="flex flex-col gap-6 w-full lg:w-[22rem] lg:shrink-0">
 
                         <!-- Queratometría -->
-                        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                             <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Queratometría</h4>
                             </div>
@@ -471,7 +485,7 @@ const redirectCancel = () => {
                         </div>
 
                         <!-- Evaluación General -->
-                        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                             <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Evaluación General</h4>
                             </div>
@@ -532,7 +546,7 @@ const redirectCancel = () => {
                     <div class="flex flex-col gap-6 w-full flex-1 min-w-0">
 
                         <!-- Marcas -->
-                        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                             <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Marcas</h4>
                             </div>
@@ -551,7 +565,7 @@ const redirectCancel = () => {
                         </div>
 
                         <!-- Obras sociales -->
-                        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                             <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Obras sociales</h4>
                             </div>
@@ -607,7 +621,7 @@ const redirectCancel = () => {
                         </div>
 
                         <!-- Observaciones -->
-                        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
+                        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
                             <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
                             </div>
@@ -621,7 +635,7 @@ const redirectCancel = () => {
                     </div>
 
                     <!-- Pruebas -->
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Pruebas</h4>
                         </div>
@@ -723,7 +737,7 @@ const redirectCancel = () => {
 
                 <!-- COLUMNA DERECHA: Precios -->
                 <div class="lg:sticky lg:top-4 flex flex-col gap-6">
-                    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+                    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
                         <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Precios</h4>
                         </div>
