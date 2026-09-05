@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/tooltip";
 import { condicionIvaDisplay } from "@/lib/utils";
 import { useLoaderStore } from "@/stores/LoaderStore";
-import { AsteriskIcon, PlusCircleIcon, PlusIcon, XIcon } from "lucide-vue-next";
+import { AsteriskIcon, PlusCircleIcon, PlusIcon, User, XIcon } from "lucide-vue-next";
 import { computed, onMounted, ref } from "vue";
 import CreateObrasSocialForm from "./CreateObrasSocial.Form.vue";
 
@@ -157,6 +157,12 @@ const onSubmit = async () => {
   }
 };
 
+const nombreEnCurso = computed(() => {
+  const { apellido, nombre } = newCliente.value;
+  if (!apellido && !nombre) return "Nuevo registro";
+  return [apellido, nombre].filter(Boolean).join(", ");
+});
+
 const availableObrasSociales = computed(() => {
   const assignedIds = new Set(
     clienteObrasSociales.value.map((item) => item.obraSocial?.id).filter((id) => id !== undefined)
@@ -182,6 +188,19 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
 
 <template>
   <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5 mt-6">
+
+    <!-- Header -->
+    <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+          <User :size="28" />
+        </div>
+        <div>
+          <h2 class="page-title">Nuevo Cliente</h2>
+          <p class="text-xl text-zinc-400 mt-1">{{ nombreEnCurso }}</p>
+        </div>
+      </div>
+    </div>
 
     <!-- ── Datos personales ── -->
     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">

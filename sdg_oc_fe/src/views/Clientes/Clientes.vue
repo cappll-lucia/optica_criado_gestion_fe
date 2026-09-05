@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Cliente } from "@/api/entities/clientes";
+import { Cliente, EstadoCliente } from "@/api/entities/clientes";
 import { Localidad } from "@/api/entities/localidad";
 import { clientesApi } from "@/api/libs/clientes";
 import { localidadesApi } from "@/api/libs/localidades";
@@ -14,7 +14,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,16 +23,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { router } from "@/router";
 import { useLoaderStore } from "@/stores/LoaderStore";
-import { ReloadIcon, SlashIcon } from "@radix-icons/vue";
-import { ChevronLeft, ChevronRight } from "lucide-vue-next";
+import { SlashIcon } from "@radix-icons/vue";
+import { ChevronLeft, ChevronRight, PlusIcon, RotateCcwIcon, UserIcon } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
+
+const ESTADO_TODOS = "todos";
 
 const loader = useLoaderStore();
 const clientes = ref<Cliente[]>([]);
 const localidades = ref<Localidad[]>([]);
 const selectedLocalidadId = ref<string>("");
 const selectedSexo = ref<string>("");
+const selectedEstado = ref<string>(EstadoCliente.Activo);
 const txtSearch = ref<string>("");
 const currentLimit = ref<string>("10");
 const currentOffset = ref<number>(0);
@@ -58,6 +61,7 @@ const clearFilters = async () => {
   txtSearch.value = "";
   selectedSexo.value = "";
   selectedLocalidadId.value = "";
+  selectedEstado.value = EstadoCliente.Activo;
   currentOffset.value = 0;
   currentLimit.value = "10";
   await handleFilterClientes();
@@ -69,6 +73,7 @@ const handleSearchClientes = async () => {
       filtro: txtSearch.value,
       sexo: selectedSexo.value,
       localidadId: selectedLocalidadId.value,
+      estado: selectedEstado.value === ESTADO_TODOS ? "" : selectedEstado.value,
       offset: currentOffset.value,
       limit: currentLimit.value,
     });
@@ -103,95 +108,126 @@ const handleLimitChange = async (newLimit: string) => {
 
 <template>
   <div class="page">
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/"> Inicio </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator>
-          <SlashIcon />
-        </BreadcrumbSeparator>
-        <BreadcrumbItem>
-          <BreadcrumbPage>Clientes</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-    <h1 class="page-title">Clientes</h1>
-    <div class="pt-2">
-      <div class="flex flex-row justify-between items-center py-4">
-        <div class="search flex w-[65rem] flex-row justify-start gap-x-6">
-          <Input
-            class="max-w-sm"
-            placeholder="Buscar cliente por nombre, apellido o documento  "
-            v-model="txtSearch"
-            @input="(e: any) => e.target.value.length >= 0 && handleSearchClientes()"
-          />
-          <Select
-            v-model="selectedLocalidadId"
-            @update:model-value="handleFilterClientes"
-          >
-            <SelectTrigger class="w-[200px]">
-              <SelectValue placeholder="Filtrar por localidad" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem
-                  v-for="localidad in localidades"
-                  :value="localidad.id.toString()"
-                  >{{ localidad.localidad }},
-                  {{ localidad.provincia.provincia }}</SelectItem
-                >
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="ghost"
-            @click="clearFilters"
-            class="text-gray-500 text-xs font-light hover:bg-transparent hover:cursor-pointer hover:underline"
-          >
-            <ReloadIcon />
-          </Button>
+    <div class="inter-page">
+      <Breadcrumb class="mb-8">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/"> Inicio </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <SlashIcon />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Clientes</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <!-- Header -->
+      <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+            <UserIcon :size="28" />
+          </div>
+          <div>
+            <h2 class="page-title">Clientes</h2>
+            <p class="text-xl text-zinc-400 mt-1">Listado de clientes</p>
+          </div>
         </div>
-        <Button class="text-xs"
-          ><a href="/clientes/create">Registrar Nuevo Cliente</a></Button
+        <button
+          class="h-9 px-4 flex items-center gap-2 rounded-lg bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#333] transition-colors"
+          @click="router.push('/clientes/create')"
         >
+          <PlusIcon class="w-3.5 h-3.5" />
+          Registrar Cliente
+        </button>
       </div>
-      <DataTable :columns="columns" :data="clientes" />
-    </div>
-    <div class="mt-4 flex w-full justify-center">
-      <div class="flex items-center gap-1 text-gray-500">
-        <Button
-          variant="outline"
-          class="h-8"
-          :disabled="previousPage === null"
-          @click="handlePageChange(previousPage)"
+
+      <!-- Filtros -->
+      <div class="flex flex-row flex-wrap items-center gap-3 py-5">
+        <Input
+          class="h-9 w-96 text-sm"
+          placeholder="Buscar por nombre, apellido o documento"
+          v-model="txtSearch"
+          @input="(e: any) => e.target.value.length >= 0 && handleSearchClientes()"
+        />
+        <Select
+          v-model="selectedLocalidadId"
+          @update:model-value="handleFilterClientes"
         >
-          <ChevronLeft />
-        </Button>
-        <Select v-model="currentLimit" @update:model-value="handleLimitChange">
-          <SelectTrigger class="w-[80px] h-8">
+          <SelectTrigger class="h-9 w-52 text-sm">
+            <SelectValue placeholder="Localidad" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem
+                v-for="localidad in localidades"
+                :key="localidad.id"
+                :value="localidad.id.toString()"
+                >{{ localidad.localidad }}
+                </SelectItem
+              >
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Select v-model="selectedEstado" @update:model-value="handleFilterClientes">
+          <SelectTrigger class="h-9 w-40 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="30">30</SelectItem>
-              <SelectItem value="40">40</SelectItem>
-              <SelectItem value="50">50</SelectItem>
+              <SelectItem :value="EstadoCliente.Activo">Activos</SelectItem>
+              <SelectItem :value="EstadoCliente.Inactivo">Inactivos</SelectItem>
+              <SelectItem :value="ESTADO_TODOS">Todos</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-        <Button
-          variant="outline"
-          class="h-8"
-          :disabled="nextPage === null"
-          @click="handlePageChange(nextPage)"
+        <button
+          @click="clearFilters"
+          class="h-9 px-3 flex items-center gap-1.5 rounded-lg border border-[#e5e5e5] text-xs text-[#888] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
         >
-          <ChevronRight />
-        </Button>
+          <RotateCcwIcon class="w-3.5 h-3.5" />
+          Limpiar filtros
+        </button>
+      </div>
+
+      <DataTable :columns="columns" :data="clientes" />
+
+      <!-- Paginación -->
+      <div class="mt-4 flex w-full justify-center">
+        <div class="flex items-center gap-2">
+          <button
+            class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            :disabled="previousPage === null"
+            @click="handlePageChange(previousPage)"
+          >
+            <ChevronLeft class="w-4 h-4" />
+          </button>
+          <Select v-model="currentLimit" @update:model-value="handleLimitChange">
+            <SelectTrigger class="h-9 w-20 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="30">30</SelectItem>
+                <SelectItem value="40">40</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <button
+            class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            :disabled="nextPage === null"
+            @click="handlePageChange(nextPage)"
+          >
+            <ChevronRight class="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
+
     <AlertError
       v-model="showError"
       title="Error"

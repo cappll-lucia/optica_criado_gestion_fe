@@ -1,4 +1,4 @@
-import { Cliente, TipoDocumento } from '@/api/entities/clientes';
+import { Cliente, EstadoCliente, TipoDocumento } from '@/api/entities/clientes';
 import { h } from 'vue'
 import { ColumnDef } from '@tanstack/vue-table';
 import Button from '@/components/ui/button/Button.vue';
@@ -10,6 +10,25 @@ export const columns: ColumnDef<Cliente>[] = [
     accessorKey: 'nombre',
     header: () => h('div', 'Apellido y Nombre'),
     cell: ({row})=> `${row.original.apellido}, ${row.original.nombre} `
+  },
+  {
+    accessorKey: 'estado',
+    header: () => h('div', 'Estado'),
+    cell: ({ row }) => {
+      const activo = row.original.estado === EstadoCliente.Activo;
+      return h(
+        'span',
+        {
+          class: [
+            'inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-wide',
+            activo
+              ? 'bg-[#eafaf0] border-[#bfe8cf] text-[#1e8a4c]'
+              : 'bg-[#f5f5f5] border-[#e5e5e5] text-[#888]',
+          ],
+        },
+        row.original.estado ?? EstadoCliente.Activo,
+      );
+    },
   },
   {
     accessorKey: 'documento',
@@ -30,7 +49,7 @@ export const columns: ColumnDef<Cliente>[] = [
     header: () => h('div', 'Localidad'),
     cell: ({ row }) =>
       row.original.localidad
-        ? `${row.original.localidad.localidad}, ${row.original.localidad.provincia.provincia}`
+        ? `${row.original.localidad.localidad}`
         : '-'
   },  
   {

@@ -2,6 +2,7 @@
 import {
   TipoDocumento,
   Cliente,
+  EstadoCliente,
 } from "@/api/entities/clientes";
 import { Localidad } from "@/api/entities/localidad";
 import { ObraSocial } from "@/api/entities/obraSocial";
@@ -31,7 +32,7 @@ import {
 } from "@/components/ui/tooltip";
 import { condicionIvaDisplay } from "@/lib/utils";
 import { useLoaderStore } from "@/stores/LoaderStore";
-import { AsteriskIcon, PlusCircleIcon, PlusIcon, XIcon } from "lucide-vue-next";
+import { AsteriskIcon, PlusCircleIcon, PlusIcon, User, XIcon } from "lucide-vue-next";
 import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import CreateObrasSocialForm from "./CreateObrasSocial.Form.vue";
@@ -175,6 +176,19 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
 <template>
   <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5 mt-6" v-if="currentCliente">
 
+    <!-- Header -->
+    <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+          <User :size="28" />
+        </div>
+        <div>
+          <h2 class="page-title">Editar Cliente</h2>
+          <p class="text-xl text-zinc-400 mt-1">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</p>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Datos personales ── -->
     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
       <div class="px-6 py-4 border-b border-[#f0f0f0]">
@@ -308,6 +322,28 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
           <Label class="text-xs text-[#888]">Email</Label>
           <div class="flex items-center gap-2">
             <Input type="text" class="h-9 text-sm flex-1" v-model="currentCliente.email" />
+            <span class="w-[1em] shrink-0" />
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="flex flex-col gap-1.5 ml-[1rem]">
+          <Label class="text-xs text-[#888]">Estado</Label>
+          <div class="flex items-center gap-2">
+            <Select
+              :model-value="currentCliente.estado"
+              @update:model-value="(value) => currentCliente && (currentCliente.estado = value as EstadoCliente)"
+            >
+              <SelectTrigger class="h-9 text-sm flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem :value="EstadoCliente.Activo">Activo</SelectItem>
+                  <SelectItem :value="EstadoCliente.Inactivo">Inactivo</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <span class="w-[1em] shrink-0" />
           </div>
         </div>

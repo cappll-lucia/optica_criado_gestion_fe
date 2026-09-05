@@ -10,6 +10,7 @@ interface ClienteFilers{
     filtro?: string | null;
     sexo?: string | null;
     localidadId?: string | null;
+    estado?: string | null;
     limit?: number | string;
     offset?: number | string;
 }
@@ -22,6 +23,7 @@ const getAll = async (filters: ClienteFilers={}) => {
         if (filters.filtro) params.append("filtro", filters.filtro)
         if (filters.sexo) params.append("sexo", filters.sexo)
         if (filters.localidadId) params.append("localidadId", filters.localidadId)
+        if (filters.estado) params.append("estado", filters.estado)
 
         params.append("limit", filters.limit?.toString() || "10");
         params.append("offset", filters.offset?.toString() || "0");

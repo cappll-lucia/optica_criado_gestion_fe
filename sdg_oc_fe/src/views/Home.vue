@@ -179,6 +179,11 @@ import { router } from '@/router';
 .c-amber .oc-icon { background: #F1EFE8; color: #000; }
 .c-slate .oc-icon { background: #F1EFE8; color: #000; }
 
+.c-green .oc-icon { background: #1a1a1a; color: white; }
+.c-blue  .oc-icon { background: #1a1a1a; color: white; }
+.c-amber .oc-icon { background: #1a1a1a; color: white; }
+.c-slate .oc-icon { background: #1a1a1a; color: white; }
+
 /* ── Text ── */
 .oc-card-label {
     font-size: 16px;

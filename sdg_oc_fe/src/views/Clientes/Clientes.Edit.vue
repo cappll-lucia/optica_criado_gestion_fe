@@ -27,8 +27,8 @@ const hanldeCancel = async(id: number)=>{
 </script>
 
 <template>
-    <div class="page lg:px-60">
-        <div class="max-w-[900px] mx-auto px-6 py-10">
+    <div class="page">
+        <div class="inter-page">
 
             <Breadcrumb class="mb-8">
             <BreadcrumbList>
@@ -54,8 +54,6 @@ const hanldeCancel = async(id: number)=>{
             </BreadcrumbList>
         </Breadcrumb>
         
-
-        <h1 class="page-title">Editar Cliente</h1>
 
         <EditClienteForm
             @handle-edit-cliente="handleEditCliente"

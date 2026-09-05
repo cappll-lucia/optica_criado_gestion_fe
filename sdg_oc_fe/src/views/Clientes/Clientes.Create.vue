@@ -20,8 +20,8 @@ const handleCreateCliente = async (newCliente: Cliente) => {
 </script>
 
 <template>
-    <div class="page lg:px-60">
-        <div class="max-w-[900px] mx-auto px-6 py-10">
+    <div class="page">
+        <div class="inter-page">
 
             <Breadcrumb class="mb-8">
                 <BreadcrumbList>
@@ -38,8 +38,6 @@ const handleCreateCliente = async (newCliente: Cliente) => {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-
-            <h1 class="page-title">Nuevo Cliente</h1>
 
             <CreateClienteForm
                 @handle-create-cliente="handleCreateCliente"
