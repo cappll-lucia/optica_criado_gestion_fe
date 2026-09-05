@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Audiometria } from "@/api/entities/audiometrias";
-import { Cliente, TipoDocumento } from "@/api/entities/clientes";
+import { Cliente, EstadoCliente, TipoDocumento } from "@/api/entities/clientes";
 import { CuentaCorriente } from "@/api/entities/cuentaCorriente";
 import { RedDePago, TipoMedioDePagoEnum } from "@/api/entities/mediosDePago";
 import {
@@ -33,13 +33,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -70,6 +63,8 @@ import { useLoaderStore } from "@/stores/LoaderStore";
 import { Pencil1Icon, SlashIcon } from "@radix-icons/vue";
 import {
   AsteriskIcon,
+  CalendarIcon,
+  ChevronDown,
   CircleDot,
   Eye,
   Fingerprint,
@@ -84,7 +79,7 @@ import {
   User,
   Wallet,
 } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 const loader = useLoaderStore();
@@ -104,6 +99,7 @@ const loadingForm = ref<boolean>(false);
 const showError = ref<boolean>(false);
 const errorMessage = ref<string>("");
 const openDialogClosedCaja = ref<boolean>(false);
+const showMoreDatos = ref<boolean>(false);
 
 const newMovimiento = ref<{
   tipoMovimiento: TipoMovimiento | undefined;
@@ -213,6 +209,20 @@ const onSubmit = async () => {
   }
 };
 
+const recetasRecetados = computed(() => recetasCliente.value.filter((r) => r.clase === "Recetados"));
+const recetasContacto = computed(() => recetasCliente.value.filter((r) => r.clase === "Lentes Contacto"));
+
+const calcularEdad = (fechaNac: Date) => {
+  const nacimiento = new Date(fechaNac);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const noCumplioAnioAun =
+    hoy.getMonth() < nacimiento.getMonth() ||
+    (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate());
+  if (noCumplioAnioAun) edad--;
+  return edad;
+};
+
 const redirectReceta = (receta: { id: number; clase: string; tipo?: TipoReceta; fecha: Date }) => {
   const tab = receta.clase == "Lentes Contacto" ? "contacto" : "recetados";
   router.push(`/recetas/${currentCliente.value?.id}?tab=${tab}&recetaId=${receta.id}`);
@@ -258,8 +268,8 @@ const handleEmitFactura = async (venta: Venta) => {
 
 <template>
   <!-- ── Cliente encontrado ── -->
-  <div class="page lg:px-60" v-if="currentCliente">
-    <div class="max-w-[900px] mx-auto px-6 py-10">
+  <div class="page" v-if="currentCliente">
+    <div class="inter-page">
 
       <!-- Breadcrumb -->
       <Breadcrumb class="mb-8">
@@ -286,6 +296,12 @@ const handleEmitFactura = async (venta: Venta) => {
             <h1 class="text-[20px] font-bold tracking-tight text-[#1a1a1a]">
               {{ currentCliente.apellido }}, {{ currentCliente.nombre }}
             </h1>
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-wide"
+              :class="currentCliente.estado === EstadoCliente.Activo
+                ? 'bg-[#eafaf0] border-[#bfe8cf] text-[#1e8a4c]'
+                : 'bg-[#f5f5f5] border-[#e5e5e5] text-[#888]'"
+            >{{ currentCliente.estado }}</span>
           </div>
           <button
             @click="router.push(`/clientes/edit/${currentCliente?.id}`)"
@@ -300,12 +316,12 @@ const handleEmitFactura = async (venta: Venta) => {
         <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
           <div class="flex items-center gap-2">
             <IdCard class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">{{ TipoDocumento[currentCliente.tipoDocumento] ?? 'Documento' }}</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">{{ TipoDocumento[currentCliente.tipoDocumento] ?? 'Documento' }}</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.nroDocumento ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <MapPin class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">Domicilio</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Domicilio</span>
             <span class="text-sm text-[#1a1a1a]">
               <template v-if="currentCliente.domicilio && currentCliente.localidad?.localidad">{{ currentCliente.domicilio }}, {{ currentCliente.localidad.localidad }}</template>
               <template v-else-if="currentCliente.localidad?.localidad">{{ currentCliente.localidad.localidad }}</template>
@@ -313,80 +329,128 @@ const handleEmitFactura = async (venta: Venta) => {
             </span>
           </div>
           <div class="flex items-center gap-2">
-            <Wallet class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">Cat. Fiscal</span>
-            <span class="text-sm text-[#1a1a1a]">{{ condicionIvaDisplay(currentCliente.categoriaFiscal) }}</span>
+            <CalendarIcon class="w-4 h-4 text-[#aaa] flex-shrink-0" />
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Edad</span>
+            <span class="text-sm text-[#1a1a1a]">
+              <template v-if="currentCliente.fechaNac">{{ calcularEdad(currentCliente.fechaNac) }} años - {{ formatDate(currentCliente.fechaNac) }}</template>
+              <template v-else>—</template>
+            </span>
           </div>
           <div class="flex items-center gap-2">
             <Phone class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">Teléfono</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Teléfono</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.telefono ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <Fingerprint class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">Sexo</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Sexo</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.sexo ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <Mail class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-xs text-[#aaa] w-28">Email</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase"> Email</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.email ?? '—' }}</span>
           </div>
           <div class="flex items-start gap-2 col-span-2">
             <HandCoinsIcon class="w-4 h-4 text-[#aaa] flex-shrink-0 mt-0.5" />
-            <span class="text-xs text-[#aaa] w-28 mt-0.5">Obras Sociales</span>
+            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase mt-0.5">Obras Sociales</span>
             <div class="flex flex-wrap gap-1.5" v-if="currentCliente.clienteObrasSociales.length">
               <span
                 v-for="os in currentCliente.clienteObrasSociales"
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#e5e5e5] text-xs text-[#1a1a1a] bg-[#fafafa]"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full border border-[#e5e5e5] text-sm text-[#1a1a1a] bg-[#fafafa]"
               >{{ os.obraSocial.nombre }}</span>
             </div>
             <span v-else class="text-sm text-[#1a1a1a]">—</span>
           </div>
         </div>
+
+        <!-- Ver más / Ver menos -->
+        <button
+          @click="showMoreDatos = !showMoreDatos"
+          class="w-full flex items-center justify-center gap-1 text-sm text-[#888] hover:text-[#1a1a1a] pt-5 mt-5 border-t border-[#f0f0f0] transition-colors"
+        >
+          {{ showMoreDatos ? 'Ver menos' : 'Ver más datos' }}
+          <ChevronDown class="w-4 h-4 transition-transform" :class="{ 'rotate-180': showMoreDatos }" />
+        </button>
+
+        <div v-if="showMoreDatos" class="mt-5 pt-5 border-t border-[#f0f0f0] space-y-9">
+          <!-- Obras sociales · detalle -->
+          <div v-if="currentCliente.clienteObrasSociales.length">
+            <p class="text-sm font-semibold tracking-wide text-[#aaa]  mb-2">Obras Sociales</p>
+            <div class="rounded-lg border border-[#f0f0f0] overflow-hidden">
+              <div class="grid grid-cols-2 px-4 py-2 bg-[#fafafa] border-b border-[#f0f0f0]">
+                <span class="text-[10px] font-semibold tracking-wide text-[#aaa] uppercase">Obra Social</span>
+                <span class="text-[10px] font-semibold tracking-wide text-[#aaa] uppercase">N° de Socio</span>
+              </div>
+              <div
+                v-for="os in currentCliente.clienteObrasSociales"
+                :key="os.id"
+                class="grid grid-cols-2 px-4 py-2.5 border-b border-[#f0f0f0] last:border-b-0"
+              >
+                <span class="text-xs font-medium text-[#1a1a1a]">{{ os.obraSocial.nombre }}</span>
+                <span class="text-xs text-[#1a1a1a]">{{ os.numeroSocio ?? '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Datos administrativos -->
+          <div>
+            <p class="text-sm font-semibold tracking-wide text-[#aaa] mb-2">Datos Administrativos</p>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
+              <div class="flex items-center gap-2">
+                <Wallet class="w-4 h-4 text-[#aaa] flex-shrink-0" />
+                <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Cat. Fiscal</span>
+                <span class="text-sm text-[#1a1a1a]">{{ condicionIvaDisplay(currentCliente.categoriaFiscal) }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <CalendarIcon class="w-4 h-4 text-[#aaa] flex-shrink-0" />
+                <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Alta en sistema</span>
+                <span class="text-sm text-[#1a1a1a]">{{ formatDate(currentCliente.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <p class="text-sm font-semibold tracking-wide text-[#aaa] mb-2">Observaciones</p>
+            <p class="text-sm text-[#1a1a1a] rounded-lg border border-[#f0f0f0] bg-[#fafafa] px-4 py-3">
+              {{ currentCliente.observaciones || '—' }}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <!-- ── Recetas + Audiometrías ── -->
+      <!-- ── Recetas + Lentes de Contacto ── -->
       <div class="grid grid-cols-2 gap-5 mb-5">
 
-        <!-- Recetas -->
+        <!-- Recetas Anteojos Recetados -->
         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
-            <span class="text-sm font-bold text-[#1a1a1a]">Recetas</span>
+            <span class="text-sm font-bold text-[#1a1a1a]">Recetas Anteojos Recetados</span>
             <div class="flex items-center gap-1.5">
               <button
-                @click="router.push(`/recetas/${currentCliente?.id}`)"
+                @click="router.push(`/recetas/${currentCliente?.id}?tab=recetados`)"
                 class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
               >
                 <Eye class="w-3.5 h-3.5" />
               </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <button class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors">
-                    <PlusIcon class="w-3.5 h-3.5" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-56 font-normal">
-                  <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
-                    Nueva receta anteojos recetados
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
-                    Nueva receta lentes de contacto
-                  </DropdownMenuLabel>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <button
+                @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"
+                class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
+              >
+                <PlusIcon class="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
-          <ScrollArea v-if="recetasCliente.length" class="h-64 px-3 py-2">
+          <ScrollArea v-if="recetasRecetados.length" class="h-64 px-3 py-2">
             <div
-              v-for="receta in recetasCliente"
+              v-for="receta in recetasRecetados"
               @click="redirectReceta(receta)"
               class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#f0f0f0] cursor-pointer hover:border-[#ccc] transition-colors group"
             >
-              <div class="w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center justify-between">
+              <div class="relative w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center">
                 <span class="text-xs text-[#888]">{{ formatDate(receta.fecha.toString()) }}</span>
-                <CircleDot class="w-2 h-2 text-[#ccc]" />
+                <CircleDot class="w-2 h-2 text-[#ccc] absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2" />
               </div>
               <div class="flex-1 px-3 py-3">
                 <span class="text-xs pl-2 text-[#1a1a1a]">{{ receta.clase }}<span v-if="receta.tipo"> · {{ receta.tipo }}</span></span>
@@ -395,73 +459,107 @@ const handleEmitFactura = async (venta: Venta) => {
           </ScrollArea>
           <div v-else class="h-64 flex flex-col items-center justify-center gap-3 px-4">
             <p class="text-sm text-[#aaa]">Sin recetas registradas</p>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <button class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors">
-                  Nueva receta
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent class="w-56 font-normal">
-                <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
-                  Nueva receta anteojos recetados
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel class="cursor-pointer font-normal" @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
-                  Nueva receta lentes de contacto
-                </DropdownMenuLabel>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"
+              class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+            >
+              Nueva receta anteojos recetados
+            </button>
           </div>
         </div>
 
-        <!-- Audiometrías -->
+        <!-- Recetas Lentes de Contacto -->
         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
-            <span class="text-sm font-bold text-[#1a1a1a]">Audiometrías</span>
+            <span class="text-sm font-bold text-[#1a1a1a]">Recetas Lentes de Contacto</span>
             <div class="flex items-center gap-1.5">
               <button
-                @click="router.push(`/audiometrias/${currentCliente?.id}`)"
+                @click="router.push(`/recetas/${currentCliente?.id}?tab=contacto`)"
                 class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
               >
                 <Eye class="w-3.5 h-3.5" />
               </button>
               <button
-                @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
+                @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"
                 class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
               >
                 <PlusIcon class="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-          <ScrollArea v-if="audiometriasCliente.length" class="h-64 px-3 py-2">
+          <ScrollArea v-if="recetasContacto.length" class="h-64 px-3 py-2">
             <div
-              v-for="(audiom, index) in audiometriasCliente"
-              @click="router.push(`/audiometrias/${currentCliente?.id}`)"
-              class="flex items-center gap-3 mb-2 rounded-xl border border-[#f0f0f0] px-3 py-3 cursor-pointer hover:border-[#ccc] transition-colors"
+              v-for="receta in recetasContacto"
+              @click="redirectReceta(receta)"
+              class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#f0f0f0] cursor-pointer hover:border-[#ccc] transition-colors group"
             >
-              <span class="text-xs text-[#888]">{{ formatDate(audiom.fechaInforme.toString()) }}</span>
-              <span class="text-xs text-[#1a1a1a]">Audiometría {{ index + 1 }}</span>
+              <div class="relative w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center">
+                <span class="text-xs text-[#888]">{{ formatDate(receta.fecha.toString()) }}</span>
+                <CircleDot class="w-2 h-2 text-[#ccc] absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2" />
+              </div>
+              <div class="flex-1 px-3 py-3">
+                <span class="text-xs pl-2 text-[#1a1a1a]">{{ receta.clase }}<span v-if="receta.tipo"> · {{ receta.tipo }}</span></span>
+              </div>
             </div>
           </ScrollArea>
           <div v-else class="h-64 flex flex-col items-center justify-center gap-3 px-4">
-            <p class="text-sm text-[#aaa]">Sin audiometrías registradas</p>
+            <p class="text-sm text-[#aaa]">Sin recetas registradas</p>
             <button
-              @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
+              @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"
               class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
             >
-              Nueva audiometría
+              Nueva receta lentes de contacto
             </button>
           </div>
         </div>
       </div>
 
+      <!-- ── Audiometrías ── -->
+      <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden mb-5">
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
+          <span class="text-sm font-bold text-[#1a1a1a]">Audiometrías</span>
+          <div class="flex items-center gap-1.5">
+            <button
+              @click="router.push(`/audiometrias/${currentCliente?.id}`)"
+              class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+            >
+              <Eye class="w-3.5 h-3.5" />
+            </button>
+            <button
+              @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
+              class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
+            >
+              <PlusIcon class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+        <ScrollArea v-if="audiometriasCliente.length" class="h-36 px-3 py-2">
+          <div
+            v-for="(audiom, index) in audiometriasCliente"
+            @click="router.push(`/audiometrias/${currentCliente?.id}`)"
+            class="flex items-center gap-3 mb-2 rounded-xl border border-[#f0f0f0] px-3 py-3 cursor-pointer hover:border-[#ccc] transition-colors"
+          >
+            <span class="text-xs text-[#888]">{{ formatDate(audiom.fechaInforme.toString()) }}</span>
+            <span class="text-xs text-[#1a1a1a]">Audiometría {{ index + 1 }}</span>
+          </div>
+        </ScrollArea>
+        <div v-else class="h-36 flex flex-col items-center justify-center gap-3 px-4">
+          <p class="text-sm text-[#aaa]">Sin audiometrías registradas</p>
+          <button
+            @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
+            class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+          >
+            Nueva audiometría
+          </button>
+        </div>
+      </div>
 
     </div>
   </div>
 
   <!-- ── Cliente no encontrado ── -->
-  <div class="page lg:px-60" v-else>
-    <div class="max-w-[900px] mx-auto px-6 py-10">
+  <div class="page" v-else>
+    <div class="inter-page">
       <Breadcrumb class="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem><BreadcrumbLink href="/">Inicio</BreadcrumbLink></BreadcrumbItem>

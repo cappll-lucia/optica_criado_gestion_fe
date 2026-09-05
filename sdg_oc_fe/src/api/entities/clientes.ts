@@ -8,16 +8,22 @@ export interface Cliente extends BaseEntity {
     nroDocumento: number ,
     tipoDocumento: TipoDocumento,
     categoriaFiscal: CondicionIva,
-    nombre: string , 
-    apellido: string , 
-    email: string , 
-    sexo:  string, 
-    telefono: string , 
-    domicilio: string , 
-    fechaNac: Date , 
-    observaciones: string , 
+    nombre: string ,
+    apellido: string ,
+    email: string ,
+    sexo:  string,
+    telefono: string ,
+    domicilio: string ,
+    fechaNac: Date ,
+    observaciones: string ,
+    estado: EstadoCliente,
     localidad: Localidad,
     clienteObrasSociales : ClienteObraSocial[]
+}
+
+export enum EstadoCliente {
+  Activo = "Activo",
+  Inactivo = "Inactivo",
 }
 
 export interface ClienteRecetasCount {
