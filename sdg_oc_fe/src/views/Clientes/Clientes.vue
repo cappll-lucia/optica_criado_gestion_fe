@@ -14,6 +14,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -126,20 +127,20 @@ const handleLimitChange = async (newLimit: string) => {
       <!-- Header -->
       <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
             <UserIcon :size="28" />
           </div>
           <div>
             <h2 class="page-title">Clientes</h2>
           </div>
         </div>
-        <button
-          class="h-9 px-4 flex items-center gap-2 rounded-lg bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#333] transition-colors"
+        <Button
+          class="h-9 px-4 gap-2 text-sm font-medium"
           @click="router.push('/clientes/create')"
         >
           <PlusIcon class="w-3.5 h-3.5" />
           Registrar Cliente
-        </button>
+        </Button>
       </div>
 
       <!-- Filtros -->
@@ -181,13 +182,14 @@ const handleLimitChange = async (newLimit: string) => {
             </SelectGroup>
           </SelectContent>
         </Select>
-        <button
+        <Button
+          variant="outline"
           @click="clearFilters"
-          class="h-9 px-3 flex items-center gap-1.5 rounded-lg border border-[#e5e5e5] text-xs text-[#888] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+          class="h-9 px-3 gap-1.5 text-xs text-[#888] hover:border-[#ccc]"
         >
           <RotateCcwIcon class="w-3.5 h-3.5" />
           Limpiar filtros
-        </button>
+        </Button>
       </div>
 
       <DataTable :columns="columns" :data="clientes" />
@@ -195,13 +197,15 @@ const handleLimitChange = async (newLimit: string) => {
       <!-- Paginación -->
       <div class="mt-4 flex w-full justify-center">
         <div class="flex items-center gap-2">
-          <button
-            class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          <Button
+            variant="outline"
+            size="icon"
+            class="hover:border-[#ccc]"
             :disabled="previousPage === null"
             @click="handlePageChange(previousPage)"
           >
             <ChevronLeft class="w-4 h-4" />
-          </button>
+          </Button>
           <Select v-model="currentLimit" @update:model-value="handleLimitChange">
             <SelectTrigger class="h-9 w-20 text-sm">
               <SelectValue />
@@ -216,13 +220,15 @@ const handleLimitChange = async (newLimit: string) => {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <button
-            class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          <Button
+            variant="outline"
+            size="icon"
+            class="hover:border-[#ccc]"
             :disabled="nextPage === null"
             @click="handlePageChange(nextPage)"
           >
             <ChevronRight class="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

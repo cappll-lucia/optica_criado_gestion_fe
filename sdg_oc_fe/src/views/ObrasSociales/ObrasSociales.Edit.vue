@@ -8,6 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { toast } from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SlashIcon } from '@radix-icons/vue';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -87,7 +88,7 @@ const validateAndSubmit = async () => {
                 <!-- Header -->
                 <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                     <div class="flex items-center gap-3">
-                        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
                             <ShieldPlusIcon :size="28" />
                         </div>
                         <div>
@@ -125,19 +126,20 @@ const validateAndSubmit = async () => {
                 </div>
 
                 <div class="flex justify-end gap-3 pt-1">
-                    <button
+                    <Button
                         type="button"
+                        variant="outline"
                         @click="router.push('/obras-sociales')"
-                        class="h-9 px-5 rounded-lg border border-[#e5e5e5] text-sm text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+                        class="h-9 px-5 text-sm hover:border-[#ccc]"
                     >
                         Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
-                        class="h-9 px-5 rounded-lg bg-[#1a1a1a] text-white text-sm font-semibold hover:bg-[#333] transition-colors"
+                        class="h-9 px-5 text-sm font-semibold"
                     >
                         Guardar
-                    </button>
+                    </Button>
                 </div>
             </form>
 

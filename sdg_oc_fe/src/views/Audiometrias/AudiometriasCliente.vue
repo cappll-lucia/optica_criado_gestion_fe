@@ -8,6 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Pencil1Icon, SlashIcon } from '@radix-icons/vue';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -109,11 +110,11 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class="inter-page">
         <div class="flex flex-row justify-between items-center w-full mb-4 mt-2">
             <h1 class="page-title">Audiometrías: {{ nombreCliente }}</h1>
-            <button
-                class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+            <Button
+                class="text-xs px-3 py-2 h-auto"
                 @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)">
                 + Nueva Audiometría
-            </button>
+            </Button>
         </div>
 
         <div class="pt-2">
@@ -165,12 +166,13 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                                 <h4 class="font-bold text-xl text-zinc-900">Audiometría</h4>
                             </div>
 
-                            <button
-                                class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                            <Button
+                                variant="outline"
+                                class="gap-1.5 text-xs px-3 py-2.5 h-auto"
                                 @click="router.push(`/audiometrias/edit/${selectedAudiom?.id}`)">
                                 <Pencil1Icon class="w-3.5 h-3.5" />
                                 Editar
-                            </button>
+                            </Button>
                         </div>
 
                         <div class="flex flex-col gap-6">
@@ -220,11 +222,11 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
 
             <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-4 bg-zinc-50 rounded-lg border border-zinc-200">
                 <p class="text-sm text-zinc-500">El cliente no tiene audiometrías registradas</p>
-                <button
-                    class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                <Button
+                    class="text-xs px-4 py-2 h-auto"
                     @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)">
                     Registrar audiometría
-                </button>
+                </Button>
             </div>
         </div>
         </div>

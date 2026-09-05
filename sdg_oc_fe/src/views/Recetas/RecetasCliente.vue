@@ -8,6 +8,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { SlashIcon } from '@radix-icons/vue';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { computed, onMounted, ref} from 'vue';
 import ListadoRecetasRecetados from '@/components/ListadoRecetasRecetados.vue'
@@ -115,16 +116,16 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
         <div class="flex flex-row justify-between items-center w-full mb-4 mt-2">
             <h1 class="page-title">Recetas: {{ nombreCliente }}</h1>
             <div class="flex gap-2">
-                <button
-                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                <Button
+                    class="text-xs px-3 py-2 h-auto"
                     @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
                     + Nueva Receta Anteojos Recetados
-                </button>
-                <button
-                    class="text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                </Button>
+                <Button
+                    class="text-xs px-3 py-2 h-auto"
                     @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
                     + Nueva Receta Lentes de Contacto
-                </button>
+                </Button>
             </div>
         </div>
 
@@ -164,11 +165,11 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">anteojos recetados</span>
                         </p>
-                        <button
-                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                        <Button
+                            class="text-xs px-4 py-2 h-auto"
                             @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)">
                             Registrar receta
-                        </button>
+                        </Button>
                     </div>
                 </TabsContent>
 
@@ -188,16 +189,17 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">lentes de contacto</span>
                         </p>
-                        <button
-                            class="text-xs px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors w-52"
+                        <Button
+                            class="text-xs px-4 py-2 h-auto w-52"
                             @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)">
                             Registrar receta
-                        </button>
-                        <button
-                            class="text-xs px-4 py-2 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors w-52"
+                        </Button>
+                        <Button
+                            variant="outline"
+                            class="text-xs px-4 py-2 h-auto w-52"
                             @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${currentCliente?.id}`)">
                             Registrar historia clínica
-                        </button>
+                        </Button>
                     </div>
                 </TabsContent>
             </Tabs>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RecetasAereos } from '@/api/entities/recetasAereos';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator'
 import { DownloadIcon, Pencil1Icon, PlusIcon } from '@radix-icons/vue'
 import { onMounted, ref, computed } from 'vue';
@@ -200,18 +201,19 @@ const handleChangeReceta = (receta: RecetasAereos) => {
         <!-- Sidebar -->
         <div class="w-[30%] p-2 pt-0 h-full">
             <div class="flex mr-2 h-10 gap-2">
-                <button
-                    class=" flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                <Button
+                    variant="outline"
+                    class="flex-1 gap-1 text-xs px-3 py-1.5 h-auto"
                     @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
-                </button>
+                </Button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <Button variant="outline" class="gap-1 text-xs px-3 py-1.5 h-auto">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
-                        </button>
+                        </Button>
                     </DialogTrigger>
                     <DialogContent class="sm:max-w-md">
                         <DialogHeader>
@@ -246,16 +248,16 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                         <div class="flex flex-col gap-2">
                             <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
                             <div class="flex gap-2">
-                                <button
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                                <Button
+                                    class="flex-1 text-xs px-3 py-2 h-auto"
                                     @click="printRecetas()">
                                     PDF Tabular
-                                </button>
-                                <button
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
+                                </Button>
+                                <Button
+                                    class="flex-1 text-xs px-3 py-2 h-auto"
                                     @click="printResumenPDF()">
                                     PDF Resumen
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </DialogContent>
@@ -336,12 +338,13 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                         <h4 class="font-bold text-xl text-zinc-900">Receta Anteojos Recetados</h4>
                     </div>
 
-                    <button
-                        class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    <Button
+                        variant="outline"
+                        class="gap-1.5 text-xs px-3 py-2.5 h-auto"
                         @click="router.push(`/recetas/recetados/edit/${currentRec?.id}`)">
                         <Pencil1Icon class="w-3.5 h-3.5" />
                         Editar
-                    </button>
+                    </Button>
                 </div>
 
                 <div class="flex flex-col gap-6">

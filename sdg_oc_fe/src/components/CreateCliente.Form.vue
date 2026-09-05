@@ -192,7 +192,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
     <!-- Header -->
     <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
       <div class="flex items-center gap-3">
-        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
           <User :size="28" />
         </div>
         <div>
@@ -405,14 +405,15 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f0f0f0] flex items-center justify-between">
         <span class="text-sm font-bold text-[#1a1a1a]">Obras Sociales</span>
-        <button
+        <Button
           type="button"
+          variant="outline"
           @click="addObraSocial"
-          class="h-7 px-3 flex items-center gap-1.5 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+          class="h-7 px-3 gap-1.5 text-xs hover:border-[#ccc]"
         >
           <PlusIcon class="w-3 h-3" />
           Agregar
-        </button>
+        </Button>
       </div>
 
       <div class="px-6 py-5">
@@ -476,32 +477,35 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
           </div>
 
           <!-- Eliminar -->
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             @click="removeObraSocial(index)"
-            class="mt-5 h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-destructive hover:border-destructive transition-colors flex-shrink-0"
+            class="mt-5 h-7 w-7 text-[#aaa] hover:text-destructive hover:border-destructive flex-shrink-0"
           >
             <XIcon class="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
     <!-- ── Footer ── -->
     <div class="flex justify-end gap-3 pt-2 pb-4">
-      <button
+      <Button
         type="button"
+        variant="outline"
         @click="emit('handleCancel')"
-        class="h-9 px-5 rounded-lg border border-[#e5e5e5] text-sm text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+        class="h-9 px-5 text-sm hover:border-[#ccc]"
       >
         Cancelar
-      </button>
-      <button
+      </Button>
+      <Button
         type="submit"
-        class="h-9 px-5 rounded-lg bg-[#1a1a1a] text-white text-sm font-semibold hover:bg-[#333] transition-colors"
+        class="h-9 px-5 text-sm font-semibold"
       >
         Guardar
-      </button>
+      </Button>
     </div>
 
   </form>

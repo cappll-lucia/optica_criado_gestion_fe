@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TData, TValue">
 import {ref, watch} from 'vue';
 import type {ColumnDef, ColumnFiltersState, PaginationState} from '@tanstack/vue-table';
+import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -94,13 +95,15 @@ watch(() => props.search, (value) => {
 
     <div class="mt-4 flex w-full justify-center">
         <div class="flex items-center gap-2">
-            <button
-                class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            <Button
+                variant="outline"
+                size="icon"
+                class="hover:border-[#ccc]"
                 :disabled="!table.getCanPreviousPage()"
                 @click="table.previousPage()"
             >
                 <ChevronLeft class="w-4 h-4" />
-            </button>
+            </Button>
             <Select :model-value="pagination.pageSize.toString()" @update:model-value="(value) => table.setPageSize(Number(value))">
                 <SelectTrigger class="h-9 w-20 text-sm">
                     <SelectValue />
@@ -115,13 +118,15 @@ watch(() => props.search, (value) => {
                     </SelectGroup>
                 </SelectContent>
             </Select>
-            <button
-                class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            <Button
+                variant="outline"
+                size="icon"
+                class="hover:border-[#ccc]"
                 :disabled="!table.getCanNextPage()"
                 @click="table.nextPage()"
             >
                 <ChevronRight class="w-4 h-4" />
-            </button>
+            </Button>
         </div>
     </div>
 </template>

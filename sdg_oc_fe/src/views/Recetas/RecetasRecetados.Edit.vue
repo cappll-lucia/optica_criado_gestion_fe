@@ -392,7 +392,7 @@ const restoReceta = computed(() => {
             <!-- Header -->
             <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
                         <GlassesIcon :size="28" />
                     </div>
                     <div>
@@ -619,9 +619,9 @@ const restoReceta = computed(() => {
                                 <div v-for="asoc in currentObrasSociales" :key="asoc.id"
                                      class="flex items-center gap-2 bg-[#f5f5f5] border border-[#e5e5e5] rounded-full px-3 py-1 text-sm max-w-full">
                                     <span class="truncate">{{ asoc.obraSocial?.nombre ?? clienteForOS?.clienteObrasSociales?.find(cos => cos.obraSocial.id === asoc.obraSocialId)?.obraSocial.nombre }}</span>
-                                    <button type="button" @click="removeObraSocial(asoc.id)" class="text-[#aaa] hover:text-destructive shrink-0">
+                                    <Button type="button" variant="ghost" size="icon" @click="removeObraSocial(asoc.id)" class="h-4 w-4 p-0 text-[#aaa] hover:text-destructive hover:bg-transparent shrink-0">
                                         <Cross2Icon class="h-3 w-3" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                             <div v-if="(clienteForOS?.clienteObrasSociales?.length ?? 0) > 0 || currentObrasSociales.length > 0">

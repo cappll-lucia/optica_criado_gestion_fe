@@ -31,12 +31,13 @@ const props = defineProps<{
                         </div>
                         <h4 class="font-bold text-xl text-zinc-900">Historia Clínica</h4>
                     </div>
-            <button
-                class="flex items-center gap-1.5 text-xs px-3 py-2.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+            <Button
+                variant="outline"
+                class="gap-1.5 text-xs px-3 py-2.5 h-auto"
                 @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
                 <Pencil1Icon class="w-3.5 h-3.5" />
                 Editar
-            </button>
+            </Button>
         </div>
 
         <div class="flex flex-col gap-6">

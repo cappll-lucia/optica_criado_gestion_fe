@@ -91,19 +91,20 @@ const handleCancel = () => {
             </div>
 
             <div class="flex justify-end gap-3 pt-1">
-                <button
+                <Button
                     type="button"
+                    variant="outline"
                     @click="handleCancel"
-                    class="h-9 px-5 rounded-lg border border-[#e5e5e5] text-sm text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+                    class="h-9 px-5 text-sm hover:border-[#ccc]"
                 >
                     Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                     type="submit"
-                    class="h-9 px-5 rounded-lg bg-[#1a1a1a] text-white text-sm font-semibold hover:bg-[#333] transition-colors"
+                    class="h-9 px-5 text-sm font-semibold"
                 >
                     Guardar
-                </button>
+                </Button>
             </div>
 
         </form>

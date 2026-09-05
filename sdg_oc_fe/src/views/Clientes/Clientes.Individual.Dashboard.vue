@@ -303,13 +303,14 @@ const handleEmitFactura = async (venta: Venta) => {
                 : 'bg-[#f5f5f5] border-[#e5e5e5] text-[#888]'"
             >{{ currentCliente.estado }}</span>
           </div>
-          <button
+          <Button
+            variant="outline"
             @click="router.push(`/clientes/edit/${currentCliente?.id}`)"
-            class="h-9 px-4 flex items-center gap-2 rounded-lg border border-[#e5e5e5] text-sm text-[#1a1a1a] font-medium hover:bg-[#fafafa] hover:border-[#ccc] transition-colors"
+            class="h-9 px-4 gap-2 text-sm font-medium hover:border-[#ccc]"
           >
             <Pencil1Icon class="w-3.5 h-3.5" />
             Editar
-          </button>
+          </Button>
         </div>
 
         <!-- Info grid -->
@@ -365,13 +366,14 @@ const handleEmitFactura = async (venta: Venta) => {
         </div>
 
         <!-- Ver más / Ver menos -->
-        <button
+        <Button
+          variant="ghost"
           @click="showMoreDatos = !showMoreDatos"
-          class="w-full flex items-center justify-center gap-1 text-sm text-[#888] hover:text-[#1a1a1a] pt-5 mt-5 border-t border-[#f0f0f0] transition-colors"
+          class="w-full h-auto justify-center gap-1 rounded-none text-sm text-[#888] hover:text-[#1a1a1a] hover:bg-transparent pt-5 mt-5 border-t border-[#f0f0f0]"
         >
           {{ showMoreDatos ? 'Ver menos' : 'Ver más datos' }}
           <ChevronDown class="w-4 h-4 transition-transform" :class="{ 'rotate-180': showMoreDatos }" />
-        </button>
+        </Button>
 
         <div v-if="showMoreDatos" class="mt-5 pt-5 border-t border-[#f0f0f0] space-y-9">
           <!-- Obras sociales · detalle -->
@@ -428,18 +430,21 @@ const handleEmitFactura = async (venta: Venta) => {
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
             <span class="text-sm font-bold text-[#1a1a1a]">Recetas Anteojos Recetados</span>
             <div class="flex items-center gap-1.5">
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 @click="router.push(`/recetas/${currentCliente?.id}?tab=recetados`)"
-                class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+                class="h-7 w-7 text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc]"
               >
                 <Eye class="w-3.5 h-3.5" />
-              </button>
-              <button
+              </Button>
+              <Button
+                size="icon"
                 @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"
-                class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
+                class="h-7 w-7"
               >
                 <PlusIcon class="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           </div>
           <ScrollArea v-if="recetasRecetados.length" class="h-64 px-3 py-2">
@@ -459,12 +464,13 @@ const handleEmitFactura = async (venta: Venta) => {
           </ScrollArea>
           <div v-else class="h-64 flex flex-col items-center justify-center gap-3 px-4">
             <p class="text-sm text-[#aaa]">Sin recetas registradas</p>
-            <button
+            <Button
+              variant="outline"
               @click="router.push(`/recetas/recetados/new?cliente=${currentCliente?.id}`)"
-              class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+              class="h-8 px-4 text-xs hover:border-[#ccc]"
             >
               Nueva receta anteojos recetados
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -473,18 +479,21 @@ const handleEmitFactura = async (venta: Venta) => {
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
             <span class="text-sm font-bold text-[#1a1a1a]">Recetas Lentes de Contacto</span>
             <div class="flex items-center gap-1.5">
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 @click="router.push(`/recetas/${currentCliente?.id}?tab=contacto`)"
-                class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+                class="h-7 w-7 text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc]"
               >
                 <Eye class="w-3.5 h-3.5" />
-              </button>
-              <button
+              </Button>
+              <Button
+                size="icon"
                 @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"
-                class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
+                class="h-7 w-7"
               >
                 <PlusIcon class="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           </div>
           <ScrollArea v-if="recetasContacto.length" class="h-64 px-3 py-2">
@@ -504,12 +513,13 @@ const handleEmitFactura = async (venta: Venta) => {
           </ScrollArea>
           <div v-else class="h-64 flex flex-col items-center justify-center gap-3 px-4">
             <p class="text-sm text-[#aaa]">Sin recetas registradas</p>
-            <button
+            <Button
+              variant="outline"
               @click="router.push(`/recetas/contacto/new?cliente=${currentCliente?.id}`)"
-              class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+              class="h-8 px-4 text-xs hover:border-[#ccc]"
             >
               Nueva receta lentes de contacto
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -519,18 +529,21 @@ const handleEmitFactura = async (venta: Venta) => {
         <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
           <span class="text-sm font-bold text-[#1a1a1a]">Audiometrías</span>
           <div class="flex items-center gap-1.5">
-            <button
+            <Button
+              variant="outline"
+              size="icon"
               @click="router.push(`/audiometrias/${currentCliente?.id}`)"
-              class="h-7 w-7 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc] transition-colors"
+              class="h-7 w-7 text-[#aaa] hover:text-[#1a1a1a] hover:border-[#ccc]"
             >
               <Eye class="w-3.5 h-3.5" />
-            </button>
-            <button
+            </Button>
+            <Button
+              size="icon"
               @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
-              class="h-7 w-7 flex items-center justify-center rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] transition-colors"
+              class="h-7 w-7"
             >
               <PlusIcon class="w-3.5 h-3.5" />
-            </button>
+            </Button>
           </div>
         </div>
         <ScrollArea v-if="audiometriasCliente.length" class="h-36 px-3 py-2">
@@ -545,12 +558,13 @@ const handleEmitFactura = async (venta: Venta) => {
         </ScrollArea>
         <div v-else class="h-36 flex flex-col items-center justify-center gap-3 px-4">
           <p class="text-sm text-[#aaa]">Sin audiometrías registradas</p>
-          <button
+          <Button
+            variant="outline"
             @click="router.push(`/audiometrias/create?cliente=${currentCliente?.id}`)"
-            class="h-8 px-4 rounded-lg border border-[#e5e5e5] text-xs text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors"
+            class="h-8 px-4 text-xs hover:border-[#ccc]"
           >
             Nueva audiometría
-          </button>
+          </Button>
         </div>
       </div>
 

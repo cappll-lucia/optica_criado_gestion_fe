@@ -8,6 +8,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SlashIcon } from '@radix-icons/vue';
 import { PlusIcon, ShieldPlusIcon } from 'lucide-vue-next';
@@ -72,20 +73,20 @@ onMounted(async () => {
             <!-- Header -->
             <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
                         <ShieldPlusIcon :size="28" />
                     </div>
                     <div>
                         <h2 class="page-title">Obras Sociales</h2>
                     </div>
                 </div>
-                <button
-                    class="h-9 px-4 flex items-center gap-2 rounded-lg bg-[#1a1a1a] text-white text-sm font-medium hover:bg-[#333] transition-colors"
+                <Button
+                    class="h-9 px-4 gap-2 text-sm font-medium"
                     @click="router.push('/obras-sociales/create')"
                 >
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva Obra Social
-                </button>
+                </Button>
             </div>
 
             <!-- Filtros -->
