@@ -9,6 +9,8 @@ import { ref } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import LoaderForm from './LoaderForm.vue';
 
+withDefaults(defineProps<{ showHeader?: boolean }>(), { showHeader: true });
+
 const newObraSocial = ref<string>();
 const isValidNewObraSocial = ref<boolean>(true);
 const loadingForm = ref<boolean>(false);
@@ -55,7 +57,7 @@ const handleCancel = () => {
 
         <form @submit.prevent="validateAndSubmit" v-if="!loadingForm" class="flex flex-col gap-5">
 
-            <div class="flex flex-col gap-1">
+            <div v-if="showHeader" class="flex flex-col gap-1">
                 <h2 class="text-[17px] font-bold text-[#1a1a1a]">Nueva Obra Social</h2>
                 <p class="text-sm text-[#aaa]">Completá el nombre para registrarla</p>
             </div>

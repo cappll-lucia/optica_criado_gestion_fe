@@ -5,11 +5,6 @@ import { ObraSocial } from "@/api/entities/obraSocial";
 
 export const columns: ColumnDef<ObraSocial>[] = [
     {
-        accessorKey: 'id',
-        header: () => h('div', 'ID'),
-        cell: info=> info.getValue()
-    },
-    {
         accessorKey: 'nombre',
         header: () => h('div', 'Nombre'),
         cell: info=> info.getValue(),

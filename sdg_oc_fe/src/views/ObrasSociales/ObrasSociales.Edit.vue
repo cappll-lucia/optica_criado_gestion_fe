@@ -19,8 +19,7 @@ import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import Label from '@/components/ui/label/Label.vue';
 import { ObraSocial } from '@/api/entities/obraSocial';
-import { AsteriskIcon } from 'lucide-vue-next';
-import { ShieldPlusIcon } from "lucide-vue-next";
+import { AsteriskIcon, ShieldPlusIcon } from 'lucide-vue-next';
 
 
 const route = useRoute();
@@ -64,8 +63,8 @@ const validateAndSubmit = async () => {
 </script>
 
 <template>
-    <div class="page lg:px-60">
-        <div class="max-w-[900px] mx-auto px-6 py-10">
+    <div class="page">
+        <div class="inter-page">
 
             <Breadcrumb class="mb-8">
                 <BreadcrumbList>
@@ -79,23 +78,22 @@ const validateAndSubmit = async () => {
                 </BreadcrumbList>
             </Breadcrumb>
 
-
-           <div class="flex items-center gap-3 mb-6">
-                <!-- <div class="w-10 h-10 rounded-[10px] bg-[#F1EFE8] flex items-center justify-center flex-shrink-0">
-                    <ShieldPlusIcon :size="20" class="text-[#444441]" />
-                </div> -->
-                <h1 class="page-title">Obras Sociales</h1>
-            </div>
-
             <form
                 v-if="currentObraSocial"
                 :key="currentObraSocial.id"
                 @submit.prevent="validateAndSubmit"
                 class="flex flex-col gap-5"
             >
-                <div class="flex flex-col gap-1">
-                    <h2 class="text-[17px] font-bold text-[#1a1a1a]">Editar Obra Social</h2>
-                    <p class="text-sm text-[#aaa]">Modificá el nombre y guardá los cambios</p>
+                <!-- Header -->
+                <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                            <ShieldPlusIcon :size="28" />
+                        </div>
+                        <div>
+                            <h2 class="page-title">Editar Obra Social</h2>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">

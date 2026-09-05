@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TData, TValue">
-import {ref} from 'vue';
-import type {ColumnDef, ColumnFiltersState} from '@tanstack/vue-table';
+import {ref, watch} from 'vue';
+import type {ColumnDef, ColumnFiltersState, PaginationState} from '@tanstack/vue-table';
 import {
     Table,
     TableBody,
@@ -10,21 +10,31 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     FlexRender,
     getCoreRowModel,
     useVueTable,
     getFilteredRowModel,
+    getPaginationRowModel,
 } from '@tanstack/vue-table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { valueUpdater } from '@/lib/utils.recetas';
 
 const props = defineProps<{
     columns: ColumnDef<TData, TValue>[];
-    data: TData[]
+    data: TData[];
+    search?: string;
 }>();
 
 const columnFilters = ref <ColumnFiltersState> ([]);
+const pagination = ref<PaginationState>({ pageIndex: 0, pageSize: 10 });
 
 const table = useVueTable({
     get data() { return props.data; },
@@ -32,25 +42,30 @@ const table = useVueTable({
     getCoreRowModel: getCoreRowModel(),
     onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: updaterOrValue => valueUpdater(updaterOrValue, pagination),
     state: {
-        get columnFilters() { return columnFilters.value; }
+        get columnFilters() { return columnFilters.value; },
+        get pagination() { return pagination.value; }
     }
 });
+
+watch(() => props.search, (value) => {
+    table.getColumn('nombre')?.setFilterValue(value);
+    pagination.value = { ...pagination.value, pageIndex: 0 };
+}, { immediate: true });
 </script>
 
 <template>
-<div class="flex flex-row justify-between items-center py-4">
-            <Input class="max-w-sm" placeholder="Buscar Obra Social"
-                :model-value="table.getColumn('nombre')?.getFilterValue() as string"
-                @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
-            <Button class="text-xs"><a href="/obras-sociales/create">Registrar Nueva Obra Social</a></Button>
-
-        </div>
-<div class="border rounded-lg">
+    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
         <Table>
             <TableHeader>
-                <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                    <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id" class="border-[#f0f0f0] hover:bg-transparent">
+                    <TableHead
+                        v-for="header in headerGroup.headers"
+                        :key="header.id"
+                        class="h-10 bg-[#fafafa] text-[10px] font-semibold uppercase tracking-wide text-[#888]"
+                    >
                         <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
                             :props="header.getContext()" />
                     </TableHead>
@@ -59,20 +74,54 @@ const table = useVueTable({
             <TableBody>
                 <template v-if="table.getRowModel().rows?.length">
                     <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
-                        :data-state="row.getIsSelected() ? 'selected' : undefined">
-                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                        :data-state="row.getIsSelected() ? 'selected' : undefined"
+                        class="border-[#f0f0f0] hover:bg-[#fafafa]">
+                        <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id" class="py-3 text-sm text-[#1a1a1a]">
                             <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                         </TableCell>
                     </TableRow>
                 </template>
                 <template v-else>
-                    <TableRow>
-                        <TableCell :colspan="columns.length" class="h-24 text-center">
+                    <TableRow class="border-[#f0f0f0] hover:bg-transparent">
+                        <TableCell :colspan="columns.length" class="h-24 text-center text-sm text-[#aaa]">
                             Obra Social no encontrada
                         </TableCell>
                     </TableRow>
                 </template>
             </TableBody>
         </Table>
+    </div>
+
+    <div class="mt-4 flex w-full justify-center">
+        <div class="flex items-center gap-2">
+            <button
+                class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                :disabled="!table.getCanPreviousPage()"
+                @click="table.previousPage()"
+            >
+                <ChevronLeft class="w-4 h-4" />
+            </button>
+            <Select :model-value="pagination.pageSize.toString()" @update:model-value="(value) => table.setPageSize(Number(value))">
+                <SelectTrigger class="h-9 w-20 text-sm">
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="20">20</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="40">40</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+            <button
+                class="h-9 w-9 flex items-center justify-center rounded-lg border border-[#e5e5e5] text-[#1a1a1a] hover:border-[#ccc] hover:bg-[#fafafa] transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                :disabled="!table.getCanNextPage()"
+                @click="table.nextPage()"
+            >
+                <ChevronRight class="w-4 h-4" />
+            </button>
+        </div>
     </div>
 </template>

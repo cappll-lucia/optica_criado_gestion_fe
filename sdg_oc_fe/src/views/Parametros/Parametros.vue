@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { router } from "@/router";
 import { SlashIcon } from "@radix-icons/vue";
-import {  ShieldPlusIcon } from "lucide-vue-next";
+import { SettingsIcon, ShieldPlusIcon } from "lucide-vue-next";
 import { onMounted } from "vue";
 
 const loadData = async () => {};
@@ -20,10 +20,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="page lg:px-60">
-    <div class="oc-container">
+  <div class="page">
+    <div class="inter-page">
 
-      <Breadcrumb class="mb-6">
+      <Breadcrumb class="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
@@ -37,7 +37,18 @@ onMounted(async () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <h1 class="page-title">Parámetros</h1>
+      <!-- Header -->
+      <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+            <SettingsIcon :size="28" />
+          </div>
+          <div>
+            <h2 class="page-title">Parámetros</h2>
+            <p class="text-xl text-zinc-400 mt-1">Configuración general del sistema</p>
+          </div>
+        </div>
+      </div>
 
       <div class="oc-grid mt-6">
 
@@ -77,12 +88,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
-.oc-container {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 2rem;
-}
 
 .oc-title {
     font-size: 22px;

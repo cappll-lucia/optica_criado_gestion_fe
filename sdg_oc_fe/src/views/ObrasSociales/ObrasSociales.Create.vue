@@ -22,8 +22,8 @@ const handleCreateObraSocial = async () => {
 </script>
 
 <template>
-    <div class="page lg:px-60">
-        <div class="max-w-[900px] mx-auto px-6 py-10">
+    <div class="page">
+        <div class="inter-page">
 
             <Breadcrumb class="mb-8">
                 <BreadcrumbList>
@@ -37,14 +37,20 @@ const handleCreateObraSocial = async () => {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div class="flex items-center gap-3 mb-6">
-                <!-- <div class="w-10 h-10 rounded-[10px] bg-[#F1EFE8] flex items-center justify-center flex-shrink-0">
-                    <ShieldPlusIcon :size="20" class="text-[#444441]" />
-                </div> -->
-                <h1 class="page-title">Obras Sociales</h1>
+            <!-- Header -->
+            <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5] mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-[10px] bg-[#1a1a1a] text-white">
+                        <ShieldPlusIcon :size="28" />
+                    </div>
+                    <div>
+                        <h2 class="page-title">Nueva Obra Social</h2>
+                    </div>
+                </div>
             </div>
 
             <CreateObrasSocialForm
+                :show-header="false"
                 @handle-create-obra-social="handleCreateObraSocial"
                 @handle-cancel="router.push('/obras-sociales')"
             />
