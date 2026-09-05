@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { router } from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { computed } from 'vue';
-import { HomeIcon, LogOutIcon, SettingsIcon, UserIcon } from 'lucide-vue-next';
+import { HomeIcon, LogOutIcon, Settings2Icon, SettingsIcon, UserIcon } from 'lucide-vue-next';
 import { QuestionMarkCircledIcon } from '@radix-icons/vue';
 
 
@@ -47,7 +47,7 @@ const userData = computed(() => userStore.getMe);
             </NavigationMenuItem>
             <NavigationMenuItem class="mr-[1rem] ">
                 <NavigationMenuLink href="/parametros" :class="navigationMenuTriggerStyle()">
-                    <SettingsIcon  class="w-4 h-4 mr-2" />
+                    <Settings2Icon  class="w-4 h-4 mr-2" />
                     Parámetros
                 </NavigationMenuLink>
             </NavigationMenuItem>
@@ -65,7 +65,7 @@ const userData = computed(() => userStore.getMe);
                     <DropdownMenuSeparator />
                     <DropdownMenuItem @click="router.push('/preguntas')" ><QuestionMarkCircledIcon /> Preguntas frecuentes</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem @click="router.push('/parametros')" > <SettingsIcon />Parámetros</DropdownMenuItem>
+                    <DropdownMenuItem @click="router.push('/parametros')" > <Settings2Icon />Parámetros</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem class="font-bold" @click="userStore.signOut()"> <LogOutIcon/> Cerrar sesión</DropdownMenuItem>
                 </DropdownMenuContent>

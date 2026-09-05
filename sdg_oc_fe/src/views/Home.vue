@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { EarIcon, EyeIcon, SettingsIcon, Users2Icon, GlassesIcon } from 'lucide-vue-next';
+import { EarIcon, EyeIcon, SettingsIcon, Users2Icon, GlassesIcon, Settings2Icon } from 'lucide-vue-next';
 import { router } from '@/router';
 </script>
 
@@ -64,9 +64,9 @@ import { router } from '@/router';
                 <!-- Parámetros -->
                 <div @click="router.push('/parametros')" class="oc-card c-slate">
                     <div class="oc-icon">
-                        <SettingsIcon :size="20" />
+                        <Settings2Icon :size="20" />
                     </div>
-                    <p class="oc-card-label">Parámetros</p>
+                    <p class="oc-card-label">Parámetross</p>
                 </div>
 
             </div>
