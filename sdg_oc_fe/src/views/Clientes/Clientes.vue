@@ -131,7 +131,6 @@ const handleLimitChange = async (newLimit: string) => {
           </div>
           <div>
             <h2 class="page-title">Clientes</h2>
-            <p class="text-xl text-zinc-400 mt-1">Listado de clientes</p>
           </div>
         </div>
         <button

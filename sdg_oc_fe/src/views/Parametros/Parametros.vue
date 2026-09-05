@@ -45,7 +45,6 @@ onMounted(async () => {
           </div>
           <div>
             <h2 class="page-title">Parámetros</h2>
-            <p class="text-xl text-zinc-400 mt-1">Configuración general del sistema</p>
           </div>
         </div>
       </div>

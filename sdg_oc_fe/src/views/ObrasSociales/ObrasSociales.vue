@@ -77,7 +77,6 @@ onMounted(async () => {
                     </div>
                     <div>
                         <h2 class="page-title">Obras Sociales</h2>
-                        <p class="text-xl text-zinc-400 mt-1">Listado de obras sociales</p>
                     </div>
                 </div>
                 <button

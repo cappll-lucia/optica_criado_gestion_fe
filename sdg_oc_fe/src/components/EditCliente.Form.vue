@@ -184,7 +184,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
         </div>
         <div>
           <h2 class="page-title">Editar Cliente</h2>
-          <p class="text-xl text-zinc-400 mt-1">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</p>
+          <p class="text-lg text-zinc-400">{{ currentCliente.apellido }}, {{ currentCliente.nombre }}</p>
         </div>
       </div>
     </div>

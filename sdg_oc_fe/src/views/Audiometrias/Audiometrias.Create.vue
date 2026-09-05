@@ -208,7 +208,7 @@ const nombreCliente = computed(()=>  selectedCliente.value?.apellido +", "+ sele
                     </div>
                     <div>
                         <h2 class="page-title">Nueva Audiometría</h2>
-                        <p class="text-xl text-zinc-400 mt-1">
+                        <p class="text-lg text-zinc-400">
                             {{ selectedCliente ? nombreCliente : 'Sin cliente seleccionado' }} · {{ fechaInforme.day }}/{{ fechaInforme.month }}/{{ fechaInforme.year }}
                         </p>
                     </div>

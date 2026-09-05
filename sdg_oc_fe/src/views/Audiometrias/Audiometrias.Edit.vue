@@ -206,7 +206,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
                     </div>
                     <div>
                         <h2 class="page-title">Editar Audiometría</h2>
-                        <p class="text-xl text-zinc-400 mt-1">
+                        <p class="text-lg text-zinc-400">
                             {{ nombreCliente }} · {{ fechaInforme.day }}/{{ fechaInforme.month }}/{{ fechaInforme.year }}
                         </p>
                     </div>

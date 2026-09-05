@@ -330,7 +330,7 @@ const redirectCancel = () => {
                     </div>
                     <div>
                         <h2 class="page-title">Editar Receta · Lentes de Contacto</h2>
-                        <p class="text-xl text-zinc-400 mt-1">
+                        <p class="text-lg text-zinc-400">
                             {{ nombreCliente }} · {{ fechaReceta.day.padStart(2, '0') }}/{{ fechaReceta.month.padStart(2, '0') }}/{{ fechaReceta.year }}
                         </p>
                     </div>
