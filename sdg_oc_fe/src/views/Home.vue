@@ -18,19 +18,18 @@ import { router } from '@/router';
 
                 <!-- Clientes — wide -->
                 <div @click="router.push('/clientes')" class="oc-card c-green wide">
-                    <div class="oc-icon">
+                    <div class="oc-icon bg-primary">
                         <Users2Icon :size="20" />
                     </div>
                     <div class="oc-card-body">
                         <p class="oc-card-label">Clientes</p>
                         <p class="oc-card-sub">Listado de Clientes</p>
                     </div>
-                    <span class="oc-arrow">→</span>
                 </div>
 
                 <!-- Anteojos Recetados -->
                 <div @click="router.push('/recetas/recetados/new')" class="oc-card c-blue">
-                    <div class="oc-icon">
+                    <div class="oc-icon bg-primary">
                         <GlassesIcon :size="20" />
                     </div>
                     <div>
@@ -41,7 +40,7 @@ import { router } from '@/router';
 
                 <!-- Lentes de Contacto -->
                 <div @click="router.push('/recetas/contacto/new')" class="oc-card c-blue">
-                    <div class="oc-icon">
+                    <div class="oc-icon bg-primary">
                         <EyeIcon :size="20" />
                     </div>
                     <div>
@@ -52,7 +51,7 @@ import { router } from '@/router';
 
                 <!-- Audiometría -->
                 <div @click="router.push('/audiometrias/create')" class="oc-card c-amber">
-                    <div class="oc-icon">
+                    <div class="oc-icon bg-primary">
                         <EarIcon :size="20" />
                     </div>
                     <div>
@@ -63,7 +62,7 @@ import { router } from '@/router';
 
                 <!-- Parámetros -->
                 <div @click="router.push('/parametros')" class="oc-card c-slate">
-                    <div class="oc-icon">
+                    <div class="oc-icon bg-primary">
                         <Settings2Icon :size="20" />
                     </div>
                     <p class="oc-card-label">Parámetross</p>
@@ -115,7 +114,7 @@ import { router } from '@/router';
 /* ── Card base ── */
 .oc-card {
     background: #ffffff;
-    border: 0.5px solid #e5e5e5;
+    border: 0.5px solid #cecbcb;
     border-radius: 18px;
     padding: 1.4rem;
     display: flex;
@@ -158,10 +157,10 @@ import { router } from '@/router';
 .oc-card-body { flex: 1; }
 
 /* ── Color variants ── */
-.c-green::after { background: #000; }
-.c-blue::after  { background: #000; }
-.c-amber::after { background: #000; }
-.c-slate::after { background: #000; }
+.c-green::after { background: #004c8f; }
+.c-blue::after  { background: #004c8f; }
+.c-amber::after { background: #004c8f; }
+.c-slate::after { background: #004c8f; }
 
 /* ── Icon ── */
 .oc-icon {
@@ -174,16 +173,9 @@ import { router } from '@/router';
     flex-shrink: 0;
 }
 
-.c-green .oc-icon { background: #F1EFE8; color: #000; }
-.c-blue  .oc-icon { background: #F1EFE8; color: #000; }
-.c-amber .oc-icon { background: #F1EFE8; color: #000; }
-.c-slate .oc-icon { background: #F1EFE8; color: #000; }
 
-.c-green .oc-icon { background: #1a1a1a; color: white; }
-.c-blue  .oc-icon { background: #1a1a1a; color: white; }
-.c-amber .oc-icon { background: #1a1a1a; color: white; }
-.c-slate .oc-icon { background: #1a1a1a; color: white; }
 
+.oc-icon { color: white; }
 /* ── Text ── */
 .oc-card-label {
     font-size: 16px;

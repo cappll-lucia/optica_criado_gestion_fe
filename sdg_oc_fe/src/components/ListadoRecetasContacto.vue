@@ -209,7 +209,7 @@ const printResumenPDF = async () => {
                         </div>
                         <Separator class="my-2" />
                         <div class="flex flex-col gap-2">
-                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
+                            <p class="text-[10px] text-zinc-400 uppercase st font-semibold">Formato</p>
                             <div class="flex gap-2">
                                 <Button v-if="recetas?.length"
                                     class="flex-1 text-xs px-3 py-2 h-auto"
@@ -228,12 +228,12 @@ const printResumenPDF = async () => {
             </div>
 
             <!-- Toggle Detalle / Resumen (solo si hay recetas) -->
-            <div class="flex items-center justify-center mr-2 mt-6 mb-2 gap-2 space-x-7 tracking-widest">
+            <div class="flex items-center justify-center mr-2 mt-6 mb-2 gap-2 space-x-7 st">
                 <span class="text-[10px] font-semibold uppercase transition-colors"
                     :class="viewMode === 'detalle' ? 'text-zinc-900' : 'text-zinc-400'">Detalle</span>
                 <button
                     class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none"
-                    :class="viewMode === 'resumen' ? 'bg-zinc-900' : 'bg-zinc-300'"
+                    :class="viewMode === 'resumen' ? 'bg-primary' : 'bg-zinc-300'"
                     @click="() => { viewMode = viewMode === 'resumen' ? 'detalle' : 'resumen'; if (viewMode === 'resumen') { currentRec = undefined; selectedHistoriaClinica = false; } else { currentRec = recetas?.[0]; } }">
                     <span class="pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200"
                         :class="viewMode === 'resumen' ? 'translate-x-4' : 'translate-x-0'" />
@@ -255,15 +255,15 @@ const printResumenPDF = async () => {
                     class="relative flex items-center gap-3 mb-2 py-2.5 cursor-pointer group"
                     @click="() => { selectedHistoriaClinica = false; currentRec = receta; }">
                     <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
-                        :class="currentRec === receta ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
+                        :class="currentRec === receta ? 'bg-primary border-primary' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
                     <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent  min-h-[4.1rem] justify-center"
-                        :class="currentRec === receta ? 'bg-zinc-900' : 'hover:border-zinc-300'">
+                        :class="currentRec === receta ? 'bg-primary' : 'hover:border-zinc-300'">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-semibold" :class="currentRec === receta ? 'text-white' : 'text-zinc-700'">
                                 {{ formatDate(receta.fecha.toString()) }}
                             </span>
                             <span v-if="index === 0"
-                                class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
+                                class="text-[10px] font-semibold r uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
                                 Última
                             </span>
                         </div>
@@ -275,9 +275,9 @@ const printResumenPDF = async () => {
                     class="relative flex items-center gap-3 mb-2 py-2.5 cursor-pointer group"
                     @click="() => { selectedHistoriaClinica = true; currentRec = undefined }">
                     <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
-                        :class="selectedHistoriaClinica ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
+                        :class="selectedHistoriaClinica ? 'bg-primary border-primary' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
                     <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent  min-h-[4rem] justify-center"
-                        :class="selectedHistoriaClinica ? 'bg-zinc-900' : 'hover:border-zinc-300'">
+                        :class="selectedHistoriaClinica ? 'bg-primary' : 'hover:border-zinc-300'">
                         <span class="text-sm font-semibold" :class="selectedHistoriaClinica ? 'text-white' : 'text-zinc-700'">
                             Historia Clínica
                         </span>
@@ -370,11 +370,11 @@ const printResumenPDF = async () => {
                         <div class="p-6 overflow-x-auto">
                             <div class="grid grid-cols-[2.75rem_5rem_5rem_5rem_5rem_5rem] gap-x-6 gap-y-2 items-center justify-center">
                                 <span></span>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">C.B.</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Esférico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Cilíndrico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Eje</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Diámetro</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">C.B.</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Esférico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Cilíndrico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Eje</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Diámetro</Label>
 
                                 <span class="font-bold text-xs text-zinc-900">O.D.</span>
                                 <span class="text-sm text-center tabular-nums">{{ currentRec.od_cb.toFixed(2) }}</span>
@@ -440,27 +440,27 @@ const printResumenPDF = async () => {
                                     </div>
                                     <div class="flex flex-col gap-3">
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.tonicidad" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.tonicidad" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Tonicidad</label>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.maquillaje" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.maquillaje" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Maquillaje</label>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.hendidura_palpebral" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.hendidura_palpebral" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Hendidura Palpebral</label>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.altura_palpebral" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.altura_palpebral" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Altura Palpebral</label>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.buen_parpadeo_amplitud" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.buen_parpadeo_amplitud" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Parpadeo: Buena amplitud</label>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <Checkbox v-model:checked="currentRec.buen_parpadeo_ritmo" class="pointer-events-none" />
+                                            <Checkbox v-model:checked="currentRec.buen_parpadeo_ritmo" class="pointer-events-none border-black" />
                                             <label class="text-sm font-light">Parpadeo: Buen ritmo</label>
                                         </div>
                                     </div>
@@ -581,31 +581,31 @@ const printResumenPDF = async () => {
                                             <!-- Checkboxes -->
                                             <div class="flex flex-row flex-wrap gap-y-3 mb-4">
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.confort" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.confort" />
                                                     <label class="text-sm font-light leading-none">Confort</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.movilidad" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.movilidad" />
                                                     <label class="text-sm font-light leading-none">Movilidad</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.centraje" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.centraje" />
                                                     <label class="text-sm font-light leading-none">Centraje</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.hiperemia" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.hiperemia" />
                                                     <label class="text-sm font-light leading-none">Hiperemia</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.agudeza_visual" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.agudeza_visual" />
                                                     <label class="text-sm font-light leading-none">Agudeza visual</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.od_edema" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.od_edema" />
                                                     <label class="text-sm font-light leading-none">OD Edema</label>
                                                 </div>
                                                 <div class="items-center w-44 flex gap-x-2 min-h-[1.5rem]">
-                                                    <Checkbox class="pointer-events-none" v-model:checked="prueba.oi_edema" />
+                                                    <Checkbox class="pointer-events-none border-black " v-model:checked="prueba.oi_edema" />
                                                     <label class="text-sm font-light leading-none">OI Edema</label>
                                                 </div>
                                             </div>

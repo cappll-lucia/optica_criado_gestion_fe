@@ -201,7 +201,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
             <!-- Header -->
             <div class="flex flex-row items-stretch justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-primary text-primary-foreground">
                         <EarIcon :size="28" />
                     </div>
                     <div>
@@ -221,14 +221,14 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
 
                     <!-- Datos de la audiometría -->
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la audiometría</h4>
                         </div>
                         <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                             <!-- Cliente -->
                             <div class="flex flex-col gap-1 sm:col-span-2">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Cliente</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Cliente</Label>
                                 <div class="h-9 w-full flex items-center rounded-lg border border-input bg-muted/40 px-3 text-sm text-[#1a1a1a]">
                                     {{ nombreCliente }}
                                 </div>
@@ -236,7 +236,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
 
                             <!-- Fecha Informe -->
                             <div class="flex flex-col gap-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Fecha informe</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Fecha informe</Label>
                                 <div class="h-9 w-fit min-w-[10rem] flex items-center rounded-lg border border-input bg-muted/40 px-3 text-sm text-[#1a1a1a]">
                                     {{ fechaInforme.day.padStart(2, '0') }}/{{ fechaInforme.month.padStart(2, '0') }}/{{ fechaInforme.year }}
                                 </div>
@@ -246,7 +246,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
 
                     <!-- Observaciones -->
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
                         </div>
                         <div class="p-6">
@@ -259,7 +259,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
                 <!-- COLUMNA DERECHA: Informe PDF -->
                 <div class="lg:sticky lg:top-4 flex flex-col gap-6">
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Informe PDF</h4>
                         </div>
                         <div class="p-6 flex flex-col gap-4">
@@ -302,7 +302,7 @@ const nombreCliente = computed(()=>  currentAudiometria.value?.cliente.apellido 
             </div>
 
             <!-- Footer sticky -->
-            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#f0f0f0] mt-2">
                 <div class="flex flex-row items-center justify-end gap-3 py-3">
                     <Button type="button" variant="outline" @click="redirectCancel">Cancelar</Button>
                     <Button type="submit">Guardar</Button>

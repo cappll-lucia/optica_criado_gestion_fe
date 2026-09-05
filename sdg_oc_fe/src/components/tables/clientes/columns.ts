@@ -20,7 +20,7 @@ export const columns: ColumnDef<Cliente>[] = [
         'span',
         {
           class: [
-            'inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-wide',
+            'inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase ',
             activo
               ? 'bg-[#eafaf0] border-[#bfe8cf] text-[#1e8a4c]'
               : 'bg-[#f5f5f5] border-[#e5e5e5] text-[#888]',

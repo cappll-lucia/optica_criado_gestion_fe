@@ -127,7 +127,7 @@ const handleLimitChange = async (newLimit: string) => {
       <!-- Header -->
       <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
+          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-primary text-primary-foreground">
             <UserIcon :size="28" />
           </div>
           <div>

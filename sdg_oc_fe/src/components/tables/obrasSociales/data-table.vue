@@ -61,11 +61,11 @@ watch(() => props.search, (value) => {
     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
         <Table>
             <TableHeader>
-                <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id" class="border-[#f0f0f0] hover:bg-transparent">
+                <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id" class="border-[#e5e5e5] hover:bg-transparent">
                     <TableHead
                         v-for="header in headerGroup.headers"
                         :key="header.id"
-                        class="h-10 bg-[#fafafa] text-[10px] font-semibold uppercase tracking-wide text-[#888]"
+                        class="h-10 bg-[#fafafa] text-[10px] font-semibold uppercase  text-[#888]"
                     >
                         <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
                             :props="header.getContext()" />
@@ -83,7 +83,7 @@ watch(() => props.search, (value) => {
                     </TableRow>
                 </template>
                 <template v-else>
-                    <TableRow class="border-[#f0f0f0] hover:bg-transparent">
+                    <TableRow class="border-[#e5e5e5] hover:bg-transparent">
                         <TableCell :colspan="columns.length" class="h-24 text-center text-sm text-[#aaa]">
                             Obra Social no encontrada
                         </TableCell>

@@ -246,7 +246,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
                         <!-- Acciones -->
                         <div class="flex flex-col gap-2">
-                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
+                            <p class="text-[10px] text-zinc-400 uppercase st font-semibold">Formato</p>
                             <div class="flex gap-2">
                                 <Button
                                     class="flex-1 text-xs px-3 py-2 h-auto"
@@ -264,14 +264,14 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                 </Dialog>
             </div>
 
-            <div class="flex items-center justify-center mr-2 mt-6 mb-2 gap-2 space-x-7 tracking-widest">
+            <div class="flex items-center justify-center mr-2 mt-6 mb-2 gap-2 space-x-7 st">
                 <span class="text-[10px] font-semibold uppercase transition-colors"
                     :class="viewMode === 'detalle' ? 'text-zinc-900' : 'text-zinc-400'">
                     Detalle
                 </span>
                 <button
                     class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none"
-                    :class="viewMode === 'historial' ? 'bg-zinc-900' : 'bg-zinc-300'"
+                    :class="viewMode === 'historial' ? 'bg-primary' : 'bg-zinc-300'"
                     @click="() => { viewMode = viewMode === 'historial' ? 'detalle' : 'historial'; viewMode === 'historial' ? currentRec = undefined : currentRec = recetas[0] }">
                     <span
                         class="pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-200"
@@ -295,17 +295,17 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
                     <div class="relative z-10  shrink-0 w-3 h-3 rounded-full border-2 transition-all"
                         :class="currentRec === receta
-                            ? 'bg-[#000] border-black'
+                            ? 'bg-primary border-primary'
                             : 'bg-white border-zinc-300 group-hover:bg-zinc-300'" />
 
                     <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent"
-                        :class="currentRec === receta ? 'bg-zinc-900 text-white' : 'hover:border-zinc-300'">
+                        :class="currentRec === receta ? 'bg-primary text-white' : 'hover:border-zinc-300'">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-semibold">
                                 {{ formatDate(receta.fecha.toString()) }}
                             </span>
                             <span v-if="index === 0"
-                                class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
+                                class="text-[10px] font-semibold r uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
                                 Última
                             </span>
                         </div>
@@ -379,9 +379,9 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                             <div class="grid grid-cols-[4.5rem_2.75rem_5.5rem_5.5rem_5.5rem] gap-x-6 gap-y-2 items-center justify-center">
                                 <span></span>
                                 <span></span>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Esférico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Cilíndrico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Eje (°)</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Esférico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Cilíndrico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Eje (°)</Label>
 
                                 <template v-if="showLejosDetalle && detalleLejos">
                                     <span class="row-span-2 self-center font-bold text-base text-zinc-900">Lejos</span>

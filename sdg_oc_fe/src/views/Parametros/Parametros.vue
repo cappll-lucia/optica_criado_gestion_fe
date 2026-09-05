@@ -40,7 +40,7 @@ onMounted(async () => {
       <!-- Header -->
       <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
+          <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-primary text-primary-foreground">
             <SettingsIcon :size="28" />
           </div>
           <div>
@@ -68,7 +68,6 @@ onMounted(async () => {
           <div class="oc-card-body">
             <p class="oc-card-label">Obras Sociales</p>
           </div>
-          <span class="oc-arrow">→</span>
         </div>
 
         <!-- <div @click="router.push('proveedores')" class="oc-card c-amber wide">
@@ -151,9 +150,7 @@ onMounted(async () => {
 /* .c-green::after { background: #1D9E75; }
 .c-blue::after  { background: #185FA5; }
 .c-amber::after { background: #BA7517; } */
-.c-green::after { background: #000; }
-.c-blue::after  { background: #000; }
-.c-amber::after { background: #000; }
+.c-green::after { background: #004C8F; }
 
 /* ── Icon ── */
 .oc-icon {
@@ -171,9 +168,7 @@ onMounted(async () => {
 .c-amber .oc-icon { background: #FAEEDA; color: #854F0B; }
   */
 
-.c-green .oc-icon { background: #F1EFE8; color: #000; }
-.c-blue  .oc-icon { background: #F1EFE8; color: #000; }
-.c-amber .oc-icon { background: #F1EFE8; color: #000; }
+.c-green .oc-icon { background: #EAF2FA; color: #004C8F; }
 
 
 /* ── Text ── */

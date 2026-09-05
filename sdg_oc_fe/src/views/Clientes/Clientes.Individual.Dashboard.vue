@@ -289,7 +289,7 @@ const handleEmitFactura = async (venta: Venta) => {
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
             <!-- Avatar iniciales -->
-            <div class="w-11 h-11 rounded-full bg-[#f0f0f0] flex items-center justify-center text-sm font-bold text-[#999] flex-shrink-0">
+            <div class="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
               <User class="rounded-[50%]" />
             </div>
           
@@ -297,7 +297,7 @@ const handleEmitFactura = async (venta: Venta) => {
               {{ currentCliente.apellido }}, {{ currentCliente.nombre }}
             </h1>
             <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase tracking-wide"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold uppercase "
               :class="currentCliente.estado === EstadoCliente.Activo
                 ? 'bg-[#eafaf0] border-[#bfe8cf] text-[#1e8a4c]'
                 : 'bg-[#f5f5f5] border-[#e5e5e5] text-[#888]'"
@@ -317,12 +317,12 @@ const handleEmitFactura = async (venta: Venta) => {
         <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
           <div class="flex items-center gap-2">
             <IdCard class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">{{ TipoDocumento[currentCliente.tipoDocumento] ?? 'Documento' }}</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase">{{ TipoDocumento[currentCliente.tipoDocumento] ?? 'Documento' }}</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.nroDocumento ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <MapPin class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Domicilio</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase">Domicilio</span>
             <span class="text-sm text-[#1a1a1a]">
               <template v-if="currentCliente.domicilio && currentCliente.localidad?.localidad">{{ currentCliente.domicilio }}, {{ currentCliente.localidad.localidad }}</template>
               <template v-else-if="currentCliente.localidad?.localidad">{{ currentCliente.localidad.localidad }}</template>
@@ -331,7 +331,7 @@ const handleEmitFactura = async (venta: Venta) => {
           </div>
           <div class="flex items-center gap-2">
             <CalendarIcon class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Edad</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase">Edad</span>
             <span class="text-sm text-[#1a1a1a]">
               <template v-if="currentCliente.fechaNac">{{ calcularEdad(currentCliente.fechaNac) }} años - {{ formatDate(currentCliente.fechaNac) }}</template>
               <template v-else>—</template>
@@ -339,22 +339,22 @@ const handleEmitFactura = async (venta: Venta) => {
           </div>
           <div class="flex items-center gap-2">
             <Phone class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Teléfono</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase">Teléfono</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.telefono ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <Fingerprint class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Sexo</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase">Sexo</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.sexo ?? '—' }}</span>
           </div>
           <div class="flex items-center gap-2">
             <Mail class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase"> Email</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase"> Email</span>
             <span class="text-sm text-[#1a1a1a]">{{ currentCliente.email ?? '—' }}</span>
           </div>
           <div class="flex items-start gap-2 col-span-2">
             <HandCoinsIcon class="w-4 h-4 text-[#aaa] flex-shrink-0 mt-0.5" />
-            <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase mt-0.5">Obras Sociales</span>
+            <span class="text-sm text-[#aaa] w-32  uppercase mt-0.5">Obras Sociales</span>
             <div class="flex flex-wrap gap-1.5" v-if="currentCliente.clienteObrasSociales.length">
               <span
                 v-for="os in currentCliente.clienteObrasSociales"
@@ -378,11 +378,11 @@ const handleEmitFactura = async (venta: Venta) => {
         <div v-if="showMoreDatos" class="mt-5 pt-5 border-t border-[#f0f0f0] space-y-9">
           <!-- Obras sociales · detalle -->
           <div v-if="currentCliente.clienteObrasSociales.length">
-            <p class="text-sm font-semibold tracking-wide text-[#aaa]  mb-2">Obras Sociales</p>
-            <div class="rounded-lg border border-[#f0f0f0] overflow-hidden">
+            <p class="text-sm font-semibold  text-[#aaa]  mb-2">Obras Sociales</p>
+            <div class="rounded-lg border border-[#e5e5e5] overflow-hidden">
               <div class="grid grid-cols-2 px-4 py-2 bg-[#fafafa] border-b border-[#f0f0f0]">
-                <span class="text-[10px] font-semibold tracking-wide text-[#aaa] uppercase">Obra Social</span>
-                <span class="text-[10px] font-semibold tracking-wide text-[#aaa] uppercase">N° de Socio</span>
+                <span class="text-[10px] font-semibold  text-[#aaa] uppercase">Obra Social</span>
+                <span class="text-[10px] font-semibold  text-[#aaa] uppercase">N° de Socio</span>
               </div>
               <div
                 v-for="os in currentCliente.clienteObrasSociales"
@@ -397,16 +397,16 @@ const handleEmitFactura = async (venta: Venta) => {
 
           <!-- Datos administrativos -->
           <div>
-            <p class="text-sm font-semibold tracking-wide text-[#aaa] mb-2">Datos Administrativos</p>
+            <p class="text-sm font-semibold  text-[#aaa] mb-2">Datos Administrativos</p>
             <div class="grid grid-cols-2 gap-x-8 gap-y-2.5">
               <div class="flex items-center gap-2">
                 <Wallet class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-                <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Cat. Fiscal</span>
+                <span class="text-sm text-[#aaa] w-32  uppercase">Cat. Fiscal</span>
                 <span class="text-sm text-[#1a1a1a]">{{ condicionIvaDisplay(currentCliente.categoriaFiscal) }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <CalendarIcon class="w-4 h-4 text-[#aaa] flex-shrink-0" />
-                <span class="text-sm text-[#aaa] w-32 tracking-wide uppercase">Alta en sistema</span>
+                <span class="text-sm text-[#aaa] w-32  uppercase">Alta en sistema</span>
                 <span class="text-sm text-[#1a1a1a]">{{ formatDate(currentCliente.createdAt) }}</span>
               </div>
             </div>
@@ -414,7 +414,7 @@ const handleEmitFactura = async (venta: Venta) => {
 
           <!-- Observaciones -->
           <div>
-            <p class="text-sm font-semibold tracking-wide text-[#aaa] mb-2">Observaciones</p>
+            <p class="text-sm font-semibold  text-[#aaa] mb-2">Observaciones</p>
             <p class="text-sm text-[#1a1a1a] rounded-lg border border-[#f0f0f0] bg-[#fafafa] px-4 py-3">
               {{ currentCliente.observaciones || '—' }}
             </p>
@@ -451,7 +451,7 @@ const handleEmitFactura = async (venta: Venta) => {
             <div
               v-for="receta in recetasRecetados"
               @click="redirectReceta(receta)"
-              class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#f0f0f0] cursor-pointer hover:border-[#ccc] transition-colors group"
+              class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#e5e5e5] cursor-pointer hover:border-[#ccc] transition-colors group"
             >
               <div class="relative w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center">
                 <span class="text-xs text-[#888]">{{ formatDate(receta.fecha.toString()) }}</span>
@@ -500,7 +500,7 @@ const handleEmitFactura = async (venta: Venta) => {
             <div
               v-for="receta in recetasContacto"
               @click="redirectReceta(receta)"
-              class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#f0f0f0] cursor-pointer hover:border-[#ccc] transition-colors group"
+              class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#e5e5e5] cursor-pointer hover:border-[#ccc] transition-colors group"
             >
               <div class="relative w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center">
                 <span class="text-xs text-[#888]">{{ formatDate(receta.fecha.toString()) }}</span>
@@ -550,7 +550,7 @@ const handleEmitFactura = async (venta: Venta) => {
           <div
             v-for="(audiom, index) in audiometriasCliente"
             @click="router.push(`/audiometrias/${currentCliente?.id}`)"
-            class="flex items-center gap-3 mb-2 rounded-xl border border-[#f0f0f0] px-3 py-3 cursor-pointer hover:border-[#ccc] transition-colors"
+            class="flex items-center gap-3 mb-2 rounded-xl border border-[#e5e5e5] px-3 py-3 cursor-pointer hover:border-[#ccc] transition-colors"
           >
             <span class="text-xs text-[#888]">{{ formatDate(audiom.fechaInforme.toString()) }}</span>
             <span class="text-xs text-[#1a1a1a]">Audiometría {{ index + 1 }}</span>

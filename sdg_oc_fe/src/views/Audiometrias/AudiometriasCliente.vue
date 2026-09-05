@@ -134,17 +134,17 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
 
                                 <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
                                     :class="selectedAudiom === audiom
-                                        ? 'bg-[#000] border-black'
+                                        ? 'bg-primary border-primary'
                                         : 'bg-white border-zinc-300 group-hover:bg-zinc-300'" />
 
                                 <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent"
-                                    :class="selectedAudiom === audiom ? 'bg-zinc-900 text-white' : 'hover:border-zinc-300'">
+                                    :class="selectedAudiom === audiom ? 'bg-primary text-white' : 'hover:border-zinc-300'">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="text-sm font-semibold">
                                             {{ formatDate(audiom.fechaInforme.toString()) }}
                                         </span>
                                         <span v-if="index === 0"
-                                            class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
+                                            class="text-[10px] font-semibold r uppercase px-1.5 py-0.5 rounded-full border border-emerald-400 text-emerald-700 bg-emerald-50">
                                             Última
                                         </span>
                                     </div>

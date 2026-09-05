@@ -113,7 +113,7 @@ const onSubmit = async()=>{
             <!-- Header -->
             <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-primary text-primary-foreground">
                         <FileClock :size="28" />
                     </div>
                     <div>
@@ -129,7 +129,7 @@ const onSubmit = async()=>{
 
                 <!-- Antecedentes Oculares -->
                 <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                    <div class="px-6 py-4 border-b border-[#f0f0f0]">
                         <h4 class="font-bold text-sm text-[#1a1a1a]">Antecedentes Oculares</h4>
                     </div>
                     <div class="p-6">
@@ -164,7 +164,7 @@ const onSubmit = async()=>{
                             </div>
                         </div>
                         <div class="flex flex-col gap-1 mt-5 pt-4 border-t border-zinc-100">
-                            <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Observaciones</Label>
+                            <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Observaciones</Label>
                             <Textarea v-model="currentHistoriaClinica.observacionesSens" class="resize-none h-[3rem]" />
                         </div>
                     </div>
@@ -172,7 +172,7 @@ const onSubmit = async()=>{
 
                 <!-- Antecedentes Generales -->
                 <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                    <div class="px-6 py-4 border-b border-[#f0f0f0]">
                         <h4 class="font-bold text-sm text-[#1a1a1a]">Antecedentes Generales</h4>
                     </div>
                     <div class="p-6">
@@ -235,7 +235,7 @@ const onSubmit = async()=>{
                             </div>
                         </div>
                         <div class="flex flex-col gap-1 mt-5 pt-4 border-t border-zinc-100">
-                            <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Observaciones</Label>
+                            <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Observaciones</Label>
                             <Textarea v-model="currentHistoriaClinica.observacionesAntecedentes" class="resize-none h-[3rem]" />
                         </div>
                     </div>
@@ -243,7 +243,7 @@ const onSubmit = async()=>{
 
                 <!-- Tratamientos Recientes o En Curso -->
                 <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                    <div class="px-6 py-4 border-b border-[#e5e5e5]">
+                    <div class="px-6 py-4 border-b border-[#f0f0f0]">
                         <h4 class="font-bold text-sm text-[#1a1a1a]">Tratamientos Recientes o En Curso</h4>
                     </div>
                     <div class="p-6">
@@ -295,7 +295,7 @@ const onSubmit = async()=>{
             </div>
 
             <!-- Footer sticky -->
-            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#f0f0f0] mt-2">
                 <div class="flex flex-row items-center justify-end gap-3 py-3">
                     <Button type="button" variant="outline" @click="router.push(`/recetas/${selectedCliente?.id}?tab=contacto&recetaId=hc`)">Cancelar</Button>
                     <Button type="submit">Guardar</Button>

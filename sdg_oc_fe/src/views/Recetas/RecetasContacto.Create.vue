@@ -374,7 +374,7 @@ const redirectCancel = () => {
             <!-- Header -->
             <div class="flex flex-row items-center justify-between gap-4 pb-5 border-b border-[#e5e5e5]">
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-[#1a1a1a] text-white">
+                    <div class="flex items-center justify-center w-14 h-14 shrink-0 rounded-lg bg-primary text-primary-foreground">
                         <EyeIcon :size="28" />
                     </div>
                     <div>
@@ -398,14 +398,14 @@ const redirectCancel = () => {
 
                     <!-- Datos de la receta -->
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Datos de la receta</h4>
                         </div>
                         <div class="p-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
 
                             <!-- Cliente -->
                             <div class="flex flex-col gap-1 xl:col-span-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Cliente</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Cliente</Label>
                                 <div class="flex flex-row items-center gap-2">
                                     <Input
                                         type="text"
@@ -435,7 +435,7 @@ const redirectCancel = () => {
 
                             <!-- Fecha -->
                             <div class="flex flex-col gap-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Fecha</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Fecha</Label>
                                 <div class="flex flex-row items-center gap-2">
                                     <Input type="text" v-model="fechaReceta.day"   placeholder="DD"   class="h-9 w-12 text-center" maxlength="2" />
                                     <Input type="text" v-model="fechaReceta.month" placeholder="MM"   class="h-9 w-12 text-center" maxlength="2" />
@@ -455,7 +455,7 @@ const redirectCancel = () => {
 
                             <!-- Oftalmólogo -->
                             <div class="flex flex-col gap-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Oftalmólogo</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Oftalmólogo</Label>
                                 <Input class="h-9 w-full" v-model="newReceta.oftalmologo" />
                             </div>
                         </div>
@@ -463,17 +463,17 @@ const redirectCancel = () => {
 
                     <!-- Lentes Definitivas -->
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden w-full">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Lentes Definitivas</h4>
                         </div>
                         <div class="p-6 overflow-x-auto">
                             <div class="grid grid-cols-[2.75rem_5rem_5rem_5rem_5rem_5rem] gap-x-6 gap-y-3 items-center justify-center">
                                 <span></span>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">C.B.</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Esférico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Cilíndrico</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Eje</Label>
-                                <Label class="block w-full text-[10px] font-medium tracking-wide text-zinc-400 uppercase text-center">Diámetro</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">C.B.</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Esférico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Cilíndrico</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Eje</Label>
+                                <Label class="block w-full text-[10px] font-medium  text-zinc-400 uppercase text-center">Diámetro</Label>
 
                                 <!-- OD -->
                                 <span class="font-bold text-xs text-[#1a1a1a]">O.D.</span>
@@ -532,7 +532,7 @@ const redirectCancel = () => {
 
                         <!-- Queratometría -->
                         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                            <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Queratometría</h4>
                             </div>
                             <div class="p-6 flex flex-col gap-3">
@@ -561,7 +561,7 @@ const redirectCancel = () => {
 
                                 <!-- Notas queterom -->
                                 <div class="flex flex-col gap-1 mt-2">
-                                    <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Notas</Label>
+                                    <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Notas</Label>
                                     <Textarea class="resize-none h-20" v-model="newReceta.observaciones_queterometria" />
                                 </div>
                             </div>
@@ -569,13 +569,13 @@ const redirectCancel = () => {
 
                         <!-- Evaluación General -->
                         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                            <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Evaluación General</h4>
                             </div>
                             <div class="p-6">
                                 <!-- Estesiometría -->
                                 <div class="flex flex-col gap-1">
-                                    <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Estesiometría</Label>
+                                    <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Estesiometría</Label>
                                     <div class="flex items-center gap-2">
                                         <Select v-model="newReceta.estesiometria" @update:model-value="(value) => newReceta.estesiometria = value">
                                             <SelectTrigger class="h-9 w-full">
@@ -630,7 +630,7 @@ const redirectCancel = () => {
 
                         <!-- Marcas -->
                         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                            <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Marcas</h4>
                             </div>
                             <div class="p-6 flex flex-col gap-3">
@@ -649,7 +649,7 @@ const redirectCancel = () => {
 
                         <!-- Obras sociales -->
                         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                            <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Obras sociales</h4>
                             </div>
                             <div class="p-6">
@@ -718,7 +718,7 @@ const redirectCancel = () => {
 
                         <!-- Observaciones -->
                         <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden flex-1 flex flex-col">
-                            <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                            <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                                 <h4 class="font-bold text-sm text-[#1a1a1a]">Observaciones</h4>
                             </div>
                             <div class="p-6 flex-1">
@@ -732,7 +732,7 @@ const redirectCancel = () => {
 
                     <!-- Pruebas -->
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Pruebas</h4>
                         </div>
                         <div class="p-6">
@@ -834,13 +834,13 @@ const redirectCancel = () => {
                 <!-- COLUMNA DERECHA: Precios -->
                 <div class="lg:sticky lg:top-4 flex flex-col gap-6">
                     <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
-                        <div class="flex items-center px-6 py-4 border-b border-[#e5e5e5]">
+                        <div class="flex items-center px-6 py-4 border-b border-[#f0f0f0]">
                             <h4 class="font-bold text-sm text-[#1a1a1a]">Precios</h4>
                         </div>
                         <div class="p-6 flex flex-col gap-4">
 
                             <div class="flex flex-col gap-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Precio</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Precio</Label>
                                 <div class="relative w-full">
                                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">$</span>
                                     <Input type="decimal" class="h-10 pl-6 pr-8" v-model="newReceta.precio" />
@@ -848,14 +848,14 @@ const redirectCancel = () => {
                             </div>
 
                             <div class="flex flex-col gap-1">
-                                <Label class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Seña recibida</Label>
+                                <Label class="text-[10px] font-medium  text-zinc-400 uppercase">Seña recibida</Label>
                                 <div class="relative w-full">
                                     <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">$</span>
                                     <Input type="decimal" class="h-10 pl-6 pr-8" v-model="newReceta.senia" />
                                 </div>
                             </div>
 
-                            <div class="flex flex-col gap-1.5 pt-3 border-t border-[#e5e5e5] text-sm">
+                            <div class="flex flex-col gap-1.5 pt-3 border-t border-[#f0f0f0] text-sm">
                                 <div class="flex justify-between text-zinc-500">
                                     <span>Precio</span>
                                     <span>{{ newReceta.precio ? '$ ' + Number(newReceta.precio).toLocaleString('es-AR') : '$ —' }}</span>
@@ -867,12 +867,12 @@ const redirectCancel = () => {
                             </div>
 
                             <div class="flex items-center justify-between rounded-xl bg-[#1a1a1a] px-4 py-3 text-white">
-                                <span class="text-[10px] font-medium tracking-wide uppercase">Total</span>
+                                <span class="text-[10px] font-medium  uppercase">Total</span>
                                 <span class="text-base font-bold">{{ totalContacto > 0 ? '$ ' + totalContacto.toLocaleString('es-AR') : '$ —' }}</span>
                             </div>
 
                             <div class="flex items-center justify-between rounded-xl border px-4 py-3 bg-secondary">
-                                <span class="text-[10px] font-medium tracking-wide uppercase">Resto a pagar</span>
+                                <span class="text-[10px] font-medium  uppercase">Resto a pagar</span>
                                 <span class="text-base font-bold">{{ totalContacto > 0 ? '$ ' + restoContacto.toLocaleString('es-AR') : '$ —' }}</span>
                             </div>
                         </div>
@@ -882,19 +882,19 @@ const redirectCancel = () => {
             </div>
 
             <!-- Footer sticky -->
-            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#e5e5e5] mt-2">
+            <div class="sticky bottom-0 z-10 -mx-[5rem] px-[5rem] bg-white/95 backdrop-blur border-t border-[#f0f0f0] mt-2">
                 <div class="flex flex-row items-center justify-between gap-6 py-3">
                     <div class="flex items-center gap-6 text-sm">
                         <div class="flex flex-col leading-tight">
-                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Total</span>
+                            <span class="text-[10px] font-medium  text-zinc-400 uppercase">Total</span>
                             <span class="font-semibold text-[#1a1a1a]">{{ totalContacto > 0 ? '$ ' + totalContacto.toLocaleString('es-AR') : '$ —' }}</span>
                         </div>
                         <div class="flex flex-col leading-tight">
-                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Seña</span>
+                            <span class="text-[10px] font-medium  text-zinc-400 uppercase">Seña</span>
                             <span class="font-semibold text-[#1a1a1a]">{{ newReceta.senia ? '$ ' + Number(newReceta.senia).toLocaleString('es-AR') : '$ —' }}</span>
                         </div>
                         <div class="flex flex-col leading-tight">
-                            <span class="text-[10px] font-medium tracking-wide text-zinc-400 uppercase">Resto</span>
+                            <span class="text-[10px] font-medium  text-zinc-400 uppercase">Resto</span>
                             <span class="font-semibold" :class="restoContacto < 0 ? 'text-destructive' : 'text-[#1a1a1a]'">{{ totalContacto > 0 ? '$ ' + restoContacto.toLocaleString('es-AR') : '$ —' }}</span>
                         </div>
                     </div>
