@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RecetasAereos } from '@/api/entities/recetasAereos';
 import { Separator } from '@/components/ui/separator'
-import { DownloadIcon, Pencil1Icon } from '@radix-icons/vue'
+import { DownloadIcon, Pencil1Icon, PlusIcon } from '@radix-icons/vue'
 import { onMounted, ref, computed } from 'vue';
 import Label from '@/components/ui/label/Label.vue';
 import ItemResumenReceta from '@/components/ItemResumenRecetaRecetados.vue'
@@ -17,9 +17,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate, generateRecetasRecetadosPDF, getLogoDataUrl } from '@/lib/utils.recetas';
 import { jsPDF } from 'jspdf';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
-import { PlusIcon } from 'lucide-vue-next';
 import { router } from '@/router';
 import { TipoDocumento } from '@/api/entities/clientes';
+import { GlassesIcon } from 'lucide-vue-next';
 
 const props = defineProps<{
     recetas: RecetasAereos[],
@@ -201,14 +201,14 @@ const handleChangeReceta = (receta: RecetasAereos) => {
         <div class="w-[30%] p-2 pt-0 h-full">
             <div class="flex mr-2 h-10 gap-2">
                 <button
-                    class=" flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class=" flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/recetados/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -247,12 +247,12 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                             <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
                             <div class="flex gap-2">
                                 <button
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                                     @click="printRecetas()">
                                     PDF Tabular
                                 </button>
                                 <button
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                                     @click="printResumenPDF()">
                                     PDF Resumen
                                 </button>
@@ -296,7 +296,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                             ? 'bg-[#000] border-black'
                             : 'bg-white border-zinc-300 group-hover:bg-zinc-300'" />
 
-                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent"
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent"
                         :class="currentRec === receta ? 'bg-zinc-900 text-white' : 'hover:border-zinc-300'">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-semibold">
@@ -328,9 +328,16 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
             <!-- MODO DETALLE -->
             <div v-else-if="currentRec">
-                <div class="flex flex-row justify-end items-center mb-4">
+                <div class="flex flex-row justify-between items-center mb-4 ">
+                    <div class="flex flex-row items-center gap-2">
+                        <div class="flex items-center justify-center p-2">
+                            <GlassesIcon :size="25" />
+                        </div>
+                        <h4 class="font-bold text-xl text-zinc-900">Receta Anteojos Recetados</h4>
+                    </div>
+
                     <button
-                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                         @click="router.push(`/recetas/recetados/edit/${currentRec?.id}`)">
                         <Pencil1Icon class="w-3.5 h-3.5" />
                         Editar
@@ -340,14 +347,14 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                 <div class="flex flex-col gap-6">
 
                     <!-- Datos de la receta -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Datos de la receta</h4>
                         </div>
                         <div class="p-6 grid grid-cols-3 gap-y-5">
                             <div class="flex flex-col gap-1">
                                 <span class="text-xs text-zinc-400">Tipo</span>
-                                <span class="w-fit text-sm font-semibold px-2.5 py-1 rounded-md border border-zinc-300 bg-zinc-100 text-zinc-900">{{ currentRec.tipoReceta }}</span>
+                                <span class="w-fit text-sm font-semibold px-2.5 py-1 rounded-lg border border-zinc-300 bg-zinc-100 text-zinc-900">{{ currentRec.tipoReceta }}</span>
                             </div>
                             <div class="flex flex-col gap-0.5">
                                 <span class="text-xs text-zinc-400">Fecha</span>
@@ -361,7 +368,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </div>
 
                     <!-- Graduación -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Graduación</h4>
                         </div>
@@ -407,7 +414,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </div>
 
                     <!-- Medidas -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Medidas</h4>
                         </div>
@@ -428,7 +435,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </div>
 
                     <!-- Cristales y armazón -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Cristales y armazón</h4>
                         </div>
@@ -454,7 +461,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
 
                     <!-- Obras sociales + Precios -->
                     <div class="flex flex-col lg:flex-row gap-6 items-stretch">
-                        <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
+                        <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
                             <div class="px-6 py-4 border-b border-zinc-200">
                                 <h4 class="font-bold text-sm text-zinc-900">Obras sociales</h4>
                             </div>
@@ -470,7 +477,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                             </div>
                         </div>
 
-                        <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
+                        <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
                             <div class="px-6 py-4 border-b border-zinc-200">
                                 <h4 class="font-bold text-sm text-zinc-900">Precios</h4>
                             </div>
@@ -501,7 +508,7 @@ const handleChangeReceta = (receta: RecetasAereos) => {
                     </div>
 
                     <!-- Observaciones -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Observaciones</h4>
                         </div>

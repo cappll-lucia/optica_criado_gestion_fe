@@ -275,7 +275,7 @@ const handleEmitFactura = async (venta: Venta) => {
       </Breadcrumb>
 
       <!-- ── Header cliente ── -->
-      <div class="rounded-2xl border border-[#e5e5e5] bg-white p-6 mb-5">
+      <div class="rounded-lg border border-[#e5e5e5] bg-white p-6 mb-5">
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
             <!-- Avatar iniciales -->
@@ -350,7 +350,7 @@ const handleEmitFactura = async (venta: Venta) => {
       <div class="grid grid-cols-2 gap-5 mb-5">
 
         <!-- Recetas -->
-        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
             <span class="text-sm font-bold text-[#1a1a1a]">Recetas</span>
             <div class="flex items-center gap-1.5">
@@ -384,12 +384,12 @@ const handleEmitFactura = async (venta: Venta) => {
               @click="redirectReceta(receta)"
               class="flex items-center gap-0 mb-2 rounded-xl overflow-hidden border border-[#f0f0f0] cursor-pointer hover:border-[#ccc] transition-colors group"
             >
-              <div class="w-[38%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-3 flex items-center justify-between">
+              <div class="w-[30%] bg-[#fafafa] border-r border-[#f0f0f0] px-3 py-4 flex items-center justify-between">
                 <span class="text-xs text-[#888]">{{ formatDate(receta.fecha.toString()) }}</span>
                 <CircleDot class="w-2 h-2 text-[#ccc]" />
               </div>
               <div class="flex-1 px-3 py-3">
-                <span class="text-xs text-[#1a1a1a]">{{ receta.clase }}<span v-if="receta.tipo"> · {{ receta.tipo }}</span></span>
+                <span class="text-xs pl-2 text-[#1a1a1a]">{{ receta.clase }}<span v-if="receta.tipo"> · {{ receta.tipo }}</span></span>
               </div>
             </div>
           </ScrollArea>
@@ -415,7 +415,7 @@ const handleEmitFactura = async (venta: Venta) => {
         </div>
 
         <!-- Audiometrías -->
-        <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+        <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
           <div class="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
             <span class="text-sm font-bold text-[#1a1a1a]">Audiometrías</span>
             <div class="flex items-center gap-1.5">
@@ -471,7 +471,7 @@ const handleEmitFactura = async (venta: Venta) => {
           <BreadcrumbItem><BreadcrumbPage>Dashboard</BreadcrumbPage></BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div class="rounded-2xl border border-[#e5e5e5] bg-white p-12 text-center">
+      <div class="rounded-lg border border-[#e5e5e5] bg-white p-12 text-center">
         <p class="text-sm text-[#aaa]">Cliente con id={{ route.params.id }} no encontrado</p>
       </div>
     </div>

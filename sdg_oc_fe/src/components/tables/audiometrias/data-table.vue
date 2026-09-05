@@ -48,7 +48,7 @@ const table = useVueTable({
             @update:model-value=" table.getColumn('nombre')?.setFilterValue($event)" />
         <Button class="text-xs" @click="router.push('/audiometrias/create')" >Registrar Nueva Audiometría</Button>
     </div>
-    <div class="border rounded-md">
+    <div class="border rounded-lg">
         <Table>
             <TableHeader>
                 <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">

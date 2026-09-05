@@ -174,14 +174,14 @@ const printResumenPDF = async () => {
         <div class="w-[30%] p-2 pt-0 h-full">
             <div class="flex mr-2 h-10 gap-2">
                 <button
-                    class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    class="flex-1 flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                     @click="router.push(`/recetas/contacto/new?cliente=${props.idCliente}`)">
                     <PlusIcon class="w-3.5 h-3.5" />
                     Nueva
                 </button>
                 <Dialog v-model:open="printOpen">
                     <DialogTrigger as-child>
-                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
+                        <button class=" flex items-center justify-center gap-1 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors">
                             <DownloadIcon class="w-3.5 h-3.5" />
                             Imprimir
                         </button>
@@ -209,13 +209,13 @@ const printResumenPDF = async () => {
                             <p class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Formato</p>
                             <div class="flex gap-2">
                                 <button v-if="recetas?.length"
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                                     @click="printRecetas()">PDF Tabular</button>
                                 <button v-if="recetas?.length"
-                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700 transition-colors"
+                                    class="flex-1 text-xs px-3 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-colors"
                                     @click="printResumenPDF()">PDF Resumen</button>
                                 <button v-if="!recetas?.length"
-                                    class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                                    class="flex-1 text-xs px-3 py-2 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                                     @click="printOpen = false">Cerrar</button>
                             </div>
                         </div>
@@ -252,7 +252,7 @@ const printResumenPDF = async () => {
                     @click="() => { selectedHistoriaClinica = false; currentRec = receta; }">
                     <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
                         :class="currentRec === receta ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
-                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent  min-h-[4.1rem] justify-center"
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent  min-h-[4.1rem] justify-center"
                         :class="currentRec === receta ? 'bg-zinc-900' : 'hover:border-zinc-300'">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-sm font-semibold" :class="currentRec === receta ? 'text-white' : 'text-zinc-700'">
@@ -272,7 +272,7 @@ const printResumenPDF = async () => {
                     @click="() => { selectedHistoriaClinica = true; currentRec = undefined }">
                     <div class="relative z-10 shrink-0 w-3 h-3 rounded-full border-2 transition-all"
                         :class="selectedHistoriaClinica ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-zinc-300 group-hover:border-zinc-500'" />
-                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-2xl border-2 border-transparent  min-h-[4rem] justify-center"
+                    <div class="flex flex-col gap-0.5 flex-1 min-w-0 py-3 px-3 rounded-lg border-2 border-transparent  min-h-[4rem] justify-center"
                         :class="selectedHistoriaClinica ? 'bg-zinc-900' : 'hover:border-zinc-300'">
                         <span class="text-sm font-semibold" :class="selectedHistoriaClinica ? 'text-white' : 'text-zinc-700'">
                             Historia Clínica
@@ -322,9 +322,10 @@ const printResumenPDF = async () => {
             <div v-else-if="currentRec">
 
                 <!-- Header -->
-                <div class="flex flex-row justify-end items-center mb-4">
+                <div class="flex flex-row justify-between items-center mb-4">
+                    <h4 class="font-bold text-xl text-zinc-900">Receta Lentes de Contacto</h4>
                     <button
-                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-md bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        class="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-zinc-300 rounded-lg bg-white text-zinc-800 hover:bg-zinc-100 transition-colors"
                         @click="router.push(`/recetas/contacto/edit/${currentRec?.id}`)">
                         <Pencil1Icon class="w-3.5 h-3.5" />
                         Editar
@@ -334,7 +335,7 @@ const printResumenPDF = async () => {
                 <div class="flex flex-col gap-6">
 
                     <!-- Datos de la receta -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Datos de la receta</h4>
                         </div>
@@ -351,7 +352,7 @@ const printResumenPDF = async () => {
                     </div>
 
                     <!-- Lentes Definitivas -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Lentes Definitivas</h4>
                         </div>
@@ -388,26 +389,26 @@ const printResumenPDF = async () => {
                         <div class="flex flex-col gap-6 w-full lg:w-[22rem] lg:shrink-0">
 
                             <!-- Queratometría -->
-                            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                                 <div class="px-6 py-4 border-b border-zinc-200">
                                     <h4 class="font-bold text-sm text-zinc-900">Queratometría</h4>
                                 </div>
                                 <div class="p-6">
-                                    <div v-if="currentRec.quet_m1_oi" class="flex flex-col gap-1">
-                                        <div class="flex h-9 items-center gap-3">
-                                            <span class="text-sm text-zinc-500 w-10">O.D.</span>
+                                    <div v-if="currentRec.quet_m1_oi" class="flex flex-col justify-center items-center gap-1">
+                                        <div class="flex h-9 items-center justify-center  gap-3">
+                                            <span class="text-sm text-zinc-500 w-12">O.D.</span>
                                             <span class="text-sm tabular-nums w-12">{{ currentRec.quet_m1_od.toFixed(2) }}</span>
                                             <Separator orientation="vertical" class="h-5" />
                                             <span class="text-sm tabular-nums w-12">{{ currentRec.quet_m2_od.toFixed(2) }}</span>
                                         </div>
-                                        <Separator class="my-1" />
-                                        <div class="flex h-9 items-center gap-3">
-                                            <span class="text-sm text-zinc-500 w-10">O.I.</span>
+                                        <Separator class="my-1 w-60" />
+                                        <div class="flex h-9 items-center  justify-center  gap-3">
+                                            <span class="text-sm text-zinc-500 w-12">O.I.</span>
                                             <span class="text-sm tabular-nums w-12">{{ currentRec.quet_m1_oi.toFixed(2) }}</span>
                                             <Separator orientation="vertical" class="h-5" />
                                             <span class="text-sm tabular-nums w-12">{{ currentRec.quet_m2_oi.toFixed(2) }}</span>
                                         </div>
-                                        <div class="mt-4 flex flex-col gap-0.5">
+                                        <div class="mt-4 flex w-full justify-start flex-col gap-0.5">
                                             <span class="text-xs text-zinc-400">Notas</span>
                                             <span class="text-sm min-h-[3rem]">{{ currentRec.observaciones_queterometria ?? '—' }}</span>
                                         </div>
@@ -417,7 +418,7 @@ const printResumenPDF = async () => {
                             </div>
 
                             <!-- Evaluación General -->
-                            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                                 <div class="px-6 py-4 border-b border-zinc-200">
                                     <h4 class="font-bold text-sm text-zinc-900">Evaluación General</h4>
                                 </div>
@@ -461,11 +462,11 @@ const printResumenPDF = async () => {
                         <div class="flex flex-col gap-6 w-full flex-1 min-w-0">
 
                             <!-- Marcas -->
-                            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                                 <div class="px-6 py-4 border-b border-zinc-200">
                                     <h4 class="font-bold text-sm text-zinc-900">Marcas</h4>
                                 </div>
-                                <div class="p-6 grid grid-cols-2 gap-y-5">
+                                <div class="p-6 grid grid-cols-1 gap-y-5">
                                     <div class="flex flex-col gap-0.5">
                                         <span class="text-xs text-zinc-400">O.D.</span>
                                         <span class="text-sm">{{ currentRec.od_marca ?? '—' }}</span>
@@ -478,7 +479,7 @@ const printResumenPDF = async () => {
                             </div>
 
                             <!-- Observaciones -->
-                            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
+                            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden flex-1 flex flex-col">
                                 <div class="px-6 py-4 border-b border-zinc-200">
                                     <h4 class="font-bold text-sm text-zinc-900">Observaciones</h4>
                                 </div>
@@ -492,7 +493,7 @@ const printResumenPDF = async () => {
                     </div>
 
                     <!-- Pruebas -->
-                    <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+                    <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                         <div class="px-6 py-4 border-b border-zinc-200">
                             <h4 class="font-bold text-sm text-zinc-900">Pruebas</h4>
                         </div>

@@ -46,7 +46,7 @@ const table = useVueTable({
             <Button class="text-xs"><a href="/marcas/create">Registrar Nueva Marca</a></Button>
 
         </div>
-<div class="border rounded-md">
+<div class="border rounded-lg">
         <Table>
             <TableHeader>
                 <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">

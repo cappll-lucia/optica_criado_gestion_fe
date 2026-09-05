@@ -176,7 +176,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
   <form @submit.prevent="validateAndSubmit" class="flex flex-col gap-5 mt-6" v-if="currentCliente">
 
     <!-- ── Datos personales ── -->
-    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
+    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
       <div class="px-6 py-4 border-b border-[#f0f0f0]">
         <span class="text-sm font-bold text-[#1a1a1a]">Datos personales</span>
       </div>
@@ -316,7 +316,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
     </div>
 
     <!-- ── Contacto y ubicación ── -->
-    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
+    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden pb-[0.5rem] mb-[1rem]">
       <div class="px-6 py-4 border-b border-[#f0f0f0]">
         <span class="text-sm font-bold text-[#1a1a1a]">Contacto y ubicación</span>
       </div>
@@ -381,7 +381,7 @@ const setObraSocialIdAtIndex = (index: number, id: number) => {
     </div>
 
     <!-- ── Obras Sociales ── -->
-    <div class="rounded-2xl border border-[#e5e5e5] bg-white overflow-hidden">
+    <div class="rounded-lg border border-[#e5e5e5] bg-white overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f0f0f0] flex items-center justify-between">
         <span class="text-sm font-bold text-[#1a1a1a]">Obras Sociales</span>
         <button

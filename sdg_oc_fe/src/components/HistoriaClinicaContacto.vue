@@ -23,7 +23,8 @@ const props = defineProps<{
         <Button class="w-[20rem]" @click="router.push(`/recetas/contacto/historia-clinica/new?cliente=${clienteId}`)" >Registrar historia clínica</Button>
     </div>
     <div class="datos flex flex-col" v-if="props.historiaClinica">
-        <div class="flex flex-row justify-end items-center mb-4">
+        <div class="flex flex-row justify-between items-center mb-4">
+            <h4 class="font-bold text-xl text-zinc-900 ">Historia Clínica</h4>
             <Button variant="outline" size="sm" class="bg-white"
                 @click="() => router.push(`/recetas/contacto/historia-clinica/edit/${props.historiaClinica?.id}?cliente=${clienteId}`)">
                 <Pencil1Icon class="w-3.5 h-3.5 mr-1.5" />
@@ -32,11 +33,11 @@ const props = defineProps<{
         </div>
 
         <div class="flex flex-col gap-6">
-
+            
             <!-- Antecedentes Oculares -->
-            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200">
-                    <h4 class="font-bold text-sm text-zinc-900">Antecedentes Oculares</h4>
+                    <h4 class="font-bold text-sm text-zinc-900 ">Antecedentes Oculares</h4>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-4 gap-y-3">
@@ -77,7 +78,7 @@ const props = defineProps<{
             </div>
 
             <!-- Antecedentes Generales -->
-            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200">
                     <h4 class="font-bold text-sm text-zinc-900">Antecedentes Generales</h4>
                 </div>
@@ -148,7 +149,7 @@ const props = defineProps<{
             </div>
 
             <!-- Tratamientos Recientes o En Curso -->
-            <div class="rounded-2xl border border-zinc-200 bg-white overflow-hidden">
+            <div class="rounded-lg border border-zinc-200 bg-white overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200">
                     <h4 class="font-bold text-sm text-zinc-900">Tratamientos Recientes o En Curso</h4>
                 </div>

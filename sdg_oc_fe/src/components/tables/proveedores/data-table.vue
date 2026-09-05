@@ -50,7 +50,7 @@ const table = useVueTable({
                 @update:model-value=" table.getColumn('razonSocial')?.setFilterValue($event)" />
             <Button class="text-xs"><a href="/proveedores/create">Registrar Nuevo Proveedor</a></Button>
         </div>
-<div class="border rounded-md">
+<div class="border rounded-lg">
         <Table>
             <TableHeader>
                 <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">

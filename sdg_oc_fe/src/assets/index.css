@@ -64,9 +64,13 @@ body,
 #app {
   width: 100vw !important;
   max-width: 100vw !important;
-  overflow-x: clip;
   margin: 0;
   padding: 0;
+}
+
+body,
+#app {
+  overflow-x: clip;
 }
 
 html {

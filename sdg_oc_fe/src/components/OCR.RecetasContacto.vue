@@ -141,7 +141,7 @@ const handleCancel = ()=>{
                                 <div v-if="imageFile1" class="w-full h-[15rem] border rounded-lg overflow-auto flex  items-center justify-center">
                                     <img :src="imageFile1URL" alt="" class=" overflow-x-scroll overflow-y-scroll"   />
                                 </div>
-                                <div v-else class="flex flex-col justify-center items-center  w-full h-full border text-gray-600 rounded-md">
+                                <div v-else class="flex flex-col justify-center items-center  w-full h-full border text-gray-600 rounded-lg">
                                     <ImageOffIcon :size="40" class="text-gray-600 mb-4" />
                                     <span class="font-light text-gray-600">Ninguna imagen seleccionada</span>
                                     <TooltipProvider >
@@ -172,7 +172,7 @@ const handleCancel = ()=>{
                                 <div v-if="imageFile2" class="w-full h-[15rem] border rounded-lg overflow-auto flex  items-center justify-center">
                                     <img :src="imageFile2URL" alt="" class=" overflow-x-scroll overflow-y-scroll"   />
                                 </div>
-                                <div v-else class="flex flex-col justify-center items-center  w-full h-full border text-gray-600 rounded-md">
+                                <div v-else class="flex flex-col justify-center items-center  w-full h-full border text-gray-600 rounded-lg">
                                     <ImageOffIcon :size="40" class="text-gray-600 mb-4" />
                                     <span class="font-light text-gray-600">Ninguna imagen seleccionada</span>
                                     <TooltipProvider >
