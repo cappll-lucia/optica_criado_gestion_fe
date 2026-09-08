@@ -21,9 +21,8 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Checkbox } from '@/components/ui/checkbox';
-import { formatDate, getLogoDataUrl, drawFichaHeader, drawFichaCutGuides } from '@/lib/utils.recetas';
+import { formatDate, getLogoDataUrl, generateFichaRecetaAereosPDF } from '@/lib/utils.recetas';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { DetalleRecetaAereos } from '@/api/entities/detalleRecetaAereos';
 import { router } from '@/router';
 import { TipoDocumento } from '@/api/entities/clientes';
@@ -194,24 +193,7 @@ const printFichaPDF = async () => {
         alert("Por favor, selecciona exactamente 1 receta para imprimir la ficha.");
         return;
     }
-    const receta = selectedToPrint.value[0]!;
-    const detLejos = receta.detallesRecetaLentesAereos.find(det => det.tipo_detalle == 'Lejos');
-    const detCerca = receta.detallesRecetaLentesAereos.find(det => det.tipo_detalle == 'Cerca');
-    const verLejos = !!detLejos && ['Lejos', 'Multifocal', 'Bifocal'].includes(receta.tipoReceta);
-    const verCerca = !!detCerca && ['Cerca', 'Multifocal', 'Bifocal'].includes(receta.tipoReceta);
-
-    // Hoja A4 completa: la ficha ocupa solo el primer tercio (alto/3)
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight() / 3;
-    const margin = 6;
-    const colDividerX = pageWidth / 2;
-    const leftX = margin;
-    const leftWidth = colDividerX - 3 - leftX;
-    const rightX = colDividerX + 3;
-    const rightWidth = pageWidth - margin - rightX;
-
-    const colTopY = await drawFichaHeader(doc, margin, {
+    await generateFichaRecetaAereosPDF(selectedToPrint.value[0]!, {
         nombreCliente: props.nombreCliente,
         nroDocumento: props.nroDocumento,
         tipoDocumento: props.tipoDocumento,
@@ -219,123 +201,6 @@ const printFichaPDF = async () => {
         domicilio: props.domicilio,
         email: props.email,
     });
-
-    // Columna izquierda: datos de la receta + graduación tabular
-    let yLeft = colTopY;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text(`ANTEOJOS ${receta.tipoReceta.toUpperCase()}`, leftX, yLeft);
-    doc.setFont('helvetica', 'normal');
-    doc.text(formatDate(receta.fecha.toString()), colDividerX - 3, yLeft, { align: 'right' });
-    yLeft += 4.5;
-
-    if (receta.oftalmologo) {
-        doc.setFontSize(7);
-        doc.text(`Oftalmólogo: ${receta.oftalmologo}`, leftX, yLeft);
-        yLeft += 4.5;
-    }
-
-    const graduacionRows: (string | number)[][] = [];
-    if (verLejos && detLejos) {
-        graduacionRows.push(['Lejos', 'O.D.', sign(detLejos.od_esferico), sign(detLejos.od_cilindrico), `${detLejos.od_grados}°`]);
-        graduacionRows.push(['', 'O.I.', sign(detLejos.oi_esferico), sign(detLejos.oi_cilindrico), `${detLejos.oi_grados}°`]);
-    }
-    if (verCerca && detCerca) {
-        graduacionRows.push(['Cerca', 'O.D.', sign(detCerca.od_esferico), sign(detCerca.od_cilindrico), `${detCerca.od_grados}°`]);
-        graduacionRows.push(['', 'O.I.', sign(detCerca.oi_esferico), sign(detCerca.oi_cilindrico), `${detCerca.oi_grados}°`]);
-    }
-
-    autoTable(doc, {
-        startY: yLeft,
-        head: [['', 'Ojo', 'Esf.', 'Cil.', 'Eje']],
-        body: graduacionRows,
-        theme: 'grid',
-        styles: { fontSize: 7, cellPadding: 1, halign: 'center', lineColor: [180, 180, 180] },
-        headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-        columnStyles: {
-            0: { cellWidth: 14, fontStyle: 'bold', halign: 'left' },
-            1: { cellWidth: 12, fontStyle: 'bold' },
-            2: { cellWidth: (leftWidth - 26) / 3 },
-            3: { cellWidth: (leftWidth - 26) / 3 },
-            4: { cellWidth: (leftWidth - 26) / 3 },
-        },
-        margin: { left: leftX, right: pageWidth - leftX - leftWidth },
-    });
-    yLeft = (doc as any).lastAutoTable.finalY + 4;
-
-    const medidas: string[] = [];
-    if (receta.dnp != null) medidas.push(`DNP ${receta.dnp}mm.`);
-    if (receta.od_alt_pelicula != null) medidas.push(`Alt. pelíc. O.D. ${receta.od_alt_pelicula}mm.`);
-    if (receta.oi_alt_pelicula != null) medidas.push(`Alt. pelíc. O.I. ${receta.oi_alt_pelicula}mm.`);
-    if (medidas.length) {
-        doc.setFontSize(7);
-        doc.text(medidas.join('   |   '), leftX, yLeft);
-        yLeft += 4.5;
-    }
-
-    // Observaciones, debajo de la grilla de graduación
-    if (receta.observaciones) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(7);
-        doc.text('Observaciones:', leftX, yLeft);
-        yLeft += 3.6;
-        doc.setFont('helvetica', 'normal');
-        const maxY = pageHeight - margin;
-        const wrapped = doc.splitTextToSize(receta.observaciones, leftWidth) as string[];
-        const disponibles = Math.max(0, Math.floor((maxY - yLeft) / 3.4) + 1);
-        const lineasAMostrar = wrapped.slice(0, disponibles);
-        const ultima = lineasAMostrar[lineasAMostrar.length - 1];
-        if (wrapped.length > lineasAMostrar.length && ultima != null) {
-            lineasAMostrar[lineasAMostrar.length - 1] = ultima.length > 3 ? ultima.slice(0, -3) + '...' : ultima;
-        }
-        lineasAMostrar.forEach((l, i) => doc.text(l, leftX, yLeft + i * 3.4));
-    }
-
-    // Columna derecha: cristales/armazón, obras sociales y precios
-    let yRight = colTopY;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-
-    const cristales: string[] = [];
-    if (receta.cristal) cristales.push(`Cristal: ${receta.cristal}`);
-    if (receta.color) cristales.push(`Color: ${receta.color}`);
-    if (receta.armazon) cristales.push(`Armazón: ${receta.armazon}`);
-    if (receta.tratamiento) cristales.push(`Tratamiento: ${receta.tratamiento}`);
-    cristales.forEach(linea => {
-        const wrapped = doc.splitTextToSize(linea, rightWidth) as string[];
-        wrapped.forEach(l => { doc.text(l, rightX, yRight); yRight += 3.6; });
-    });
-
-    const obrasSociales = receta.recetaLentesAereosObrasSociales?.map(ros => ros.obraSocial.nombre) ?? [];
-    if (obrasSociales.length) {
-        const wrapped = doc.splitTextToSize(`Obras sociales: ${obrasSociales.join(', ')}`, rightWidth) as string[];
-        wrapped.forEach(l => { doc.text(l, rightX, yRight); yRight += 3.6; });
-    }
-
-    yRight += 1.5;
-    doc.setDrawColor(210);
-    doc.line(rightX, yRight, pageWidth - margin, yRight);
-    yRight += 4;
-
-    doc.setFontSize(7);
-    doc.text(`Armazón: ${formatMonto(Number(receta.precioArmazon) || 0)}`, rightX, yRight);
-    yRight += 3.8;
-    doc.text(`Cristales: ${formatMonto(Number(receta.precioCristales) || 0)}`, rightX, yRight);
-    yRight += 3.8;
-    doc.text(`Total: ${formatMonto(totalReceta(receta))}`, rightX, yRight);
-    yRight += 3.8;
-    doc.text(`Seña: ${Number(receta.senia) > 0 ? '- ' + formatMonto(Number(receta.senia)) : '$ —'}`, rightX, yRight);
-    yRight += 3.8;
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Resto a pagar: ${formatMonto(restoReceta(receta))}`, rightX, yRight);
-    doc.setFont('helvetica', 'normal');
-
-    doc.setDrawColor(210);
-    doc.line(colDividerX, colTopY - 3, colDividerX, pageHeight - margin);
-
-    drawFichaCutGuides(doc, pageWidth);
-
-    doc.save(`Ficha_${receta.tipoReceta}_${props.nombreCliente}.pdf`);
     printOpen.value = false;
 };
 

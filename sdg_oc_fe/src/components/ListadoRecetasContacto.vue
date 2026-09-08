@@ -21,9 +21,8 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { formatDate, getLogoDataUrl, drawFichaHeader, drawFichaCutGuides } from '@/lib/utils.recetas';
+import { formatDate, getLogoDataUrl, generateFichaRecetaContactoPDF } from '@/lib/utils.recetas';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { RecetaContacto } from '@/api/entities/recetasContacto';
 import { HistoriaClinica } from '@/api/entities/historiaClinica';
 import { router } from '@/router';
@@ -78,10 +77,6 @@ const sign = (n: number) => n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
 
 const puedeImprimirFicha = computed(() => selectedToPrint.value.length === 1);
 const puedeImprimirResumen = computed(() => selectedToPrint.value.length >= 1);
-
-const totalReceta = (receta: RecetaContacto) => Number(receta.precio) || 0;
-const restoReceta = (receta: RecetaContacto) => totalReceta(receta) - (Number(receta.senia) || 0);
-const formatMonto = (n: number) => n > 0 ? '$ ' + n.toLocaleString('es-AR') : '$ —';
 
 const printResumenPDF = async () => {
     if (selectedToPrint.value.length === 0) { alert("Seleccioná al menos una receta."); return; }
@@ -182,21 +177,7 @@ const printFichaPDF = async () => {
         alert("Por favor, selecciona exactamente 1 receta para imprimir la ficha.");
         return;
     }
-    const receta = selectedToPrint.value[0]!;
-
-    // Hoja A4 completa: la ficha ocupa solo el primer tercio (alto/3)
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight() / 3;
-    const margin = 6;
-    // Columna derecha angosta: solo precios. El resto de la info va a la izquierda.
-    const rightWidth = 42;
-    const rightX = pageWidth - margin - rightWidth;
-    const colDividerX = rightX - 3;
-    const leftX = margin;
-    const leftWidth = colDividerX - 3 - leftX;
-
-    const colTopY = await drawFichaHeader(doc, margin, {
+    await generateFichaRecetaContactoPDF(selectedToPrint.value[0]!, {
         nombreCliente: props.nombreCliente,
         nroDocumento: props.nroDocumento,
         tipoDocumento: props.tipoDocumento,
@@ -204,121 +185,6 @@ const printFichaPDF = async () => {
         domicilio: props.domicilio,
         email: props.email,
     });
-
-    // Columna izquierda: datos de la receta, graduación tabular, marcas, queratometría, evaluación y observaciones
-    let yLeft = colTopY;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text('LENTES DE CONTACTO', leftX, yLeft);
-    doc.setFont('helvetica', 'normal');
-    doc.text(formatDate(receta.fecha.toString()), colDividerX - 3, yLeft, { align: 'right' });
-    yLeft += 4.5;
-
-    if (receta.oftalmologo) {
-        doc.setFontSize(7);
-        doc.text(`Oftalmólogo: ${receta.oftalmologo}`, leftX, yLeft);
-        yLeft += 4.5;
-    }
-
-    autoTable(doc, {
-        startY: yLeft,
-        head: [['Ojo', 'C.B.', 'Esf.', 'Cil.', 'Eje', 'Diám.']],
-        body: [
-            ['O.D.', receta.od_cb.toFixed(2), sign(receta.od_esferico), sign(receta.od_cilindrico), `${receta.od_eje.toFixed(2)}°`, receta.od_diametro.toFixed(2)],
-            ['O.I.', receta.oi_cb.toFixed(2), sign(receta.oi_esferico), sign(receta.oi_cilindrico), `${receta.oi_eje.toFixed(2)}°`, receta.oi_diametro.toFixed(2)],
-        ],
-        theme: 'grid',
-        styles: { fontSize: 7, cellPadding: 1, halign: 'center', lineColor: [180, 180, 180] },
-        headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-        columnStyles: {
-            0: { cellWidth: 14, fontStyle: 'bold', halign: 'left' },
-            1: { cellWidth: (leftWidth - 14) / 5 },
-            2: { cellWidth: (leftWidth - 14) / 5 },
-            3: { cellWidth: (leftWidth - 14) / 5 },
-            4: { cellWidth: (leftWidth - 14) / 5 },
-            5: { cellWidth: (leftWidth - 14) / 5 },
-        },
-        margin: { left: leftX, right: pageWidth - leftX - leftWidth },
-    });
-    yLeft = (doc as any).lastAutoTable.finalY + 5;
-
-    if (receta.od_marca || receta.oi_marca) {
-        doc.setFontSize(7);
-        doc.text(`Marca   O.D.: ${receta.od_marca ?? '—'}`, leftX, yLeft);
-        yLeft += 3.5;
-        doc.text(`Marca   O.I.: ${receta.oi_marca ?? '—'}`, leftX, yLeft);
-        yLeft += 5;
-    }
-
-    if (receta.quet_m1_od || receta.quet_m1_oi) {
-        doc.setFontSize(7);
-        doc.text(`Queratometría   O.D.: ${receta.quet_m1_od?.toFixed(2) ?? '—'} / ${receta.quet_m2_od?.toFixed(2) ?? '—'}   O.I.: ${receta.quet_m1_oi?.toFixed(2) ?? '—'} / ${receta.quet_m2_oi?.toFixed(2) ?? '—'}`, leftX, yLeft);
-        yLeft += 3.6;
-        if (receta.observaciones_queterometria) {
-            const wrapped = doc.splitTextToSize(`Notas querato.: ${receta.observaciones_queterometria}`, leftWidth) as string[];
-            wrapped.forEach(l => { doc.text(l, leftX, yLeft); yLeft += 3.6; });
-        }
-        yLeft += 1;
-    }
-
-    const evalItems: string[] = [];
-    if (receta.maquillaje) evalItems.push('Maquillaje');
-    if (receta.tonicidad) evalItems.push('Tonicidad');
-    if (receta.hendidura_palpebral) evalItems.push('Hendidura Palpebral');
-    if (receta.altura_palpebral) evalItems.push('Altura Palpebral');
-    if (receta.buen_parpadeo_amplitud) evalItems.push('Parpadeo Amplitud');
-    if (receta.buen_parpadeo_ritmo) evalItems.push('Parpadeo Ritmo');
-    if (evalItems.length) {
-        doc.setFontSize(7);
-        const wrapped = doc.splitTextToSize(`Evaluación: ${evalItems.join(', ')}`, leftWidth) as string[];
-        wrapped.forEach(l => { doc.text(l, leftX, yLeft); yLeft += 3.6; });
-    }
-    if (receta.estesiometria) {
-        doc.setFontSize(7);
-        doc.text(`Estesiometría: ${receta.estesiometria}`, leftX, yLeft);
-        yLeft += 3.6;
-    }
-    if (receta.pruebasLentesContacto?.length) {
-        doc.setFontSize(7);
-        doc.text(`Pruebas registradas: ${receta.pruebasLentesContacto.length}`, leftX, yLeft);
-        yLeft += 3.6;
-    }
-
-    if (receta.observaciones) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(7);
-        doc.text('Observaciones:', leftX, yLeft);
-        yLeft += 3.6;
-        doc.setFont('helvetica', 'normal');
-        const maxY = pageHeight - margin;
-        const wrapped = doc.splitTextToSize(receta.observaciones, leftWidth) as string[];
-        const disponibles = Math.max(0, Math.floor((maxY - yLeft) / 3.4) + 1);
-        const lineasAMostrar = wrapped.slice(0, disponibles);
-        const ultima = lineasAMostrar[lineasAMostrar.length - 1];
-        if (wrapped.length > lineasAMostrar.length && ultima != null) {
-            lineasAMostrar[lineasAMostrar.length - 1] = ultima.length > 3 ? ultima.slice(0, -3) + '...' : ultima;
-        }
-        lineasAMostrar.forEach((l, i) => doc.text(l, leftX, yLeft + i * 3.4));
-    }
-
-    // Columna derecha: solo precios
-    let yRight = colTopY;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.text(`Precio: ${formatMonto(totalReceta(receta))}`, rightX, yRight);
-    yRight += 3.8;
-    doc.text(`Seña: ${Number(receta.senia) > 0 ? '- ' + formatMonto(Number(receta.senia)) : '$ —'}`, rightX, yRight);
-    yRight += 3.8;
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Resto a pagar: ${formatMonto(restoReceta(receta))}`, rightX, yRight);
-    doc.setFont('helvetica', 'normal');
-
-    doc.setDrawColor(210);
-    doc.line(colDividerX, colTopY - 3, colDividerX, pageHeight - margin);
-
-    drawFichaCutGuides(doc, pageWidth);
-
-    doc.save(`FichaContacto_${props.nombreCliente}.pdf`);
     printOpen.value = false;
 };
 </script>

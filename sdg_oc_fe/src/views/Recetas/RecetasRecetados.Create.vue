@@ -4,6 +4,7 @@ import { createDetalleAereosCustomValidator } from '@/api/entities/detalleReceta
 import { ColorCristal, TipoCristal, TipoReceta, TratamientoCristal, createRecetaAereosCustomValidator } from '@/api/entities/recetasAereos';
 import { clientesApi } from '@/api/libs/clientes';
 import { recetasApi } from '@/api/libs/recetas';
+import { generateFichaRecetaAereosPDF } from '@/lib/utils.recetas';
 import SelectClienteDialog from '@/components/SelectClienteDialog.vue';
 import {
     Breadcrumb,
@@ -281,6 +282,16 @@ const onSubmit = async () => {
         const createdReceta = await recetasApi.createRecetaAereos({ ...newRecetaObj!, obrasSociales: selectedObrasSocialIds.value.map(id => ({ id })) });
         loader.hide();
         toast({ title: 'Receta registrada con éxito' })
+        if (selectedCliente.value) {
+            generateFichaRecetaAereosPDF(createdReceta, {
+                nombreCliente: nombreCliente.value,
+                nroDocumento: selectedCliente.value.nroDocumento,
+                tipoDocumento: selectedCliente.value.tipoDocumento,
+                telefono: selectedCliente.value.telefono,
+                domicilio: selectedCliente.value.domicilio,
+                email: selectedCliente.value.email,
+            }).catch(() => { /* no se pudo generar la ficha automáticamente */ });
+        }
         router.push(`/recetas/${newReceta.value.cliente.id}?tab=recetados&recetaId=${createdReceta.id}`)
     } catch (err: any) {
         errorMessage.value = err.message as string

@@ -47,6 +47,7 @@ import AccordionContent from '@/components/ui/accordion/AccordionContent.vue';
 import { recetaContactoCustomValidator } from '@/api/entities/recetasContacto';
 import { pruebaLentesContactoCustomValidator } from '@/api/entities/pruebasLentesContacto';
 import { recetasApi } from '@/api/libs/recetas';
+import { generateFichaRecetaContactoPDF } from '@/lib/utils.recetas';
 import { useRoute } from 'vue-router';
 import { useLoaderStore } from '@/stores/LoaderStore';
 import AlertError from '@/components/AlertError.vue';
@@ -316,6 +317,16 @@ const onSubmit = async () => {
         const createdReceta = await recetasApi.createRecetaContacto({ ...recetaObj, obrasSociales: selectedObrasSocialIds.value.map(id => ({ id })) })
         loader.hide();
         toast({ title: 'Receta registrada con éxito' })
+        if (selectedCliente.value) {
+            generateFichaRecetaContactoPDF(createdReceta, {
+                nombreCliente: nombreCliente.value,
+                nroDocumento: selectedCliente.value.nroDocumento,
+                tipoDocumento: selectedCliente.value.tipoDocumento,
+                telefono: selectedCliente.value.telefono,
+                domicilio: selectedCliente.value.domicilio,
+                email: selectedCliente.value.email,
+            }).catch(() => { /* no se pudo generar la ficha automáticamente */ });
+        }
         router.push(`/recetas/${newReceta.value.cliente.id}?tab=contacto&recetaId=${createdReceta.id}`)
     } catch (err: any) {
         errorMessage.value = err.message as string
