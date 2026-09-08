@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { router } from '@/router';
 import { useUserStore } from '@/stores/UsersStore';
 import { computed } from 'vue';
-import { HomeIcon, LogOutIcon, Settings2Icon, SettingsIcon, UserIcon } from 'lucide-vue-next';
+import { HomeIcon, LogOutIcon, Settings2Icon, UserIcon } from 'lucide-vue-next';
 import { QuestionMarkCircledIcon } from '@radix-icons/vue';
 
 

@@ -160,7 +160,8 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                             :nroDocumento="currentCliente?.nroDocumento"
                             :tipoDocumento="currentCliente?.tipoDocumento"
                             :telefono="currentCliente?.telefono"
-                            :email="currentCliente?.email" />
+                            :email="currentCliente?.email"
+                            :domicilio="currentCliente?.domicilio" />
                     <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-4">
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">anteojos recetados</span>
@@ -184,7 +185,8 @@ const nombreCliente = computed(()=> currentCliente.value?.apellido +", "+current
                     :nroDocumento="currentCliente?.nroDocumento"
                     :tipoDocumento="currentCliente?.tipoDocumento"
                     :telefono="currentCliente?.telefono"
-                    :email="currentCliente?.email" />
+                    :email="currentCliente?.email"
+                    :domicilio="currentCliente?.domicilio" />
                     <div v-else class="flex min-h-[20rem] flex-col w-full justify-center items-center gap-3">
                         <p class="text-sm text-zinc-500">
                             El cliente no tiene recetas de <span class="font-semibold text-zinc-700">lentes de contacto</span>

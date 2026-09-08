@@ -2,10 +2,8 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
-import { RecetasAereos } from '@/api/entities/recetasAereos';
-import { RecetaContacto } from '@/api/entities/recetasContacto';
+import { TipoDocumento } from '@/api/entities/clientes';
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -49,201 +47,66 @@ export const formatTime = (dateString: string | Date) => {
   });
 };
 
-export function generateRecetasRecetadosPDF (recetas: RecetasAereos[], nombreCliente:string) {
-  const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Recetas Anteojos Recetados`, 105, 20, { align: "center" });
-    doc.setFontSize(14);
-    doc.text(`${nombreCliente}`, 105, 30, { align: "center" });
-  let y = 30;
+export interface FichaHeaderData {
+  nombreCliente: string;
+  nroDocumento: number | undefined;
+  tipoDocumento: TipoDocumento | undefined;
+  telefono: string | undefined;
+  domicilio: string | undefined;
+  email: string | undefined;
+}
 
-  recetas.forEach((receta, index) => {
-    doc.setFontSize(14);
-    y+=10;
-    doc.text(`Receta #${receta.id}`, 20, y);
-    y += 6;
+// Dibuja el encabezado (logo + datos del cliente) de una ficha de 1/3 de hoja A4.
+// Devuelve el Y desde donde continuar el contenido.
+export async function drawFichaHeader(doc: jsPDF, margin: number, data: FichaHeaderData): Promise<number> {
+  let headerTextX = margin;
+  try {
+    const logo = await getLogoDataUrl();
+    const logoWidth = 50;
+    const logoHeight = logoWidth / (1090 / 229);
+    doc.addImage(logo, 'PNG', margin, margin, logoWidth, logoHeight);
+    headerTextX = margin + logoWidth + 5;
+  } catch {
+    // logo no disponible, se continúa sin él
+  }
 
-    const recetaInfo = [
-      ["Fecha", new Date(receta.fecha).toLocaleDateString()],
-      ["Oftalmólogo", receta.oftalmologo],
-      ["Tipo", receta.tipoReceta],
-      ["Cristal", receta.cristal],
-      ["Color", receta.color],
-      ["Tratamiento", receta.tratamiento],
-      ["Armazón", receta.armazon ?? "Sin especificar"],
-      ["Observaciones", receta.observaciones],
-    ];
+  const tipoDoc = data.tipoDocumento === TipoDocumento.CUIT ? 'CUIT' : 'DNI';
 
-    autoTable(doc, {
-      startY: y,
-      theme: "striped",
-      head: [["Campo", "Valor"]],
-      body: recetaInfo,
-      styles: { fontSize: 10 },
-      margin: { left: 20, right: 20 },
-    });
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text(data.nombreCliente, headerTextX, margin + 3.5);
 
-    y = (doc as any).lastAutoTable.finalY + 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  const linea1 = [
+    data.nroDocumento ? `${tipoDoc}: ${data.nroDocumento}` : '',
+    data.telefono ? `Tel.: ${data.telefono}` : '',
+  ].filter(Boolean).join('   |   ');
+  if (linea1) doc.text(linea1, headerTextX, margin + 7.5);
 
-    if (receta.detallesRecetaLentesAereos.length > 0) {
-      const detalleRows = receta.detallesRecetaLentesAereos.flatMap((d) => [
-        [
-          d.tipo_detalle,
-          "OD",
-          d.od_esferico,
-          d.od_cilindrico,
-          d.od_grados,
-          d.dnp,
-        ],
-        [
-          d.tipo_detalle,
-          "OI",
-          d.oi_esferico,
-          d.oi_cilindrico,
-          d.oi_grados,
-          d.dnp,
-        ],
-      ]);
+  const linea2 = [
+    data.domicilio ? `Domicilio: ${data.domicilio}` : '',
+    data.email ? `Email: ${data.email}` : '',
+  ].filter(Boolean).join('   |   ');
+  if (linea2) doc.text(linea2, headerTextX, margin + 11);
 
-      autoTable(doc, {
-        startY: y,
-        head: [["Tipo", "Ojo", "Esférico", "Cilíndrico", "Grados", "DNP"]],
-        body: detalleRows,
-        styles: { fontSize: 10 },
-        margin: { left: 20, right: 20 },
-        theme: "striped",
-      });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = margin + 16;
+  doc.setDrawColor(180);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 5;
+  return y;
+}
 
-      y = (doc as any).lastAutoTable.finalY + 10;
-    } else {
-      doc.setFontSize(10);
-      doc.text("Sin detalles de lentes aéreos.", 20, y);
-      y += 10;
-    }
-
-    if (y > 270 && index < recetas.length - 1) {
-      doc.addPage();
-      y = 20;
-    }
-  });
-  doc.save(`Recetas_${nombreCliente}.pdf`);
-};
-
-
-export function generateRecetasContactoPDF (recetas: RecetaContacto[], nombreCliente:string) {
-  const doc = new jsPDF();
-  doc.setFontSize(18);
-    doc.text(`Recetas Lentes de Contacto`, 105, 20, { align: "center" });
-    doc.setFontSize(14);
-    doc.text(`${nombreCliente}`, 105, 30, { align: "center" });
-
-  let y = 30;
-
-  recetas.forEach((receta, index) => {
-    doc.setFontSize(14);
-    y+=10;
-    doc.text(`Receta #${receta.id}`, 20, y);
-    y += 6;
-
-    const infoGeneral = [
-      ["Fecha", new Date(receta.fecha).toLocaleDateString()],
-      ["Oftalmólogo", receta.oftalmologo],
-      ["Observaciones", receta.observaciones],
-    ];
-
-    autoTable(doc, {
-      startY: y,
-      head: [["Campo", "Valor"]],
-      body: infoGeneral,
-      styles: { fontSize: 10 },
-      margin: { left: 20, right: 20 },
-    });
-
-    y = (doc as any).lastAutoTable.finalY + 5;
-
-    // Queterometría
-    const queteBody = [
-      ["M1 OD", receta.quet_m1_od, "M2 OD", receta.quet_m2_od],
-      ["M1 OI", receta.quet_m1_oi, "M2 OI", receta.quet_m2_oi],
-    ];
-
-    autoTable(doc, {
-      startY: y,
-      head: [["Queratometría", "", "", ""]],
-      body: queteBody,
-      styles: { fontSize: 10 },
-      margin: { left: 20, right: 20 },
-    });
-
-    y = (doc as any).lastAutoTable.finalY + 3;
-
-    doc.setFontSize(10);
-    y += 7;
-    doc.text(`Observaciones Queratometría: ${receta.observaciones_queterometria}`, 20, y);
-    y += 7;
-
-    const booleanos = [
-      ["Maquillaje", receta.maquillaje ? "Sí" : "No"],
-      ["Tonicidad", receta.tonicidad ? "Sí" : "No"],
-      ["Hendidura Palpebral", receta.hendidura_palpebral ? "Sí" : "No"],
-      ["Altura Palpebral", receta.altura_palpebral ? "Sí" : "No"],
-      ["Buen Parpadeo (Ritmo)", receta.buen_parpadeo_ritmo ? "Sí" : "No"],
-      ["Buen Parpadeo (Amplitud)", receta.buen_parpadeo_amplitud ? "Sí" : "No"],
-      ["Estesiometría", receta.estesiometria],
-    ];
-
-    autoTable(doc, {
-      startY: y,
-      head: [["Evaluación", "Resultado"]],
-      body: booleanos,
-      styles: { fontSize: 10 },
-      margin: { left: 20, right: 20 },
-    });
-
-    y = (doc as any).lastAutoTable.finalY + 5;
-
-    // Graduación OD / OI
-    const graduacion = [
-      [
-        "OD",
-        receta.od_cb,
-        receta.od_esferico,
-        receta.od_cilindrico,
-        receta.od_eje,
-        receta.od_diametro,
-        receta.od_marca,
-      ],
-      [
-        "OI",
-        receta.oi_cb,
-        receta.oi_esferico,
-        receta.oi_cilindrico,
-        receta.oi_eje,
-        receta.oi_diametro,
-        receta.oi_marca,
-      ],
-    ];
-
-    autoTable(doc, {
-      startY: y,
-      head: [["Ojo", "CB", "Esférico", "Cilíndrico", "Eje", "Diámetro", "Marca"]],
-      body: graduacion,
-      styles: { fontSize: 10 },
-      margin: { left: 20, right: 20 },
-      theme: "striped",
-    });
-
-    y = (doc as any).lastAutoTable.finalY + 10;
-
-    if (y > 270 && index < recetas.length - 1) {
-      doc.addPage();
-      y = 20;
-    }
-  });
-
-     doc.save(`Recetas_${nombreCliente}.pdf`);
-};
-
+// Dibuja líneas punteadas en los tercios de la hoja A4 para guiar el recorte de la ficha.
+export function drawFichaCutGuides(doc: jsPDF, pageWidth: number) {
+  const fullPageHeight = doc.internal.pageSize.getHeight();
+  doc.setDrawColor(180);
+  doc.setLineDashPattern([2, 2], 0);
+  doc.line(0, fullPageHeight / 3, pageWidth, fullPageHeight / 3);
+  doc.line(0, (fullPageHeight / 3) * 2, pageWidth, (fullPageHeight / 3) * 2);
+  doc.setLineDashPattern([], 0);
+}
 
 export function isCuit(_cuit: string){
     if (typeof _cuit !== 'string') return false;
